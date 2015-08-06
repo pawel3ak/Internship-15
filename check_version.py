@@ -28,8 +28,8 @@ def check_ver_number():
     build_number = build_number.groups()[0]
 
     request = authorization(url_from_site2_data)
-    data = urllib2.urlopen(request)
-    lmts_version_name = (re.search('<a href="(.*_amd64.deb)">', data.read())).groups()[0]
+    lmts_versions_site_data = urllib2.urlopen(request)
+    lmts_version_name = (re.search('<a href="(.*_amd64.deb)">', lmts_versions_site_data.read())).groups()[0]
     lmts_download_url = str(url_from_site2_data) + "/" + str(lmts_version_name)
 
     return build_version, build_number, lmts_download_url, lmts_version_name
