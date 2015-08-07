@@ -18,20 +18,20 @@ def _lmts_upgrade ():
         i = child_bash.expect(["\.", "failed", pexpect.TIMEOUT])
     except pexpect.TIMEOUT:
         print "pexpect.TIMEOUT - starting up LMTS Executor"
-        sys.exit(1)
+        return 1
     if i == 1:
         child_bash.sendline("sudo /etc/init.d/lmts-executor stop")
-        sleep(1)
+        sleep(2)
         child_bash.sendline("sudo /etc/init.d/lmts-executor start")
         try:
             child_bash.expect("Starting up LMTS Executor:")
             i = child_bash.expect(["\.", "failed"])
         except pexpect.TIMEOUT:
             print "pexpect.TIMEOUT - starting up LMTS Executor"
-            sys.exit(1)
+            return 1
         if i == 1:
             print "LMTS-executor start fail"
-            sys.exit(1);
+            return 1
     sleep (2)
 
     #2 LMTS-trace start
@@ -41,10 +41,10 @@ def _lmts_upgrade ():
         i = child_bash.expect(["\.", "failed", "process already running"])
     except pexpect.TIMEOUT:
         print "pexpect.TIMEOUT - starting up LMTS Executor"
-        sys.exit(2)
+        return 2
     if i == 1:
         print "LMTS-trace start fail"
-        sys.exit(2);
+        return 2
     sleep (2)
 
     #3 start telnet connection
@@ -54,7 +54,7 @@ def _lmts_upgrade ():
         child_bash.expect("LTE-LMTS>")
     except pexpect.TIMEOUT:
         print "pexpect.TIMEOUT - telnet connection"
-        sys.exit(3)
+        return 3
 
     #4 config update
     child_bash.sendline("config update")
@@ -63,7 +63,7 @@ def _lmts_upgrade ():
         child_bash.expect("LTE-LMTS>")
     except pexpect.TIMEOUT:
         print "pexpect.TIMEOUT - config update"
-        sys.exit(4)
+        return 4
 
     #5 config remote reload
     child_bash.sendline("config remote reload")
@@ -76,7 +76,7 @@ def _lmts_upgrade ():
         child_bash.expect("RETURN CODE: 0", timeout=200)
     except pexpect.TIMEOUT:
         print "pexpect.TIMEOUT - config remote reload"
-        sys.exit(5)
+        return 5
 
     #6 config ue reload
     child_bash.sendline("config ue reload")
@@ -86,7 +86,7 @@ def _lmts_upgrade ():
         child_bash.expect("LTE-LMTS>")
     except pexpect.TIMEOUT:
         print "pexpect.TIMEOUT - config ue reload"
-        sys.exit(6)
+        return 6
 
 
     #7 config loopback
@@ -97,20 +97,18 @@ def _lmts_upgrade ():
         child_bash.expect("LTE-LMTS>")
     except pexpect.TIMEOUT:
         print "pexpect.TIMEOUT - config ue reload"
-        sys.exit(7)
-
+        return 7
+'''
     #8 config remote update
     child_bash.sendline("condig remote update")
-    '''
     try:
-        child_bash.expect(" ", timeout=)
+        #child_bash.expect(" ", timeout=)
         sleep(1)
         child_bash.expect("LTE-LMTS>")
     except pexpect.TIMEOUT:
         print "pexpect.TIMEOUT - config ue reload"
-        sys.exit(8)
-    '''
-
+        return 8
+'''
 
 if __name__ == "__main__":
-    _lmts_upgrade()
+    print _lmts_upgrade()
