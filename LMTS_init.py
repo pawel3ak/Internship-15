@@ -11,6 +11,19 @@ import pexpect
 from time import sleep
 
 
+def _wait_for_server_response():
+    print "waiting for server response"
+    pinging_bash = pexpect.spawn("/bin/bash")
+    while True:
+        sleep(1)
+        pinging_bash.sendline("ping -c 1 10.60.0.11")
+        control_output = pinging_bash.expect(["bytes from 10.60.0.11", "Destination Host Unreachable"])
+        if not control_output == 0:
+            pass
+        else:
+            pinging_bash.sendline("exit")
+            return 0
+
 def _lmts_upgrade():
 
     # 1 LMTS-executor start
@@ -79,7 +92,7 @@ def _lmts_upgrade():
     child_bash.sendline("config remote reload")  # take long to execute
     sleep(1)
     try:
-        child_bash.expect("(no)? yes", timeout=400)
+        child_bash.expect("(no)? yes", timeout=500)
         sleep(1)
         child_bash.expect("RETURN CODE: 0", timeout=200)
     except pexpect.TIMEOUT:
@@ -97,50 +110,55 @@ def _lmts_upgrade():
         print "pexpect.TIMEOUT - config ue reload"
         return 6
 
-    # 7 config loopback
-    print "config loopback"
-    child_bash.sendline("config loopback")
+    # 7 config loopback apply tgrs
+    print "config loopback apply tgrs"
+    child_bash.sendline("config loopback apply tgrs")
     try:
         child_bash.expect("Looback config successfully applied")
         sleep(1)
         child_bash.expect("LTE-LMTS>")
     except pexpect.TIMEOUT:
-        print "pexpect.TIMEOUT - config loopback"
+        print "pexpect.TIMEOUT - config loopback apply tgrs"
         return 7
 
-    # 8 config loopback apply tgrs
-    print "config loopback apply tgrs"
-    child_bash.sendline("config loopback apply tgrs")
-    try:
-        # child_bash.expect("Looback config successfully applied")
-        sleep(1)
-        child_bash.expect("LTE-LMTS>")
-    except pexpect.TIMEOUT:
-        print "pexpect.TIMEOUT - config loopback apply tgrs"
-        return 8
-
-    # 9 cm server start
+    # 8 cm server start
     print "cm server start"
-    child_bash.sendline("Loopback server started")
+    child_bash.sendline("cm server start")
     try:
-        # child_bash.expect(" ")
+        child_bash.expect("Loopback server started")
         sleep(1)
         child_bash.expect("LTE-LMTS>")
     except pexpect.TIMEOUT:
         print "pexpect.TIMEOUT - cm server start"
-        return 9
+        return 8
 
-    # 10 config remote update
+    # 9 config remote update
+    print 99
+    _wait_for_server_response()
     print "config remote update"
     child_bash.sendline("condig remote update")
     try:
-        # child_bash.expect(" ")
+        control_output = child_bash.expect(["CTRL-1: COMMAND: /sbin/reload", "Error connecting to CTRL-1"], timeout=200)
+        if control_output == 1:
+            #sleep(30)
+            print "retry config remote update"
+            child_bash.sendline("condig remote update")
+            sleep(1)
+            control_output = child_bash.expect(["CTRL-1: COMMAND: /sbin/reload", "Error connecting to CTRL-1"], timeout=200)
+            if control_output == 1:
+                print "Error connecting to CTRL-1"
+                return 10
         sleep(1)
-        child_bash.expect("LTE-LMTS>")
+        child_bash.expect("RETURN CODE: 0")
+        sleep(1)
+        child_bash.expect("LTE-LMTS>", timeout=200)
     except pexpect.TIMEOUT:
         print "pexpect.TIMEOUT - config remote update"
         return 10
+
     print "all done"
+    child_bash.sendline("exit")
+
 
 if __name__ == "__main__":
     print _lmts_upgrade()
