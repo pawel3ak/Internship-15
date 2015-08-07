@@ -6,11 +6,11 @@
 """
 
 import pexpect
-import sys
 from time import sleep
 
 def _lmts_upgrade ():
     #1 LMTS-executor start
+    print "LMTS-executor"
     child_bash = pexpect.spawn("/bin/bash")
     child_bash.sendline("sudo /etc/init.d/lmts-executor start")
     try:
@@ -35,6 +35,7 @@ def _lmts_upgrade ():
     sleep (2)
 
     #2 LMTS-trace start
+    print "LMTS-trace"
     child_bash.sendline("sudo /etc/init.d/lmts-trace start")
     try:
         child_bash.expect("Starting up LMTS trace")
@@ -48,6 +49,7 @@ def _lmts_upgrade ():
     sleep (2)
 
     #3 start telnet connection
+    print "start telnet connection"
     child_bash.sendline("telnet 0 1234")
     try:
         child_bash.expect("Connected")
@@ -57,6 +59,7 @@ def _lmts_upgrade ():
         return 3
 
     #4 config update
+    print "config update"
     child_bash.sendline("config update")
     try:
         child_bash.expect("New configuration applied")
@@ -66,6 +69,7 @@ def _lmts_upgrade ():
         return 4
 
     #5 config remote reload
+    print "config remote reload - can take few minutes"
     child_bash.sendline("config remote reload")
     sleep(1)
     child_bash.sendline("config remote reload")#take long to execute
@@ -79,6 +83,7 @@ def _lmts_upgrade ():
         return 5
 
     #6 config ue reload
+    print "config ue reload"
     child_bash.sendline("config ue reload")
     try:
         child_bash.expect("UE data reloaded")
@@ -90,25 +95,50 @@ def _lmts_upgrade ():
 
 
     #7 config loopback
+    print "config loopback"
     child_bash.sendline("config loopback")
     try:
         child_bash.expect("Looback config successfully applied")
         sleep(1)
         child_bash.expect("LTE-LMTS>")
     except pexpect.TIMEOUT:
-        print "pexpect.TIMEOUT - config ue reload"
+        print "pexpect.TIMEOUT - config loopback"
         return 7
-'''
-    #8 config remote update
-    child_bash.sendline("condig remote update")
+
+    #8 config loopback apply tgrs
+    print "config loopback apply tgrs"
+    child_bash.sendline("config loopback apply tgrs")
     try:
-        #child_bash.expect(" ", timeout=)
+        #child_bash.expect("Looback config successfully applied")
         sleep(1)
         child_bash.expect("LTE-LMTS>")
     except pexpect.TIMEOUT:
-        print "pexpect.TIMEOUT - config ue reload"
+        print "pexpect.TIMEOUT - config loopback apply tgrs"
         return 8
-'''
+
+    #9 cm server start
+    print "cm server start"
+    child_bash.sendline("cm server start")
+    try:
+        #child_bash.expect(" ")
+        sleep(1)
+        child_bash.expect("LTE-LMTS>")
+    except pexpect.TIMEOUT:
+        print "pexpect.TIMEOUT - cm server start"
+        return 9
+
+    #10 config remote update
+    print "config remote update"
+    child_bash.sendline("condig remote update")
+    try:
+        #child_bash.expect(" ")
+        sleep(1)
+        child_bash.expect("LTE-LMTS>")
+    except pexpect.TIMEOUT:
+        print "pexpect.TIMEOUT - config remote update"
+        return 10
+    print "all done"
+
 
 if __name__ == "__main__":
     print _lmts_upgrade()
