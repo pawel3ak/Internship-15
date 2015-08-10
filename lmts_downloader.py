@@ -10,7 +10,7 @@
 from ssh_ import authorization
 import urllib2
 
-def downloader(url, lmts_version_name):
+def download_given_SW_version(url, lmts_version_name):
     with open(lmts_version_name, "wb") as output:
         request = authorization(url)
         file_data = urllib2.urlopen(request)

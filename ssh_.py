@@ -2,9 +2,9 @@
 """
 :created on: '6/8/15'
 
-:copyright: NSN
+:copyright: Nokia
 :author: Pawel Nogiec
-:contact: pawel.nogiec@nsn.com
+:contact: pawel.nogiec@nsn.com, pawel.nogiec@nokia.com
 """
 
 import pexpect
@@ -13,47 +13,50 @@ import re
 import urllib2
 import base64
 
-def authorization(url):
-    u = raw_input("user: ")
-    pw = raw_input("passwd: ")
+import check_version
+from lmts_downloader import download_given_SW_version
+
+def authorization(url, user = None, password = None): #TODO how user/pswd You've used?
     req = urllib2.Request(url)
-    base64string = base64.encodestring('%s:%s' % (u, pw)).replace('\n', '')
+    base64string = base64.encodestring('%s:%s' % (user, password)).replace('\n', '')
     req.add_header("Authorization", "Basic %s" % base64string)
     return req
 
-def main():
-    LMTS_version = ""
+def _get_ssh_process(user, host):
+    _ssh_command = "ssh {user}@{host}".format(user=user, host=host)
+    _ssh_process = pexpect.spawn(_ssh_command)
+    return _ssh_process
 
-    ssh_command = 'ssh root@10.60.0.11'
-    ssh_process = pexpect.spawn(ssh_command)
-    i = ssh_process.expect(["password:", pexpect.EOF, pexpect.TIMEOUT])
-    if i == 0:
+def _get_ssh_command_result(ssh_process):
+    match = ssh_process.expect(["password:", pexpect.EOF, pexpect.TIMEOUT])
+    if match == 0:
         time.sleep(0.1)
         ssh_process.sendline('root')
         time.sleep(2)
         ssh_process.sendline('hversion')
         ssh_process.expect('Running Software Version: ')
         ssh_process.expect('\n')
-        LMTS_version = ssh_process.before
-    elif i == 1:
+        hversion_command_output = ssh_process.before
+        return hversion_command_output
+    elif match == 1:
         print "Connection error, child process has exited."
-    elif i == 2:
+        raise
+    elif match == 2:
         print "Connection timeout."
+        raise #TODO maybe we should add some custom Exception(s)
 
+def check_if_LMTS_SW_version_is_actual():
+    _ssh_process = _get_ssh_process(user='root', host='10.60.0.11')
+    _hversion_cmd_output = _get_ssh_command_result(ssh_process=_ssh_process)
+    _current_LMTS_SW_version = re.search('R(\d{1,}.\d{1,}).*BLD-.*', hversion_cmd_output).groups()[0]
+    _LMTS_bld_number = re.search('R\d{1,}.\d{1,}.*BLD-(.*)', hversion_cmd_output).groups()[0]
 
-    LMTS_version = re.search('R(\d{1,}.\d{1,}).*BLD-(.*)',LMTS_version)
-    build_version = LMTS_version.groups()[0]
-    build_number = LMTS_version.groups()[1]
-    from check_version import check_ver_number
-    latest_build_version, latest_build_number, lmts_file_url, f_name = check_ver_number()
-
-    if latest_build_version == build_version and latest_build_number == build_number:
+    if _current_LMTS_SW_version == check_version.get_LMTS_bld_version() and _LMTS_bld_number == check_version.get_LMTS_bld_number():
         print "Latest version is already installed"
-        pass
     else:
+        lmts_downloader.download_given_SW_version(url = check_version.get_path_to_download_latest_LMTS_SW_version(),
+                                                  lmts_version_name = check_version.get_LMTS_bld_name())
 
-        from lmts_downloader import downloader
-        downloader(lmts_file_url, f_name)
 
 if __name__ == "__main__":
     main()
