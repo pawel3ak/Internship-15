@@ -1,23 +1,45 @@
 import socket
-from os import fork
+import subprocess
+import multiprocessing as mp
+import select
+import argparse
+
+#default variables
+HOST_IP, HOST_PORT = "127.0.0.1",50000
+EOL = u'\n\r\n'
+
+def main():
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument('-a', '--host', default=HOST_IP,
+                        help='set IP addres for server')
+    parser.add_argument('-p', '--port', type=int, default=HOST_PORT,
+                        help='set port number for server')
+
+    # override defaults if got
+    args = parser.parse_args()
+    host = args.host
+    port = args.port
+
+    try:
+        serversocket = socket.socket(family= socket.AF_INET, type= socket.SOCK_DGRAM)
+        serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+        serversocket.bind((host, port))
 
 
-host = "127.0.0.1"
-port = 5000
-host = (host,port)
-data = "zapytani"
+        while True:
+            data,addr = serversocket.recvfrom(1024)
+            print "data = {data} \naddr={addr}".format(data=data, addr=addr)
+            serversocket.sendto(data,addr)
 
-sock = socket.socket(family= socket.AF_INET, type= socket.SOCK_DGRAM)
-sock.bind(host)
-a = fork()
-if a == 0:
-    while True:
-        sock.connect
-        sock.sendto(data,host)
-        from time import sleep
-        sleep(1)
-else:
-    while True:
-        data,addr = sock.recvfrom(1024)
-        print "data = {data} \naddr={addr}".format(data=data, addr=addr)
 
+    except:
+        print "what?"
+        pass
+
+
+
+if __name__ == '__main__':
+    main()
