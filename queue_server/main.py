@@ -2,8 +2,8 @@ import socket
 from os import fork
 
 
-host = "0.0.0.0"
-port = 50000
+host = "127.0.0.1"
+port = 5000
 host = (host,port)
 data = "zapytani"
 
