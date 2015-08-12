@@ -21,28 +21,34 @@ def _get_ssh_process(user, host):
     return _ssh_process
 
 def _get_ssh_command_result(ssh_process):
-    while True:
-        match = ssh_process.expect(["password:", pexpect.EOF, pexpect.TIMEOUT])
-        if match == 0:
-            time.sleep(0.1)
-            ssh_process.sendline('root')
-            time.sleep(2)
-            ssh_process.sendline('hversion')
-            ssh_process.expect('Running Software Version: ')
-            ssh_process.expect('\n')
-            hversion_command_output = ssh_process.before
-            return hversion_command_output
+    match = ssh_process.expect(["password:", pexpect.EOF, pexpect.TIMEOUT])
+    if match == 0:
+        time.sleep(0.1)
+        ssh_process.sendline('root')
+        time.sleep(2)
+        ssh_process.sendline('hversion')
+        ssh_process.expect('Running Software Version: ')
+        ssh_process.expect('\n')
+        hversion_command_output = ssh_process.before
+        return hversion_command_output
 
-        elif match == 1:
-            print "Connection error, child process has exited."
-            raise
-        elif match == 2:
-            print "Connection timeout."
-            raise #TODO maybe we should add some custom Exception(s)
+    elif match == 1:
+        print "Connection error, child process has exited."
+        #raise
+        return 1
+    elif match == 2:
+        print "Connection timeout."
+        #raise #TODO maybe we should add some custom Exception(s)
+        return 1
+
 
 def check_if_LMTS_SW_version_is_actual():
     _ssh_process = _get_ssh_process(user='root', host='10.60.0.11')
-    _hversion_cmd_output = _get_ssh_command_result(ssh_process=_ssh_process)
+    _hversion_cmd_output = None
+    while True:
+        _hversion_cmd_output = _get_ssh_command_result(ssh_process=_ssh_process)
+        if not _hversion_cmd_output == 1: break
+        time.sleep(10)
 
     _current_LMTS_SW_version = re.search('R(\d{1,}.\d{1,}).*BLD-.*', _hversion_cmd_output).groups()[0]
     _LMTS_bld_number = (re.search('R\d{1,}.\d{1,}.*BLD-(.*)', _hversion_cmd_output).groups()[0])[:-1]
