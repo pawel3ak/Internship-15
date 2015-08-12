@@ -8,6 +8,10 @@
 """
 
 import xml.etree.ElementTree as ET
+
+from _jenkins.xml_config_api.exceptions import *
+
+
 INTERNSHIP_PATH = "/home/ute/PycharmProjects/projekty/Internship-15/_jenkins/"
 EMPTY_CONFIG_XML_PATH = "/home/ute/PycharmProjects/projekty/Internship-15/_jenkins/empty_config_file.xml"
 TASKS = {
@@ -29,6 +33,8 @@ class XML_config(object):
         self.tree = self.get_tree(self.path)
         scm_tag = self.tree.find('scm')
         scm_tag.set('class','hudson.scm.NullSCM')
+        canRoam_tag = self.tree.find('canRoam')
+        canRoam_tag.text = 'false'
 
 
     def get_tree(self,path):
@@ -36,19 +42,20 @@ class XML_config(object):
             self.tree = ET.parse(path)
             self.update_path(path)
             return self.tree
-        except OSError as e:
-            print e.message
+        except IOError as e:
+            raise XmlConfigApiException(e)
 
     def update_tree(self,tree):
         self.tree = tree
         return self.tree
 
     def get_path(self):
-        if not self.path == None:
+        try:
             return self.path
-        else:
-            pass
-            #raise Exception.message
+        except AttributeError as e:
+            raise XmlConfigApiUnknownPathException(e.message)
+
+
 
     def update_path(self,path):
         self.path = path
@@ -69,27 +76,31 @@ class XML_config(object):
         return self.update_tree(self.tree)
 
     def _add_parameter(self, _parameter):
-        if not len(_parameter) == 4:
-            #raise
-            print 'Not enough parameters'
-            return
+
+        for param_number in range(0,len(_parameter)):
+            if not len(_parameter[param_number]) == 4:
+                raise XmlConfigApiFailValidationArgumentsException("_parameter",param_number)
+
         properties_tag = self.tree.find('properties')
         properties_tag.text = '\n\t'
         parametersDefinitionProperty = ET.SubElement(properties_tag, 'hudson.model.ParametersDefinitionProperty')
         parametersDefinitionProperty.text = '\n\t\t'
         parameterDefitnitions = ET.SubElement(parametersDefinitionProperty, 'parameterDefinitions')
         parameterDefitnitions.text = '\n\t\t\t'
-        parameter_tag = ET.SubElement(parameterDefitnitions, PARAMETERS[_parameter['type']])
-        parameter_tag.text = '\n\t\t\t\t'
-        name_tag = ET.SubElement(parameter_tag, 'name')
-        name_tag.text = _parameter['name']
-        desciption_tag = ET.SubElement(parameter_tag, 'desciption')
-        desciption_tag.text = _parameter['description']
-        default_value_tag = ET.SubElement(parameter_tag, 'default_value')
-        default_value_tag.text = _parameter['default_value']
-        name_tag.tail = '\n\t\t\t\t'
-        desciption_tag.tail = '\n\t\t\t\t'
-        default_value_tag.tail = '\n\t\t\t'
+        parameterDefitnitions.text = '\n\t\t\t'
+        for param_number in range(0,len(_parameter)):
+            parameter_tag = ET.SubElement(parameterDefitnitions, PARAMETERS[_parameter[param_number]['type']])
+            parameter_tag.text = '\n\t\t\t\t'
+            name_tag = ET.SubElement(parameter_tag, 'name')
+            name_tag.text = _parameter[param_number]['name']
+            desciption_tag = ET.SubElement(parameter_tag, 'desciption')
+            desciption_tag.text = _parameter[param_number]['description']
+            defaultValue_tag = ET.SubElement(parameter_tag, 'defaultValue')
+            defaultValue_tag.text = _parameter[param_number]['defaultValue']
+            name_tag.tail = '\n\t\t\t\t'
+            desciption_tag.tail = '\n\t\t\t\t'
+            defaultValue_tag.tail = '\n\t\t\t'
+            parameter_tag.tail = '\n\t\t\t'
         parameter_tag.tail = '\n\t\t'
         parameterDefitnitions.tail = '\n\t'
         parametersDefinitionProperty.tail = '\n  '
@@ -116,21 +127,25 @@ class XML_config(object):
 
 
 if __name__ == "__main__":
+
     xml = XML_config(EMPTY_CONFIG_XML_PATH)
     xml._add_task(0,command_to_execute)
-    xml._add_task(0,command_to_execute)
-
-    parameters = {'type': 0,
+    xml._add_task(0,command_to_execute[:-7] + str('$plik'))
+    parameters =[]
+    parameters.append({'type': 0,
                   'name': 'f_name',
                   'description': '',
-                  'default_value': '3'}
-
+                  'defaultValue': '2'})
+    parameters.append({'type': 0,
+                  'name': 'plik',
+                  'description': '',
+                  'defaultValue': 'cos'})
     xml._add_parameter(parameters)
-    parameters['default_value'] = 'inna'
-    xml._add_parameter(parameters)
-    xml._assigned_node("tl_wroc")
+    #parameters['default_value'] = 'inna'
+    #xml._add_parameter(parameters)
+    xml._assigned_node("moj_dwa")
     xml.write_tree(INTERNSHIP_PATH + "output.xml")
-    pass
+
 
 
 
