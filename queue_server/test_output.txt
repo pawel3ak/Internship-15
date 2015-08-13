@@ -1,0 +1,48 @@
+ - 12:11:20 13/08/2015 -
+==============================================================================
+CPLN
+==============================================================================
+CPLN.LTE1841
+==============================================================================
+CPLN.LTE1841.Tests
+==============================================================================
+CPLN.LTE1841.Tests.TC1 :: Suite description
+==============================================================================
+[1]C-Pln_LTE1841-A-c No activation of A4 AMLE measurement because ... | FAIL |
+Parent suite setup failed:
+No keyword with name 'configure all for LTE1841' found.
+------------------------------------------------------------------------------
+CPLN.LTE1841.Tests.TC1 :: Suite description                           | FAIL |
+Parent suite setup failed:
+No keyword with name 'configure all for LTE1841' found.
+
+1 critical test, 0 passed, 1 failed
+1 test total, 0 passed, 1 failed
+==============================================================================
+CPLN.LTE1841.Tests                                                    | FAIL |
+Suite setup failed:
+No keyword with name 'configure all for LTE1841' found.
+
+Also suite teardown failed:
+No keyword with name 'deconfigure all for LTE1841' found.
+
+1 critical test, 0 passed, 1 failed
+1 test total, 0 passed, 1 failed
+==============================================================================
+CPLN.LTE1841                                                          | FAIL |
+1 critical test, 0 passed, 1 failed
+1 test total, 0 passed, 1 failed
+==============================================================================
+CPLN                                                                  | FAIL |
+1 critical test, 0 passed, 1 failed
+1 test total, 0 passed, 1 failed
+==============================================================================
+Output:  /home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/logs/suite_1.xml
+Log:     /home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/logs/log.html
+Report:  /home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/logs/report.html
+suite_1.xml
+Output:  /home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/logs/output.xml
+Log:     /home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/logs/log.html
+Report:  /home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/logs/report.html
+ - 12:11:33 13/08/2015 -
+
