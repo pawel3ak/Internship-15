@@ -73,7 +73,7 @@ def main_server():
     sock.bind((host, port))
     sock.listen(5)
 
-    thread = Thread(target=checking_reservation_queue(queue_file_name))
+    thread = Thread(target=checking_reservation_queue, args=[queue_file_name])
     thread.daemon = True
     thread.start()
 
