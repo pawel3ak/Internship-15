@@ -20,8 +20,9 @@ def write_to_queue(file_name, record):
 
 
 def read_next_from_queue(file_name):
-    with open(file_name, "rb") as queue_file:
-        return json.loads(queue_file.readline())
+    if
+        with open(file_name, "rb") as queue_file:
+            return json.loads(queue_file.readline())
 
 
 def delete_reservation_from_queue(file_name, queue_number, password):
@@ -38,7 +39,7 @@ def delete_reservation_from_queue(file_name, queue_number, password):
     return 0
 
 
-def check_queue(file_name):
+def check_queue_length(file_name):
     with open(file_name, "rb") as queue_file:
         return len(queue_file.readlines())
 
@@ -54,4 +55,3 @@ if __name__ == "__main__":
     print check_queue(default_file)
     delete_reservation_from_queue(default_file, 112, 'abcd')
     print check_queue(default_file)
-

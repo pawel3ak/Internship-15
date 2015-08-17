@@ -9,10 +9,10 @@
 
 import socket
 import argparse
-import reservation_queue as queue
-from tl_reservation import TestLineReservation
 from time import sleep
-from thread import *
+from tl_reservation import TestLineReservation
+import reservation_queue as queue
+
 
 
 HOST_IP = "127.0.0.1"
@@ -42,7 +42,7 @@ def response(connect, data):
 def check_reservation_queue(queue_file_name, loop = True):
     while loop:
         test_reservation = TestLineReservation()
-        if (queue.check_queue(queue_file_name) > 0) & (test_reservation.get_available_tl_count() > 2):
+        if (queue.check_queue_length(queue_file_name) > 0) & (test_reservation.get_available_tl_count() > 2):
             # start our script
             print "SCRIPT"
         if loop:
@@ -50,7 +50,7 @@ def check_reservation_queue(queue_file_name, loop = True):
 
 
 def new_request(queue_file_name, request):
-    if queue.check_queue(queue_file_name) > 0:
+    if queue.check_queue_length(queue_file_name) > 0:
         queue.write_to_queue(queue_file_name, request)
         print("Add to reservatuon queue")
 
@@ -71,7 +71,7 @@ def main_server():
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind((host, port))
-    sock.listen(1)
+    sock.listen(5)
 
     while True:
         connect, address = sock.accept()
