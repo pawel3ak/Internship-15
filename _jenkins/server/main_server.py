@@ -26,7 +26,7 @@ def second():
 
 
 def response(connect, data):
-    working_dictionary = {'pierwszy': pierwszy(), 'drugi': drugi()}
+    working_dictionary = {'first': first(), 'second': second()}
     try:
         message = working_dictionary[data]
     except:
