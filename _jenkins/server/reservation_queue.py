@@ -42,6 +42,7 @@ def check_queue_length(file_name):
     with open(file_name, "rb") as queue_file:
         return len(queue_file.readlines())
 
+
 if __name__ == "__main__":
     a = ({'ID': 111, 'tekst': 'simple', 'list': 'list', 'password': 'abcd'})
     b = ({'ID': 112, 'tekst': 'simple2', 'list': 'list2', 'password': 'abcd'})
