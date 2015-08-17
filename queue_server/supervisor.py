@@ -12,6 +12,8 @@ import time
 import jenkinsapi
 import xml.etree.ElementTree as ET
 import re
+import ute_mail.sender
+import ute_mail.mail
 
 
 def create_reservation_and_run_job(testline_type=None, enb_build=None, ute_build=None,
@@ -28,26 +30,48 @@ def reservation_status(id):
     reservation = tlr.TestLineReservation(id)
     reservation_status_dict = {1: 'Pending for testline',
                                2: 'Testline assigned',
-                               3: 'Confirmed'}
-    if reservation.get_reservation_status() == 1 or reservation.get_reservation_status() == 2:
-        time.sleep(60)
-    elif reservation.get_reservation_status() == 3:
-        return 0
+                               3: 'Confirmed',
+                               4: 'Finished',
+                               5: 'Canceled'}
+    while True:
+        if reservation.get_reservation_status() == reservation_status_dict[1] or\
+                        reservation.get_reservation_status() == reservation_status_dict[2]:
+            print "jeszcze nie"
+            time.sleep(30)
+        elif reservation.get_reservation_status() == reservation_status_dict[3]:
+            return 0
+        elif reservation.get_reservation_status() == reservation_status_dict[4] or\
+                        reservation.get_reservation_status() == reservation_status_dict[5]:
+            raise "Reservation already canceled or finished"
 
 def _get_tl_name(id):
     reservation = tlr.TestLineReservation(id)
     return reservation.get_reservation_details()['testline']['name']
 
 def send_information(id,tl_name,user_info, test_passed = False):
-    #user_info['fist_name']
-    #user_info['last_name']
-    #user_info['e-mail']
-    #TODO send mail to @mail with id and tl_name
-    if test_passed == True:
-        #send mail with information that all tests were successful
-        pass
+    # user_info['first_name']
+    # user_info['last_name']
+    # user_info['e-mail']
+    _message = "Hello {f_name} {l_name}! \n\n" \
+                  "Your reservation is pending.\n" \
+                  "Reservation ID = {rID}\n" \
+                  "Testline name = {tl_name}\n\n" \
+                  "Have a nice day!".format(f_name=user_info['first_name'],
+                                            l_name=user_info['last_name'],
+                                            rID=id, tl_name=tl_name)
+    _subject = "Reservation status update"
 
-    pass
+    if test_passed == True:
+        _message = "Hello {f_name} {l_name}! \n\n" \
+                  "All your tests were successful\n\n" \
+                  "Have a nice day!".format(f_name=user_info['first_name'],
+                                            l_name=user_info['last_name'])
+        _subject = "Tests status update"
+
+    send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
+    mail = ute_mail.mail.Mail(subject=_subject,message=_message, recipients=user_info['e-mail'], name_from="Reservation Api")
+    send.connect()
+    send.send(mail)
 
 def _update_tl_name(job, tl_name):
     job_config_xml = ET.fromstring(job.get_config())
@@ -57,18 +81,18 @@ def _update_tl_name(job, tl_name):
 
 
 def _create_and_build_job(jenkins_info, tl_name):
-    job_name = jenkins_info['name']
+    _job_name = jenkins_info['name']
     job_parameters = jenkins_info['parameters']
     job_api = jenkinsapi.api.Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
-    job = job_api.get_job(job_name)
+    job = job_api.get_job(_job_name)
     _update_tl_name(job, tl_name)
-    job_api.build_job(job_name=job_name, params=job_parameters)
+    job_api.build_job(jobname=_job_name, params=job_parameters)
     return job
 
 def _get_jenkins_console_output(jenkins_info, job):
     time.sleep(5)       #let the new job build get started
     while job.get_last_build().get_status() == None:
-        time.sleep(120)
+        time.sleep(10)      ###############TODO longer sleep on real tests
     return (job.get_last_build().get_console()).split("\n")
 
 def _update_parent_dict(serverID, parent_dict, id, job_test_status=None, busy_status = False):
@@ -82,16 +106,17 @@ def _get_job_test_status(job_output):
     for test in range(0,len(job_output)):
         try:
             match = re.search('^(.*)\s*.\sFAIL|^(.*)\s*.\sPASS',job_output[test]).groups()
-            if match[0] != None: dict[match[0]] = 'PASS'
-            else:
-                dict[str(match[1][:-1]).strip(" ")] = 'FAIL'
+            if match[0] != None:
+                dict[match[0]] = 'FAIL'
                 has_got_fail = True
+            else:
+                dict[str(match[1][:-1]).strip(" ")] = 'PASS'
         except:
             pass
     return dict, has_got_fail
 
 
-def main(serverID, reservation_data,parent_dict,user_info, jenkins_info):
+def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
 
     reservationID = create_reservation_and_run_job(reservation_data['testline_type'],
                                                    reservation_data['enb_build'],
@@ -119,3 +144,28 @@ def main(serverID, reservation_data,parent_dict,user_info, jenkins_info):
                             job_test_status=job_test_status_dict, busy_status=False)
         send_information(reservation_data, tl_name, user_info, test_passed=True)
 
+
+if __name__ == '__main__':
+    reservationID = create_reservation_and_run_job(testline_type="CLOUD_F")
+    print reservationID
+    time.sleep(2)
+    print reservation_status(reservationID)
+    print _get_tl_name(reservationID)
+
+    # jenkins_info = {'name' : 'test_job_tl_99',
+    #                 'parameters' : {
+    #                     'f_name' : 'ttt',
+    #                     't1' : 'inny',
+    #                     't2' : 'jeszcze_inny'},
+    #                 }
+    # job = _create_and_build_job(jenkins_info,tl_name="tl99_test")
+    # jenkins_console_output = _get_jenkins_console_output(jenkins_info, job)
+    # job_test_status_dict, has_got_fail = _get_job_test_status(jenkins_console_output)
+    # print job_test_status_dict, has_got_fail
+
+    # send_information(12343,"tl99",user_info={'first_name' : 'Pawel',
+    #                                          'last_name' : 'Nogiec',
+    #                                          'e-mail' : 'pawel.nogiec@nokia.com'})
+    # send_information(12343,"tl99",user_info={'first_name' : 'Pawel',
+    #                                          'last_name' : 'Nogiec',
+    #                                          'e-mail' : 'pawel.nogiec@nokia.com'}, test_passed=True)
