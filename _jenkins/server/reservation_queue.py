@@ -20,7 +20,6 @@ def write_to_queue(file_name, record):
 
 
 def read_next_from_queue(file_name):
-    if
         with open(file_name, "rb") as queue_file:
             return json.loads(queue_file.readline())
 
@@ -46,12 +45,12 @@ def check_queue_length(file_name):
 if __name__ == "__main__":
     a = ({'ID': 111, 'tekst': 'simple', 'list': 'list', 'password': 'abcd'})
     b = ({'ID': 112, 'tekst': 'simple2', 'list': 'list2', 'password': 'abcd'})
-    print check_queue(default_file)
+    print check_queue_length(default_file)
     write_to_queue(default_file, a)
     write_to_queue(default_file, b)
-    print check_queue(default_file)
+    print check_queue_length(default_file)
     print read_next_from_queue(default_file)
     delete_reservation_from_queue(default_file, 111, 'abcd')
-    print check_queue(default_file)
+    print check_queue_length(default_file)
     delete_reservation_from_queue(default_file, 112, 'abcd')
-    print check_queue(default_file)
+    print check_queue_length(default_file)

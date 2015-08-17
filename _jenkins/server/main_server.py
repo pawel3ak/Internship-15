@@ -9,6 +9,7 @@
 
 import socket
 import argparse
+import random
 from time import sleep
 from tl_reservation import TestLineReservation
 import reservation_queue as queue
@@ -18,6 +19,7 @@ import reservation_queue as queue
 HOST_IP = "127.0.0.1"
 HOST_PORT = 5005
 QUEUE_FILE_NAME = "reservation_queue"
+ID = 1
 
 
 def first():
@@ -26,6 +28,14 @@ def first():
 
 def second():
     return "2 bbbb"
+
+def generate_password(passw_lenght = 4):
+    alphabet = "abcdefghijklmnopqrstuvwxyz0123456789"
+    password = ""
+    for i in range(passw_lenght):
+        next_sign = random.randrange(len(alphabet))
+        password += alphabet[next_sign]
+    return password
 
 
 def response(connect, data):
@@ -50,6 +60,9 @@ def check_reservation_queue(queue_file_name, loop = True):
 
 
 def new_request(queue_file_name, request):
+    id = 1  #new ID number
+    request['ID'] = id
+    request['password'] = generate_password()
     if queue.check_queue_length(queue_file_name) > 0:
         queue.write_to_queue(queue_file_name, request)
         print("Add to reservatuon queue")
@@ -70,6 +83,7 @@ def main_server():
     queue_file_name = args.file
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((host, port))
     sock.listen(5)
 
