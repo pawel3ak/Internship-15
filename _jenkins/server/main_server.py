@@ -8,6 +8,7 @@
 """
 
 import socket
+import json
 import argparse
 import multiprocessing as mltpr
 from threading import Thread
@@ -19,7 +20,7 @@ from checking_loop import checking_reservation_queue
 HOST_IP = "127.0.0.1"
 HOST_PORT = 5005
 QUEUE_FILE_NAME = "reservation_queue"
-
+ID_NUMBER = 1
 
 
 def generate_password(passw_lenght = 4):
@@ -33,24 +34,28 @@ def generate_password(passw_lenght = 4):
     return password
 
 
-def response(connect, data):
-    working_dictionary = {}
+def response(connect, message, queue_file_name):
+    working_dictionary = {"request/create_reservation": new_request(connect, queue_file_name)}
     try:
-        message = working_dictionary[data]
+        message = working_dictionary[message]
     except Exception:
         message = 'Wrong command'
     connect.send(message)
     connect.close()
 
 
-def new_request(queue_file_name, request):
-    id = 1  #new ID number
-    request['ID'] = id
+def new_request(connect, queue_file_name):
+    connect.send("OK")
+    data = connect.recv(1024).strip()
+    request = json.loads(data)
+    global ID_NUMBER
+    request['serverID'] = ID_NUMBER
+    ID_NUMBER += 1
     request['password'] = generate_password()
     queue.write_to_queue(queue_file_name, request)
     if queue.check_queue_length(queue_file_name) == 1:
         checking_reservation_queue(queue_file_name, False)
-    return ("Add to reservation queue")
+    return ("Add to reservation queue" + str(request["serverID"]) + request["password"])
 
 
 def main_server():
@@ -82,7 +87,7 @@ def main_server():
         data = connect.recv(1024).strip()
         if data == "KONIEC":
             break
-        response(connect, data)
+        response(connect, data, queue_file_name)
 
     sock.close()
 

@@ -28,7 +28,6 @@ data = json.dumps({'reservation_data' :
                        },
                    })
 
-
 sock = socket.socket(socket.AF_INET,
                      socket.SOCK_STREAM)
 sock.connect((HOST_IP, HOST_PORT))
