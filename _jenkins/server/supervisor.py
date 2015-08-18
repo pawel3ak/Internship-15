@@ -117,7 +117,12 @@ def _get_job_test_status(job_output):
 
 
 def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
-
+    print serverID
+    print reservation_data
+    print parent_dict
+    print user_info
+    print jenkins_info
+    '''
     reservationID = create_reservation_and_run_job(reservation_data['testline_type'],
                                                    reservation_data['enb_build'],
                                                    reservation_data['ute_build'],
@@ -144,13 +149,14 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
                             job_test_status=job_test_status_dict, busy_status=False)
         send_information(reservation_data, tl_name, user_info, test_passed=True)
 
-
-if __name__ == '__main__':
-    reservationID = create_reservation_and_run_job(testline_type="CLOUD_F")
-    print reservationID
-    time.sleep(2)
-    print reservation_status(reservationID)
-    print _get_tl_name(reservationID)
+    '''
+# if __name__ == '__main__':
+#     main()
+    # reservationID = create_reservation_and_run_job(testline_type="CLOUD_F")
+    # print reservationID
+    # time.sleep(2)
+    # print reservation_status(reservationID)
+    # print _get_tl_name(reservationID)
 
     # jenkins_info = {'name' : 'test_job_tl_99',
     #                 'parameters' : {
