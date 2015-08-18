@@ -10,7 +10,6 @@
 import socket
 import json
 import argparse
-import multiprocessing as mltpr
 from threading import Thread
 
 import reservation_queue as queue
@@ -23,7 +22,7 @@ QUEUE_FILE_NAME = "reservation_queue"
 ID_NUMBER = 1
 
 
-def generate_password(passw_lenght = 4):
+def generate_password(passw_lenght=4):
     import random
 
     alphabet = "abcdefghijklmnopqrstuvwxyz0123456789"
