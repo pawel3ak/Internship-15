@@ -19,6 +19,7 @@ from checking_loop import checking_reservation_queue
 HOST_IP = "127.0.0.1"
 HOST_PORT = 5005
 QUEUE_FILE_NAME = "reservation_queue"
+PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
 ID_NUMBER = 1
 
 
@@ -33,8 +34,8 @@ def generate_password(passw_lenght=4):
     return password
 
 
-def response(connect, message, queue_file_name):
-    working_dictionary = {"request/create_reservation": new_request(connect, queue_file_name)}
+def response(connect, message, queue_file_name, priority_queue_file_name):
+    working_dictionary = {"request/create_reservation": new_request(connect, queue_file_name, priority_queue_file_name)}
     try:
         message = working_dictionary[message]
     except Exception:
@@ -43,7 +44,7 @@ def response(connect, message, queue_file_name):
     connect.close()
 
 
-def new_request(connect, queue_file_name):
+def new_request(connect, queue_file_name, priority_queue_file_name):
     connect.send("OK")
     data = connect.recv(1024).strip()
     request = json.loads(data)
@@ -51,9 +52,14 @@ def new_request(connect, queue_file_name):
     request['serverID'] = ID_NUMBER
     ID_NUMBER += 1
     request['password'] = generate_password()
-    queue.write_to_queue(queue_file_name, request)
-    if queue.check_queue_length(queue_file_name) == 1:
-        checking_reservation_queue(queue_file_name, False)
+    if request['priority'] == 0:
+        request.pop('priority')
+        queue.write_to_queue(queue_file_name, request)
+    elif request['priority'] == 1:
+        request.pop('priority')
+        queue.write_to_queue(priority_queue_file_name, request)
+    if (queue.check_queue_length(queue_file_name) == 1) or (queue.check_queue_length(priority_queue_file_name) == 1):
+        checking_reservation_queue(queue_file_name, priority_queue_file_name, False)
     return ("Add to reservation queue " + str(request["serverID"]) + " " + request["password"])
 
 
@@ -65,11 +71,14 @@ def main_server():
                         help='set port number for server')
     parser.add_argument('-f', '--file', default=QUEUE_FILE_NAME,
                         help='set file for reservation queue')
+    parser.add_argument('-r', '--priority', default=PRIORITY_QUEUE_FILE_NAME,
+                        help='set file for reservation priority queue')
 
     args = parser.parse_args()
     host = args.host
     port = args.port
     queue_file_name = args.file
+    priority_queue_file_name = args.priority
 
     # set up server
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -77,7 +86,7 @@ def main_server():
     sock.bind((host, port))
     sock.listen(5)
 
-    thread = Thread(target=checking_reservation_queue, args=[queue_file_name])
+    thread = Thread(target=checking_reservation_queue, args=[queue_file_name, priority_queue_file_name])
     thread.daemon = True
     thread.start()
 
@@ -86,7 +95,7 @@ def main_server():
         data = connect.recv(1024).strip()
         if data == "KONIEC":
             break
-        response(connect, data, queue_file_name)
+        response(connect, data, queue_file_name, priority_queue_file_name)
 
     sock.close()
 
