@@ -41,8 +41,7 @@ class TestLineReservation(CloudReservationApi):
         try:
             self.__set_id(super(TestLineReservation, self).create_reservation(testline_type, enb_build, ute_build,
                                                                               sysimage_build, robotlte_revision, state, duration))
-            print self.get_id()
-            return 0
+            return self.get_id()
         except ApiMaxReservationCountExceededException:
             print 'User max reservation count exceeded'
             return -103  # User max reservation count exceeded
