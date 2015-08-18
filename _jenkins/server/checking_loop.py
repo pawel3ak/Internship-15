@@ -20,15 +20,17 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, loop =
     while True:
         print "loop"
         test_reservation = TestLineReservation()
-        if (test_reservation.get_available_tl_count() > 2):
+        if (test_reservation.get_available_tl_count() >= 2):
             if queue.check_queue_length(priority_queue_file_name) > 0:
                 request = queue.read_next_from_queue(priority_queue_file_name)
+                sleep(15)
                 queue.delete_reservation_from_queue(priority_queue_file_name, request["serverID"], request["password"])
                 thread = Thread(target=supervisor.main, args=[request["serverID"], request["reservation_data"], "parent ID", request["user_info"], request["jenkins_info"]])
                 thread.daemon = True
                 thread.start()
             elif queue.check_queue_length(queue_file_name) > 0:
                 request = queue.read_next_from_queue(queue_file_name)
+                sleep(15)
                 queue.delete_reservation_from_queue(queue_file_name, request["serverID"], request["password"])
                 thread = Thread(target=supervisor.main, args=[request["serverID"], request["reservation_data"], "parent ID", request["user_info"], request["jenkins_info"]])
                 thread.daemon = True
