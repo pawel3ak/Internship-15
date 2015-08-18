@@ -122,6 +122,22 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
     print parent_dict
     print user_info
     print jenkins_info
+    from time import sleep
+    sleep(3)
+    print "dziecko widzi = ", parent_dict
+    parent_dict['trzy'] = 'cztery'
+    #sleep(5)
+    from threading import Thread
+    from kolejne_dziecko import mmmm
+    # from multiprocessing import Manager
+    # man = Manager()
+    # dict = man.dict()
+    # dict = parent_dict
+    thread = Thread(target=mmmm, args=[parent_dict])
+    thread.daemon = True
+    thread.start()
+    time.sleep(2)
+    print "dziecko widzi (2) = ", parent_dict
     '''
     reservationID = create_reservation_and_run_job(reservation_data['testline_type'],
                                                    reservation_data['enb_build'],
