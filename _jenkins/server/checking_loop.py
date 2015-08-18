@@ -8,12 +8,19 @@
 """
 
 from time import sleep
-import json
 from threading import Thread
 
 import reservation_queue as queue
 import supervisor
 from tl_reservation import TestLineReservation
+
+
+def start_reservation(queue_file):
+    request = queue.read_next_from_queue(queue_file)
+    queue.delete_reservation_from_queue(queue_file, request["serverID"], request["password"])
+    thread = Thread(target=supervisor.main, args=[request["serverID"], request["reservation_data"], "parent ID", request["user_info"], request["jenkins_info"]])
+    thread.daemon = True
+    thread.start()
 
 
 def checking_reservation_queue(queue_file_name, priority_queue_file_name, loop = True):
@@ -22,22 +29,11 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, loop =
         test_reservation = TestLineReservation()
         if (test_reservation.get_available_tl_count() >= 2):
             if queue.check_queue_length(priority_queue_file_name) > 0:
-                request = queue.read_next_from_queue(priority_queue_file_name)
-                sleep(15)
-                queue.delete_reservation_from_queue(priority_queue_file_name, request["serverID"], request["password"])
-                thread = Thread(target=supervisor.main, args=[request["serverID"], request["reservation_data"], "parent ID", request["user_info"], request["jenkins_info"]])
-                thread.daemon = True
-                thread.start()
+                start_reservation(priority_queue_file_name)
             elif queue.check_queue_length(queue_file_name) > 0:
-                request = queue.read_next_from_queue(queue_file_name)
-                sleep(15)
-                queue.delete_reservation_from_queue(queue_file_name, request["serverID"], request["password"])
-                thread = Thread(target=supervisor.main, args=[request["serverID"], request["reservation_data"], "parent ID", request["user_info"], request["jenkins_info"]])
-                thread.daemon = True
-                thread.start()
+                start_reservation(queue_file_name)
             print "SCRIPT"
-
         if loop:
             sleep(30) # 1800??
-        if loop is False:
+        else:
             break

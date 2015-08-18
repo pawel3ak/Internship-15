@@ -10,7 +10,9 @@
 import json
 
 
-default_file = "reservation_queue"
+def create_file(file):
+    with open(file, "ab+") as open_file:
+        pass
 
 
 def write_to_queue(file_name, record):
@@ -44,6 +46,7 @@ def check_queue_length(file_name):
 
 
 if __name__ == "__main__":
+    default_file = "reservation_queue"
     a = ({'serverID': 111, 'tekst': 'simple', 'list': 'list', 'password': 'abcd'})
     b = ({'serverID': 112, 'tekst': 'simple2', 'list': 'list2', 'password': 'abcd'})
     print check_queue_length(default_file)

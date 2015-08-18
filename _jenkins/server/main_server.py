@@ -36,15 +36,9 @@ def generate_password(passw_lenght=4):
 
 def response(connect, message, queue_file_name, priority_queue_file_name):
     if message == "request/create_reservation": new_request(connect, queue_file_name, priority_queue_file_name)
-    elif message == "request/available_tl_count" : _get_available_tl_count(connect)
+    elif message == "request/available_tl_count": _get_available_tl_count(connect)
     else: message == "Wrong command"
-    # working_dictionary = {"request/create_reservation": new_request(connect, queue_file_name, priority_queue_file_name)}
-    # try:
-    #     message = working_dictionary[message]
-    # except Exception:
-    #     message = 'Wrong command'
-    #connect.send(message)
-    #connect.close()
+
 
 def _get_available_tl_count(connect):
     testline_handle = tl_reservation.TestLineReservation()
@@ -68,7 +62,7 @@ def new_request(connect, queue_file_name, priority_queue_file_name):
         queue.write_to_queue(priority_queue_file_name, request)
     if (queue.check_queue_length(queue_file_name) == 1) or (queue.check_queue_length(priority_queue_file_name) == 1):
         checking_reservation_queue(queue_file_name, priority_queue_file_name, False)
-    return ("Add to reservation queue " + str(request["serverID"]) + " " + request["password"])
+    connect.close()
 
 
 def main_server():
@@ -88,16 +82,22 @@ def main_server():
     queue_file_name = args.file
     priority_queue_file_name = args.priority
 
+    # create files if no exist
+    queue.create_file(queue_file_name)
+    queue.create_file(priority_queue_file_name)
+
     # set up server
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((host, port))
     sock.listen(5)
 
+    # start checking loop
     thread = Thread(target=checking_reservation_queue, args=[queue_file_name, priority_queue_file_name])
     thread.daemon = True
     thread.start()
 
+    # main server loop
     while True:
         connect, address = sock.accept()
         data = connect.recv(1024).strip()
