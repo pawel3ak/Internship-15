@@ -12,6 +12,8 @@ import sys
 import json
 
 HOST_IP, HOST_PORT = "127.0.0.1", 5005
+request = "request/available_tl_count"
+'''
 request = "request/create_reservation"
 data = json.dumps({'reservation_data' :
                        {'testline_type' : 'CLOUD_F'},
@@ -27,7 +29,7 @@ data = json.dumps({'reservation_data' :
                              't2'       : 'trzeci'}
                        },
                    })
-
+'''
 sock = socket.socket(socket.AF_INET,
                      socket.SOCK_STREAM)
 sock.connect((HOST_IP, HOST_PORT))

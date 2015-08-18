@@ -11,7 +11,7 @@ import socket
 import json
 import argparse
 from threading import Thread
-
+import tl_reservation
 import reservation_queue as queue
 from checking_loop import checking_reservation_queue
 
@@ -35,12 +35,20 @@ def generate_password(passw_lenght=4):
 
 
 def response(connect, message, queue_file_name, priority_queue_file_name):
-    working_dictionary = {"request/create_reservation": new_request(connect, queue_file_name, priority_queue_file_name)}
-    try:
-        message = working_dictionary[message]
-    except Exception:
-        message = 'Wrong command'
-    connect.send(message)
+    if message == "request/create_reservation": new_request(connect, queue_file_name, priority_queue_file_name)
+    elif message == "request/available_tl_count" : _get_available_tl_count(connect)
+    else: message == "Wrong command"
+    # working_dictionary = {"request/create_reservation": new_request(connect, queue_file_name, priority_queue_file_name)}
+    # try:
+    #     message = working_dictionary[message]
+    # except Exception:
+    #     message = 'Wrong command'
+    #connect.send(message)
+    #connect.close()
+
+def _get_available_tl_count(connect):
+    testline_handle = tl_reservation.TestLineReservation()
+    connect.send(str((testline_handle.get_available_tl_count_group_by_type())['CLOUD_F']))
     connect.close()
 
 
