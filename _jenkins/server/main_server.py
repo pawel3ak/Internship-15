@@ -55,7 +55,7 @@ def new_request(connect, queue_file_name):
     queue.write_to_queue(queue_file_name, request)
     if queue.check_queue_length(queue_file_name) == 1:
         checking_reservation_queue(queue_file_name, False)
-    return ("Add to reservation queue" + str(request["serverID"]) + request["password"])
+    return ("Add to reservation queue " + str(request["serverID"]) + " " + request["password"])
 
 
 def main_server():

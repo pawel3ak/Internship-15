@@ -117,28 +117,7 @@ def _get_job_test_status(job_output):
 
 
 def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
-    print serverID
-    print reservation_data
-    print parent_dict
-    print user_info
-    print jenkins_info
-    from time import sleep
-    sleep(3)
-    print "dziecko widzi = ", parent_dict
-    parent_dict['trzy'] = 'cztery'
-    #sleep(5)
-    from threading import Thread
-    from kolejne_dziecko import mmmm
-    # from multiprocessing import Manager
-    # man = Manager()
-    # dict = man.dict()
-    # dict = parent_dict
-    thread = Thread(target=mmmm, args=[parent_dict])
-    thread.daemon = True
-    thread.start()
-    time.sleep(2)
-    print "dziecko widzi (2) = ", parent_dict
-    '''
+
     reservationID = create_reservation_and_run_job(reservation_data['testline_type'],
                                                    reservation_data['enb_build'],
                                                    reservation_data['ute_build'],
@@ -165,7 +144,7 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
                             job_test_status=job_test_status_dict, busy_status=False)
         send_information(reservation_data, tl_name, user_info, test_passed=True)
 
-    '''
+
 # if __name__ == '__main__':
 #     main()
     # reservationID = create_reservation_and_run_job(testline_type="CLOUD_F")
