@@ -37,7 +37,9 @@ def generate_password(passw_lenght=4):
 def response(connect, message, queue_file_name, priority_queue_file_name):
     if message == "request/create_reservation": new_request(connect, queue_file_name, priority_queue_file_name)
     elif message == "request/available_tl_count": _get_available_tl_count(connect)
-    else: message == "Wrong command"
+    else:
+        connect.send("Wrong command")
+        connect.close()
 
 
 def _get_available_tl_count(connect):

@@ -27,7 +27,7 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, loop =
     while True:
         print "loop"
         test_reservation = TestLineReservation()
-        if (test_reservation.get_available_tl_count() >= 2):
+        if ((test_reservation.get_available_tl_count_group_by_type())['CLOUD_F'] > 2):
             if queue.check_queue_length(priority_queue_file_name) > 0:
                 start_reservation(priority_queue_file_name)
             elif queue.check_queue_length(queue_file_name) > 0:

@@ -73,11 +73,14 @@ class TestLineReservation(CloudReservationApi):
 
 if __name__ == '__main__':
     print 'abc'
-    reservation = TestLineReservation(63530)
+    #9:47 (11:47)
+    # reservation = TestLineReservation(65454)
+    reservation = TestLineReservation(65455)
+    #print reservation.create_reservation(testline_type="CLOUD_F", duration=600)
     print reservation.get_address()
     print reservation.get_reservation_status()
     print reservation.get_reservation_details()
     print reservation.release_reservation()
-    print reservation.get_address()
-    print reservation.get_reservation_status()
-    print reservation.get_reservation_details()
+    # print reservation.get_address()
+    # print reservation.get_reservation_status()
+    # print reservation.get_reservation_details()
