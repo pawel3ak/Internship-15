@@ -23,6 +23,10 @@ def get_catalog_list(dir):
 
 def make_queue_from_test(queue_file, dir):
     dirlist = get_catalog_list(dir)
+    request = {}
+    request['serverID'] = queue.get_server_ID_number()
+    request['password'] = queue.generate_password()
+    queue.write_to_queue(queue_file, request)
     # IN PROGRES
 
 

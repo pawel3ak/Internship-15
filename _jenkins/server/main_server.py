@@ -20,19 +20,7 @@ HOST_IP = "127.0.0.1"
 HOST_PORT = 5005
 QUEUE_FILE_NAME = "reservation_queue"
 PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
-ID_NUMBER = 1
 FREE_TL = 3
-
-
-def generate_password(passw_lenght=4):
-    import random
-
-    alphabet = "abcdefghijklmnopqrstuvwxyz0123456789"
-    password = ""
-    for i in range(passw_lenght):
-        next_sign = random.randrange(len(alphabet))
-        password += alphabet[next_sign]
-    return password
 
 
 def response(connect, message, queue_file_name, priority_queue_file_name):
@@ -53,10 +41,8 @@ def new_request(connect, queue_file_name, priority_queue_file_name):
     connect.send("OK")
     data = connect.recv(1024).strip()
     request = json.loads(data)
-    global ID_NUMBER
-    request['serverID'] = ID_NUMBER
-    ID_NUMBER += 1
-    request['password'] = generate_password()
+    request['serverID'] = queue.get_server_ID_number()
+    request['password'] = queue.generate_password()
     if request['priority'] == 0:
         request.pop('priority')
         queue.write_to_queue(queue_file_name, request)

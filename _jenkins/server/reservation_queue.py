@@ -47,16 +47,36 @@ def check_queue_length(file_name):
         # add option to ignor empty lines!!!!!!!!!!!!
 
 
+def get_server_ID_number():
+    id_file = "temp_id"
+    with open(id_file, "ab+") as open_file:
+        lines = open_file.readlines()
+    if len(lines) == 0:
+        write_to_queue(id_file, 1)
+        return 1
+    elif len(lines) == 1:
+        id_number = read_next_from_queue(id_file) + 1
+        with open(id_file, "wb+") as open_file:
+            json.dump(id_number, open_file)
+        return id_number
+    else:
+        id_number = 1
+        with open(id_file, "wb+") as open_file:
+            json.dump(id_number, open_file)
+        return id_number
+
+
+def generate_password(passw_lenght=4):
+    import random
+
+    alphabet = "abcdefghijklmnopqrstuvwxyz0123456789"
+    password = ""
+    for i in range(passw_lenght):
+        next_sign = random.randrange(len(alphabet))
+        password += alphabet[next_sign]
+    return password
+
+
+
 if __name__ == "__main__":
-    default_file = "reservation_queue"
-    a = ({'serverID': 111, 'tekst': 'simple', 'list': 'list', 'password': 'abcd'})
-    b = ({'serverID': 112, 'tekst': 'simple2', 'list': 'list2', 'password': 'abcd'})
-    print check_queue_length(default_file)
-    write_to_queue(default_file, a)
-    write_to_queue(default_file, b)
-    print check_queue_length(default_file)
-    print read_next_from_queue(default_file)
-    delete_reservation_from_queue(default_file, 111, 'abcd')
-    print check_queue_length(default_file)
-    delete_reservation_from_queue(default_file, 112, 'abcd')
-    print check_queue_length(default_file)
+    print get_server_ID_number()
