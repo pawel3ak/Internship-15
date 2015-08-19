@@ -8,6 +8,7 @@
 """
 
 import json
+import random
 
 
 def create_file(file):
@@ -43,7 +44,7 @@ def delete_reservation_from_queue(file_name, queue_number, password):
 def check_queue_length(file_name):
     with open(file_name, "rb") as queue_file:
         return len(queue_file.readlines())
-        # add option to ignor empty lines
+        # add option to ignor empty lines!!!!!!!!!!!!
 
 
 if __name__ == "__main__":

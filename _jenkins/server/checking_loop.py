@@ -15,11 +15,16 @@ import supervisor
 from tl_reservation import TestLineReservation
 
 
-def get_catalog_list():
-    dir = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN'
+def get_catalog_list(dir):
     dirlist = []
     [dirlist.append(x) for x in os.listdir(dir) if os.path.isdir(os.path.join(dir,x))]
     return dirlist
+
+
+def make_queue_from_test(queue_file, dir):
+    dirlist = get_catalog_list(dir)
+    # IN PROGRES
+
 
 def start_reservation(queue_file):
     request = queue.read_next_from_queue(queue_file)
@@ -37,6 +42,9 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
             if queue.check_queue_length(priority_queue_file_name) > 0:
                 start_reservation(priority_queue_file_name)
             elif queue.check_queue_length(queue_file_name) > 0:
+                start_reservation(queue_file_name)
+            elif queue.check_queue_length(queue_file_name) == 0:
+                make_queue_from_test(queue_file_name, '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN')
                 start_reservation(queue_file_name)
             print "SCRIPT"
         if loop:
