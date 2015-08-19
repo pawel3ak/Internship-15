@@ -23,17 +23,20 @@ def get_catalog_list(dir):
 
 def make_queue_from_test(queue_file, dir):
     dirlist = get_catalog_list(dir)
-    request = {}
-    request['serverID'] = queue.get_server_ID_number()
-    request['password'] = queue.generate_password()
-    queue.write_to_queue(queue_file, request)
-    # IN PROGRES
+    for directory in dirlist:
+        request = {'reservation_data': {},
+                   'serverID': queue.get_server_ID_number(),
+                   'password': queue.generate_password(),
+                   'user_info': {},
+                   'jenkins_info': {'parameters': {'name': directory}}
+                   }
+        queue.write_to_queue(queue_file, request)
 
 
 def start_reservation(queue_file):
     request = queue.read_next_from_queue(queue_file)
     queue.delete_reservation_from_queue(queue_file, request["serverID"], request["password"])
-    thread = Thread(target=supervisor.main, args=[request["serverID"], request["reservation_data"], "parent ID", request["user_info"], request["jenkins_info"]])
+    thread = Thread(target=supervisor.main, args=[request["serverID"], request["reservation_data"], "000", request["user_info"], request["jenkins_info"]])
     thread.daemon = True
     thread.start()
 
@@ -55,3 +58,10 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
             sleep(30) # 1800??
         else:
             break
+
+
+if __name__ == "__main__":
+    directory = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN'
+    queue_file = 'reservation_queue'
+    make_queue_from_test(queue_file, directory)
+    print "END"
