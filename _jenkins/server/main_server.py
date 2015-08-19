@@ -21,6 +21,7 @@ HOST_PORT = 5005
 QUEUE_FILE_NAME = "reservation_queue"
 PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
 ID_NUMBER = 1
+FREE_TL = 3
 
 
 def generate_password(passw_lenght=4):
@@ -37,7 +38,9 @@ def generate_password(passw_lenght=4):
 def response(connect, message, queue_file_name, priority_queue_file_name):
     if message == "request/create_reservation": new_request(connect, queue_file_name, priority_queue_file_name)
     elif message == "request/available_tl_count": _get_available_tl_count(connect)
-    else: message == "Wrong command"
+    else:
+        connect.send("Wrong command")
+        connect.close()
 
 
 def _get_available_tl_count(connect):
@@ -71,6 +74,8 @@ def main_server():
                         help='set IP addres for server')
     parser.add_argument('-p', '--port', type=int, default=HOST_PORT,
                         help='set port number for server')
+    parser.add_argument('-t', '--freetl', type=int, default=FREE_TL,
+                        help='set how many free telstline will be available for users')
     parser.add_argument('-f', '--file', default=QUEUE_FILE_NAME,
                         help='set file for reservation queue')
     parser.add_argument('-r', '--priority', default=PRIORITY_QUEUE_FILE_NAME,
@@ -79,6 +84,7 @@ def main_server():
     args = parser.parse_args()
     host = args.host
     port = args.port
+    free_testline = args.freetl
     queue_file_name = args.file
     priority_queue_file_name = args.priority
 
@@ -93,7 +99,8 @@ def main_server():
     sock.listen(5)
 
     # start checking loop
-    thread = Thread(target=checking_reservation_queue, args=[queue_file_name, priority_queue_file_name])
+
+    thread = Thread(target=checking_reservation_queue, args=[queue_file_name, priority_queue_file_name, free_testline])
     thread.daemon = True
     thread.start()
 

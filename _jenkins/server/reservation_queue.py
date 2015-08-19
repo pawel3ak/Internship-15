@@ -22,8 +22,8 @@ def write_to_queue(file_name, record):
 
 
 def read_next_from_queue(file_name):
-        with open(file_name, "rb") as queue_file:
-            return json.loads(queue_file.readline())
+    with open(file_name, "rb") as queue_file:
+        return json.loads(queue_file.readline())
 
 
 def delete_reservation_from_queue(file_name, queue_number, password):
@@ -43,6 +43,7 @@ def delete_reservation_from_queue(file_name, queue_number, password):
 def check_queue_length(file_name):
     with open(file_name, "rb") as queue_file:
         return len(queue_file.readlines())
+        # add option to ignor empty lines
 
 
 if __name__ == "__main__":
