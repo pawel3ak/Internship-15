@@ -9,11 +9,17 @@
 
 from time import sleep
 from threading import Thread
-
+import os
 import reservation_queue as queue
 import supervisor
 from tl_reservation import TestLineReservation
 
+
+def get_catalog_list():
+    dir = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN'
+    dirlist = []
+    [dirlist.append(x) for x in os.listdir(dir) if os.path.isdir(os.path.join(dir,x))]
+    return dirlist
 
 def start_reservation(queue_file):
     request = queue.read_next_from_queue(queue_file)
