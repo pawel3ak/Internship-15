@@ -36,22 +36,20 @@ def reservation_status(id):
     while True:
         if reservation.get_reservation_status() == reservation_status_dict[1] or\
                         reservation.get_reservation_status() == reservation_status_dict[2]:
-            print "jeszcze nie"
-            time.sleep(30)
+            time.sleep(60)
         elif reservation.get_reservation_status() == reservation_status_dict[3]:
             return 0
         elif reservation.get_reservation_status() == reservation_status_dict[4] or\
                         reservation.get_reservation_status() == reservation_status_dict[5]:
-            raise "Reservation already canceled or finished"
+            return -1
+
 
 def _get_tl_name(id):
     reservation = tlr.TestLineReservation(id)
     return reservation.get_reservation_details()['testline']['name']
 
+
 def send_information(id,tl_name,user_info, test_passed = None, tests_status = None):
-    # user_info['first_name']
-    # user_info['last_name']
-    # user_info['e-mail']
     if test_passed == None:
         _message = "Hello {f_name} {l_name}! \n\n" \
                    "Your reservation is pending.\n" \
@@ -88,27 +86,30 @@ def send_information(id,tl_name,user_info, test_passed = None, tests_status = No
     send.connect()
     send.send(mail)
 
-def _update_tl_name(job, tl_name):
-    job_config_xml = ET.fromstring(job.get_config())
-    assignedNode_tag = job_config_xml.find('assignedNode')
-    assignedNode_tag.text = str(tl_name)
-    job.update_config(ET.tostring(job_config_xml))
+
+# def _update_tl_name(job, tl_name):
+#     job_config_xml = ET.fromstring(job.get_config())
+#     assignedNode_tag = job_config_xml.find('assignedNode')
+#     assignedNode_tag.text = str(tl_name)
+#     job.update_config(ET.tostring(job_config_xml))
 
 
 def _create_and_build_job(jenkins_info, tl_name):
-    _job_name = jenkins_info['name']
+    _job_name = 'test_on_{tl_name}'.format(tl_name=tl_name)
     job_parameters = jenkins_info['parameters']
     job_api = jenkinsapi.api.Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
     job = job_api.get_job(_job_name)
-    _update_tl_name(job, tl_name)
+    # _update_tl_name(job, tl_name)
     job_api.build_job(jobname=_job_name, params=job_parameters)
     return job
 
-def _get_jenkins_console_output(jenkins_info, job):
-    time.sleep(5)       #let the new job build get started
+
+def _get_jenkins_console_output(job):
+    time.sleep(10)       #let the new job build get started
     while job.get_last_build().get_status() == None:
         time.sleep(30)      ###############TODO longer sleep on real tests
     return job.get_last_build().get_console()
+
 
 def _update_parent_dict(serverID, parent_dict, id, busy_status, tl_name, duration, job_test_status=None):
     parent_dict[serverID]['reservationID'] = id
@@ -139,8 +140,10 @@ def _get_job_test_status(job_output):
 
     return tests_dict, has_got_fail
 
+
 def _check_for_fails(output):
     return output.find('| FAIL |')
+
 
 def _end(id, has_got_fail, tl_name, user_info, job_test_status, jenkins_console_output=None):
     if has_got_fail == False:
@@ -153,9 +156,7 @@ def _end(id, has_got_fail, tl_name, user_info, job_test_status, jenkins_console_
     return 0
 
 
-
 def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
-
     reservationID = create_reservation_and_run_job(reservation_data['testline_type'],
                                                    reservation_data['enb_build'],
                                                    reservation_data['ute_build'],
@@ -166,66 +167,24 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
     _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
                         tl_name='', duration=reservation_data['duration'])
     if not reservation_status(reservationID) == 0:
-        raise "Some weird exception"
+        parent_dict[serverID]['busy'] = False
+        return -1
     tl_name = _get_tl_name(reservationID)
+
+    ############################################################################
+    #temporary hard-coded  variables:
+    tl_name = 'tl_99_test'
+    user_info = {'first_name' : 'Pawel',
+                'last_name' : 'Nogiec',
+                'e-mail' : 'pawel.nogiec@nokia.com'}
+    #############################################################################
     _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
                         tl_name=tl_name, duration=reservation_data['duration'])
 
     job = _create_and_build_job(jenkins_info, tl_name)
-    jenkins_console_output = _get_jenkins_console_output(jenkins_info, job)
+    jenkins_console_output = _get_jenkins_console_output(job)
     job_test_status_dict, has_got_fail = _get_job_test_status(job_output=jenkins_console_output)
-    if has_got_fail:
-        _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID,
-                            busy_status=False, tl_name=tl_name, duration=reservation_data['duration'],
-                            job_test_status=job_test_status_dict)
-        send_information(id=reservationID, tl_name=tl_name,
-                         user_info={'first_name' : 'Pawel',
-                                    'last_name' : 'Nogiec',
-                                    'e-mail' : 'pawel.nogiec@nokia.com'},
-                         test_passed=False)
-    else:
-        _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
-                        tl_name=tl_name, duration=reservation_data['duration'],
-                        job_test_status='ALL tests passed')
-        send_information(id=reservationID, tl_name=tl_name,
-                         user_info={'first_name' : 'Pawel',
-                                    'last_name' : 'Nogiec',
-                                    'e-mail' : 'pawel.nogiec@nokia.com'},
-                         test_passed=True)
-
-
-if __name__ == '__main__':
-#     main()
-#     reservationID = create_reservation_and_run_job(testline_type="CLOUD_F", duration=120)
-#     print reservationID
-#     time.sleep(2)
-#     if not reservation_status(reservationID) == 0:
-#         raise "Some weird exception"
-#     print _get_tl_name(reservationID)
-#     print reservation_status(reservationID)
-
-    tl_name = 'tl99_test'
-    reservation_data = {'duration' : 120}
-    reservationID = 65554
-    serverID = 124
-    parent_dict = {serverID : {}}
-    _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
-                        tl_name=tl_name, duration=reservation_data['duration'])
-    print parent_dict
-    jenkins_info = {'name' : 'test_job2_tl99',
-                    'parameters' : {
-                        'name' : ''}
-                    }
-    user_info = {'first_name' : 'Pawel',
-                'last_name' : 'Nogiec',
-                'e-mail' : 'pawel.nogiec@nokia.com'}
-
-    job = _create_and_build_job(jenkins_info,tl_name=tl_name)
-    jenkins_console_output = _get_jenkins_console_output(jenkins_info, job)
-    job_test_status_dict, has_got_fail = _get_job_test_status(jenkins_console_output)
-    print job_test_status_dict, has_got_fail
     _end(id=reservationID, has_got_fail=has_got_fail, tl_name=tl_name,
          job_test_status=job_test_status_dict, user_info=user_info)
-
-    print parent_dict
-    print "done"
+    del parent_dict[serverID]
+    return 0
