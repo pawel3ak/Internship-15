@@ -1,0 +1,2724 @@
+---
+Nr: 1
+Time: '12:26:53.82 '
+Epoch: '1438597613.820000 '
+Payload: ##:LOG:############################################################################<\n>##
+  LID=2015/08/03-12:26:53.82<\n><\n>
+Type_of_record: S
+---
+Nr: 2
+Time: '13:25:27.75 '
+Epoch: '1438601127.749472 '
+Payload: ''
+Type_of_record: O
+---
+Nr: 3
+Time: '13:25:27.75 '
+Epoch: '1438601127.750268 '
+Payload: 'Connection ''127.0.0.1.34255'' established via tcp 127.0.0.1:34255 9854
+  (open #1)<\n>'
+Type_of_record: O
+---
+Nr: 4
+Time: '13:25:27.75 '
+Epoch: '1438601127.752658 '
+Payload: starting,Event::JsonRpcRequest<\n>
+Type_of_record: H
+---
+Nr: 5
+Time: '13:25:27.75 '
+Epoch: '1438601127.753127 '
+Payload: '{"id": 1,"jsonrpc": "2.0","method": "register_callback_handler","params":
+  {"callback_name": "server_async_calls"}}'
+Type_of_record: ' '
+---
+Nr: 6
+Time: '13:25:27.85 '
+Epoch: '1438601127.853814 '
+Payload: '{"jsonrpc": "2.0","result": 1,"id": 1}<\n>'
+Type_of_record: '>'
+---
+Nr: 7
+Time: '13:25:27.86 '
+Epoch: '1438601127.856105 '
+Payload: '{"id": 2,"jsonrpc": "2.0","method": "class_call","params": {"class": "DevMgr","expect":
+  "scalar","method": "find_existed_device_name","params": {"-NAME": "ENB1"}}}'
+Type_of_record: ' '
+---
+Nr: 8
+Time: '13:25:27.86 '
+Epoch: '1438601127.857603 '
+Payload: '{"jsonrpc": "2.0","result": "ENB1","id": 2}<\n>'
+Type_of_record: '>'
+---
+Nr: 9
+Time: '13:25:27.86 '
+Epoch: '1438601127.858999 '
+Payload: '{"id": 3,"jsonrpc": "2.0","method": "class_call","params": {"class": "DevMgr","expect":
+  "object_instance","method": "get_device","params": {"-NAME": "ENB1"}}}'
+Type_of_record: ' '
+---
+Nr: 10
+Time: '13:25:29.91 '
+Epoch: '1438601129.909487 '
+Payload: '{"jsonrpc": "2.0","result": "Device::Unix=HASH(0x2aebc58)","id": 3}<\n>'
+Type_of_record: '>'
+---
+Nr: 11
+Time: '13:25:29.91 '
+Epoch: '1438601129.911484 '
+Payload: '{"id": 4,"jsonrpc": "2.0","method": "object_call","params": {"expect": "object_instance","method":
+  "get_connection","object_id": "Device::Unix=HASH(0x2aebc58)","params": null}}'
+Type_of_record: ' '
+---
+Nr: 12
+Time: '13:25:29.91 '
+Epoch: '1438601129.912643 '
+Payload: '{"jsonrpc": "2.0","result": "Connection::Ssh=HASH(0x2aec678)","id": 4}<\n>'
+Type_of_record: '>'
+---
+Nr: 13
+Time: '13:25:29.91 '
+Epoch: '1438601129.913845 '
+Payload: '{"id": 5,"jsonrpc": "2.0","method": "class_call","params": {"class": "DevMgr","expect":
+  "object_instance","method": "get_device","params": {"-NAME": "emss1"}}}'
+Type_of_record: ' '
+---
+Nr: 14
+Time: '13:25:30.02 '
+Epoch: '1438601130.021315 '
+Payload: '{"jsonrpc": "2.0","result": "Device::EMSS=HASH(0x2bd0210)","id": 5}<\n>'
+Type_of_record: '>'
+---
+Nr: 15
+Time: '13:25:30.02 '
+Epoch: '1438601130.022561 '
+Payload: '{"id": 6,"jsonrpc": "2.0","method": "object_call","params": {"expect": "object_instance","method":
+  "get_connection","object_id": "Device::EMSS=HASH(0x2bd0210)","params": null}}'
+Type_of_record: ' '
+---
+Nr: 16
+Time: '13:25:30.02 '
+Epoch: '1438601130.023694 '
+Payload: '{"jsonrpc": "2.0","result": "Connection::EMSS=HASH(0x2c32470)","id": 6}<\n>'
+Type_of_record: '>'
+---
+Nr: 17
+Time: '13:25:30.03 '
+Epoch: '1438601130.026013 '
+Payload: '{"id": 7,"jsonrpc": "2.0","method": "object_call","params": {"expect": "object_instance","method":
+  "cmd_disp_all","object_id": "Device::EMSS=HASH(0x2bd0210)","params": {"-NEW_INSTANCE":
+  95774352,"-OBJECT": "LNBTS","-TIMEOUT": 10}}}'
+Type_of_record: ' '
+---
+Nr: 18
+Time: '13:25:30.06 '
+Epoch: '1438601130.058152 '
+Payload: '{"jsonrpc": "2.0","result": "Command::EMSS::FLEXI::disp_all=HASH(0x2c492e0)","id":
+  7}<\n>'
+Type_of_record: '>'
+---
+Nr: 19
+Time: '13:25:30.06 '
+Epoch: '1438601130.059704 '
+Payload: '{"id": 8,"jsonrpc": "2.0","method": "object_call","params": {"expect": "scalar","method":
+  "run","object_id": "Command::EMSS::FLEXI::disp_all=HASH(0x2c492e0)","params": {"-OBJECT":
+  "LNBTS","-TIMEOUT": 10}}}'
+Type_of_record: ' '
+---
+Nr: 20
+Time: '13:25:30.49 '
+Epoch: '1438601130.486599 '
+Payload: '{"jsonrpc": "2.0","result": "1","id": 8}<\n>'
+Type_of_record: '>'
+---
+Nr: 21
+Time: '13:25:30.49 '
+Epoch: '1438601130.487955 '
+Payload: '{"id": 9,"jsonrpc": "2.0","method": "object_call","params": {"expect": "scalar","method":
+  "get","object_id": "Command::EMSS::FLEXI::disp_all=HASH(0x2c492e0)","params": ["-STATUS"]}}'
+Type_of_record: ' '
+---
+Nr: 22
+Time: '13:25:30.49 '
+Epoch: '1438601130.489220 '
+Payload: '{"jsonrpc": "2.0","result": "SUCCESS","id": 9}<\n>'
+Type_of_record: '>'
+---
+Nr: 23
+Time: '13:25:30.49 '
+Epoch: '1438601130.490256 '
+Payload: '{"id": 10,"jsonrpc": "2.0","method": "object_call","params": {"expect":
+  "scalar","method": "await_finish","object_id": "Command::EMSS::FLEXI::disp_all=HASH(0x2c492e0)","params":
+  {"-TIMEOUT": 9.5693199634552}}}'
+Type_of_record: ' '
+---
+Nr: 24
+Time: '13:25:30.49 '
+Epoch: '1438601130.491308 '
+Payload: '{"jsonrpc": "2.0","result": 1,"id": 10}<\n>'
+Type_of_record: '>'
+---
+Nr: 25
+Time: '13:25:30.49 '
+Epoch: '1438601130.492427 '
+Payload: '{"id": 11,"jsonrpc": "2.0","method": "object_call","params": {"expect":
+  "scalar","method": "get","object_id": "Command::EMSS::FLEXI::disp_all=HASH(0x2c492e0)","params":
+  ["-STATUS"]}}'
+Type_of_record: ' '
+---
+Nr: 26
+Time: '13:25:30.49 '
+Epoch: '1438601130.493355 '
+Payload: '{"jsonrpc": "2.0","result": "SUCCESS","id": 11}<\n>'
+Type_of_record: '>'
+---
+Nr: 27
+Time: '13:25:30.49 '
+Epoch: '1438601130.494481 '
+Payload: '{"id": 12,"jsonrpc": "2.0","method": "object_call","params": {"expect":
+  null,"method": "returned_data","object_id": "Command::EMSS::FLEXI::disp_all=HASH(0x2c492e0)","params":
+  {}}}'
+Type_of_record: ' '
+---
+Nr: 28
+Time: '13:25:30.51 '
+Epoch: '1438601130.506427 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   {<\n>      "LNBTS-99" : {<\n>         "actHighPrioServices"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "rlfBasedRCRdefault"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actL1PM"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actDualBand"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "minNotActivatedUtraRSCFS"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "24"<\n>         },<\n>         "actHOtoHrpd"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "prohibitPsHOtoWcdma"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "rlcProf103"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "snFieldLengthDL"
+  : "10bit",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "103",<\n>                  "snFieldLengthUL" : "10bit"<\n>               }<\n>            ]<\n>         },<\n>         "tS1RelPrepU"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "2000"<\n>         },<\n>         "keyRefrMarg"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "50000"<\n>         },<\n>         "actOperatorQCIGBR"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "rlcProf101"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "snFieldLengthDL"
+  : "5bit",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "101",<\n>                  "snFieldLengthUL" : "5bit"<\n>               }<\n>            ]<\n>         },<\n>         "actMroInterRatUtran"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "congWeightAlg"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "qciPrio"<\n>         },<\n>         "actLPPaOtdoa"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actFlexScellSelect"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actCompChecks"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "anrUtraTRSCFS"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "5000ms"<\n>         },<\n>         "actNwReqUeCapa"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "amRlcPBTab4"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "ulPollByte"
+  : "750kB",<\n>                  "dlPollByte" : "250kB",<\n>                  "ueCategory"
+  : "4"<\n>               }<\n>            ]<\n>         },<\n>         "qciTab6"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "enforceTtiBundling"
+  : "false",<\n>                  "pdcpProfIdx" : "2",<\n>                  "dscp"
+  : "18",<\n>                  "prio" : "6",<\n>                  "rlcProfIdx" : "2",<\n>                  "schedulPrio"
+  : "9",<\n>                  "drxProfileIndex" : "3",<\n>                  "lcgid"
+  : "3",<\n>                  "rlcProfIdx3cc" : "6",<\n>                  "qciSupp"
+  : "ENABLE",<\n>                  "schedulWeight" : "20",<\n>                  "schedulBSD"
+  : "300ms",<\n>                  "rlcMode" : "RLC_AM",<\n>                  "resType"
+  : "nonGBR",<\n>                  "qci" : "6"<\n>               }<\n>            ]<\n>         },<\n>         "actMultBearers"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actUtranLoadBal"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actMBMS"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actUserLayerTcpMssClamping"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actMDTloggedCellTrace"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "qciTab1"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "pdcpProfIdx"
+  : "101",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "1",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "31",<\n>                  "rlcMode" : "RLC_UM",<\n>                  "resType"
+  : "GBR",<\n>                  "qci" : "1",<\n>                  "delayTarget" :
+  "80ms",<\n>                  "enforceTtiBundling" : "true",<\n>                  "dscp"
+  : "46",<\n>                  "prio" : "2",<\n>                  "rlcProfIdx" : "101",<\n>                  "schedulPrio"
+  : "5",<\n>                  "schedulBSD" : "100ms",<\n>                  "maxGbrUl"
+  : "31"<\n>               }<\n>            ]<\n>         },<\n>         "qciTab8"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "enforceTtiBundling"
+  : "false",<\n>                  "pdcpProfIdx" : "2",<\n>                  "dscp"
+  : "10",<\n>                  "prio" : "8",<\n>                  "rlcProfIdx" : "2",<\n>                  "schedulPrio"
+  : "11",<\n>                  "drxProfileIndex" : "3",<\n>                  "lcgid"
+  : "3",<\n>                  "rlcProfIdx3cc" : "6",<\n>                  "qciSupp"
+  : "ENABLE",<\n>                  "schedulWeight" : "5",<\n>                  "schedulBSD"
+  : "300ms",<\n>                  "rlcMode" : "RLC_AM",<\n>                  "resType"
+  : "nonGBR",<\n>                  "qci" : "8"<\n>               }<\n>            ]<\n>         },<\n>         "actOTNRecovery"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actDualRx1xCsfb"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actERabModify"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actCMAS"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "pdcpProf102"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tDiscard"
+  : "150ms",<\n>                  "snSize" : "7bit",<\n>                  "pdcpProfileId"
+  : "102"<\n>               }<\n>            ]<\n>         },<\n>         "scellMeasCycle"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "sf320"<\n>         },<\n>         "utranPrdRevalWaitTmr"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "960min"<\n>         },<\n>         "actInterEnbDLCAggr"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actMultGbrBearers"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "rlcProf5"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tPollRetr"
+  : "120ms",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "5",<\n>                  "pollPdu" : "64",<\n>                  "tProhib" : "50ms"<\n>               }<\n>            ]<\n>         },<\n>         "actRfChaining"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "pdcpProf3"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "statusRepReq"
+  : "3",<\n>                  "tDiscard" : "750ms",<\n>                  "pdcpProfileId"
+  : "3"<\n>               }<\n>            ]<\n>         },<\n>         "rlcProf2"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tPollRetr"
+  : "120ms",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "2",<\n>                  "pollPdu" : "64",<\n>                  "tProhib" : "50ms"<\n>               }<\n>            ]<\n>         },<\n>         "mncLength"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "2"<\n>         },<\n>         "pdcpProf1"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "statusRepReq"
+  : "3",<\n>                  "tDiscard" : "750ms",<\n>                  "pdcpProfileId"
+  : "1"<\n>               }<\n>            ]<\n>         },<\n>         "actDualCarrier"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actLTES1Ho"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actAutoUtranNeighRemoval"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "operationalState"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "onAir"<\n>         },<\n>         "actUeBasedAnrUtran"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actSdl"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actLBPowerSaving"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "sCellpCellHARQFdbkUsage"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "conservative"<\n>         },<\n>         "actMeasBasedIMLB"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actSubscriberTrace"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "caSchedFairFact"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "0"<\n>         },<\n>         "anrRobLevelUtran"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "middle"<\n>         },<\n>         "actETWS"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actFlexBbUsage"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actOperatorQCI"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "nRimRirU"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "3"<\n>         },<\n>         "defProfIdxUM"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "104"<\n>         },<\n>         "sCellActivationCyclePeriod"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "2s"<\n>         },<\n>         "actMDTCellTrace"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "mmeAssignmentMode"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "selectZeroCapacityToo"<\n>         },<\n>         "consecUtranHoFailThres"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "3"<\n>         },<\n>         "pdcpProf101"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "rohcMaxCid"
+  : "4",<\n>                  "tDiscard" : "100ms",<\n>                  "snSize"
+  : "7bit",<\n>                  "pdcpProfileId" : "101"<\n>               }<\n>            ]<\n>         },<\n>         "tS1RelPrepL"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "500"<\n>         },<\n>         "tRsrResFirst"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "10"<\n>         },<\n>         "maxNumAnrMoiAllowed"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "4000"<\n>         },<\n>         "actGsmRedirWithSI"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "amRlcPBTab1"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "ulPollByte"
+  : "50kB",<\n>                  "dlPollByte" : "25kB",<\n>                  "ueCategory"
+  : "1"<\n>               }<\n>            ]<\n>         },<\n>         "qciTabOperator"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "pdcpProfIdx"
+  : "103",<\n>                  "l2OHFactorDl" : "16",<\n>                  "l2OHFactorUl"
+  : "35",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "2",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "2048",<\n>                  "rlcMode" : "RLC_UM",<\n>                  "resType"
+  : "GBR",<\n>                  "delayTarget" : "80ms",<\n>                  "qci"
+  : "128",<\n>                  "enforceTtiBundling" : "false",<\n>                  "dscp"
+  : "46",<\n>                  "prio" : "3",<\n>                  "schedulPrio" :
+  "6",<\n>                  "rlcProfIdx" : "103",<\n>                  "rlcProfIdx3cc"
+  : "6",<\n>                  "counterGroup" : "1",<\n>                  "schedulWeight"
+  : "16",<\n>                  "schedulBSD" : "100ms",<\n>                  "maxGbrUl"
+  : "512"<\n>               },<\n>               {<\n>                  "pdcpProfIdx"
+  : "103",<\n>                  "l2OHFactorDl" : "16",<\n>                  "l2OHFactorUl"
+  : "35",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "2",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "128",<\n>                  "rlcMode" : "RLC_UM",<\n>                  "resType"
+  : "GBR",<\n>                  "delayTarget" : "80ms",<\n>                  "qci"
+  : "129",<\n>                  "enforceTtiBundling" : "false",<\n>                  "dscp"
+  : "46",<\n>                  "prio" : "3",<\n>                  "schedulPrio" :
+  "6",<\n>                  "rlcProfIdx" : "103",<\n>                  "rlcProfIdx3cc"
+  : "6",<\n>                  "counterGroup" : "2",<\n>                  "schedulWeight"
+  : "16",<\n>                  "schedulBSD" : "100ms",<\n>                  "maxGbrUl"
+  : "64"<\n>               },<\n>               {<\n>                  "pdcpProfIdx"
+  : "103",<\n>                  "l2OHFactorDl" : "16",<\n>                  "l2OHFactorUl"
+  : "35",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "2",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "128",<\n>                  "rlcMode" : "RLC_UM",<\n>                  "resType"
+  : "GBR",<\n>                  "delayTarget" : "80ms",<\n>                  "qci"
+  : "135",<\n>                  "enforceTtiBundling" : "false",<\n>                  "dscp"
+  : "46",<\n>                  "prio" : "3",<\n>                  "schedulPrio" :
+  "6",<\n>                  "rlcProfIdx" : "103",<\n>                  "rlcProfIdx3cc"
+  : "6",<\n>                  "counterGroup" : "3",<\n>                  "schedulWeight"
+  : "16",<\n>                  "schedulBSD" : "100ms",<\n>                  "maxGbrUl"
+  : "64"<\n>               },<\n>               {<\n>                  "pdcpProfIdx"
+  : "103",<\n>                  "l2OHFactorDl" : "16",<\n>                  "l2OHFactorUl"
+  : "35",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "2",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "128",<\n>                  "rlcMode" : "RLC_UM",<\n>                  "resType"
+  : "GBR",<\n>                  "delayTarget" : "80ms",<\n>                  "qci"
+  : "136",<\n>                  "enforceTtiBundling" : "false",<\n>                  "dscp"
+  : "46",<\n>                  "prio" : "3",<\n>                  "schedulPrio" :
+  "6",<\n>                  "rlcProfIdx" : "103",<\n>                  "rlcProfIdx3cc"
+  : "6",<\n>                  "counterGroup" : "4",<\n>                  "schedulWeight"
+  : "16",<\n>                  "schedulBSD" : "100ms",<\n>                  "maxGbrUl"
+  : "64"<\n>               },<\n>               {<\n>                  "pdcpProfIdx"
+  : "103",<\n>                  "l2OHFactorDl" : "16",<\n>                  "l2OHFactorUl"
+  : "35",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "2",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "2048",<\n>                  "rlcMode" : "RLC_UM",<\n>                  "resType"
+  : "GBR",<\n>                  "delayTarget" : "80ms",<\n>                  "qci"
+  : "254",<\n>                  "enforceTtiBundling" : "false",<\n>                  "dscp"
+  : "46",<\n>                  "prio" : "3",<\n>                  "schedulPrio" :
+  "6",<\n>                  "rlcProfIdx" : "103",<\n>                  "rlcProfIdx3cc"
+  : "6",<\n>                  "counterGroup" : "5",<\n>                  "schedulWeight"
+  : "16",<\n>                  "schedulBSD" : "100ms",<\n>                  "maxGbrUl"
+  : "512"<\n>               },<\n>               {<\n>                  "enforceTtiBundling"
+  : "false",<\n>                  "pdcpProfIdx" : "2",<\n>                  "dscp"
+  : "18",<\n>                  "rlcProfIdx" : "2",<\n>                  "schedulPrio"
+  : "9",<\n>                  "drxProfileIndex" : "3",<\n>                  "lcgid"
+  : "3",<\n>                  "counterGroup" : "6",<\n>                  "rlcProfIdx3cc"
+  : "6",<\n>                  "qciSupp" : "ENABLE",<\n>                  "schedulWeight"
+  : "20",<\n>                  "schedulBSD" : "300ms",<\n>                  "rlcMode"
+  : "RLC_AM",<\n>                  "resType" : "nonGBR",<\n>                  "qci"
+  : "200"<\n>               }<\n>            ]<\n>         },<\n>         "tS1RelPrepG"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "1000"<\n>         },<\n>         "actInterFreqLB"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actIntraFreqLoadBal"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "pdcpProf4"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "statusRepReq"
+  : "3",<\n>                  "tDiscard" : "750ms",<\n>                  "pdcpProfileId"
+  : "4"<\n>               }<\n>            ]<\n>         },<\n>         "act1xCsfb"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "pwsWithEmAreaId"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actImmHRPD"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "maxNumOfLnadjLimit"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "128"<\n>         },<\n>         "prohibitLBHOTimer"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "10s"<\n>         },<\n>         "anrRobLevel"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "middle"<\n>         },<\n>         "tRimRirU"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "5"<\n>         },<\n>         "actZUC"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "tChangeMobilityReq"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "5"<\n>         },<\n>         "tRsrInitWait"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "300"<\n>         },<\n>         "actSrvccToWcdma"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actTaHistCounters"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "etwsPrimNotifBcDur"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "60"<\n>         },<\n>         "integrityPrefL"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "eia0"
+  : "1",<\n>                  "eia1" : "8",<\n>                  "eia2" : "9",<\n>                  "eia3"
+  : "8"<\n>               }<\n>            ]<\n>         },<\n>         "enableBwCombCheck"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "ttiBundlingDuringHoMeas"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "qciTab3"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "pdcpProfIdx"
+  : "103",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "2",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "128",<\n>                  "rlcMode" : "RLC_UM",<\n>                  "resType"
+  : "GBR",<\n>                  "qci" : "3",<\n>                  "delayTarget" :
+  "80ms",<\n>                  "enforceTtiBundling" : "false",<\n>                  "l2OHFactorDL"
+  : "16",<\n>                  "dscp" : "46",<\n>                  "prio" : "3",<\n>                  "rlcProfIdx"
+  : "103",<\n>                  "schedulPrio" : "6",<\n>                  "l2OHFactorUL"
+  : "35",<\n>                  "schedulBSD" : "100ms",<\n>                  "maxGbrUl"
+  : "64"<\n>               }<\n>            ]<\n>         },<\n>         "rlcProf104"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "snFieldLengthDL"
+  : "10bit",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "104",<\n>                  "snFieldLengthUL" : "5bit"<\n>               }<\n>            ]<\n>         },<\n>         "anrOmExtEnable"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actIfHo"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "disabled"<\n>         },<\n>         "actAutoLteNeighRemoval"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "tRimPollG"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "150"<\n>         },<\n>         "actS1OlHandling"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "amRlcPBTab3"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "ulPollByte"
+  : "500kB",<\n>                  "dlPollByte" : "250kB",<\n>                  "ueCategory"
+  : "3"<\n>               }<\n>            ]<\n>         },<\n>         "prioTopoHO"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "all equal"<\n>         },<\n>         "actCiphering"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actCsfbPsHoToUtra"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "nRimRirG"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "3"<\n>         },<\n>         "actCSFBRedir"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "Disabled"<\n>         },<\n>         "pdcpProf103"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tDiscard"
+  : "100ms",<\n>                  "snSize" : "12bit",<\n>                  "pdcpProfileId"
+  : "103"<\n>               }<\n>            ]<\n>         },<\n>         "anrIdleTimeThresLte"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "idleTimeThresNbEnbExch"
+  : "18",<\n>                  "idleTimeThresX2" : "80",<\n>                  "idleTimeThresLteNR"
+  : "72",<\n>                  "idleTimeThresNbeNB" : "48",<\n>                  "nbEnbExchWaitTmr"
+  : "6"<\n>               }<\n>            ]<\n>         },<\n>         "maxNumX2LinksOut"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "60"<\n>         },<\n>         "actOptMmeSelection"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actRadioPosFlexibilty"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "s1PrdRevalWaitTmr"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "60min"<\n>         },<\n>         "actUlCoMp"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actRLFbasedRCR"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "act1xSrvcc"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "supportedNumOfLnadj"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "256"<\n>         },<\n>         "qciTab7"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "enforceTtiBundling"
+  : "false",<\n>                  "pdcpProfIdx" : "1",<\n>                  "dscp"
+  : "20",<\n>                  "prio" : "7",<\n>                  "rlcProfIdx" : "2",<\n>                  "schedulPrio"
+  : "10",<\n>                  "drxProfileIndex" : "3",<\n>                  "lcgid"
+  : "3",<\n>                  "rlcProfIdx3cc" : "6",<\n>                  "qciSupp"
+  : "ENABLE",<\n>                  "schedulWeight" : "10",<\n>                  "schedulBSD"
+  : "100ms",<\n>                  "rlcMode" : "RLC_AM",<\n>                  "resType"
+  : "nonGBR",<\n>                  "qci" : "7"<\n>               }<\n>            ]<\n>         },<\n>         "actDLCAggr"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "timDelACContPreempt"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "100"<\n>         },<\n>         "tRimRirG"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "5"<\n>         },<\n>         "actRedirect"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "enabled"<\n>         },<\n>         "sCellActivationMethod"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "nonGBRBufferBased"<\n>         },<\n>         "actUplaneOvlHandling"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actVendSpecCellTraceEnh"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "rlcProf6"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tPollRetr"
+  : "95ms",<\n>                  "tReord" : "25ms",<\n>                  "rlcProfileId"
+  : "6",<\n>                  "pollPdu" : "64",<\n>                  "tProhib" : "25ms"<\n>               }<\n>            ]<\n>         },<\n>         "btsResetRequest"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "1427979011"<\n>         },<\n>         "qciTab4"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "pdcpProfIdx"
+  : "2",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "2",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "320",<\n>                  "rlcMode" : "RLC_AM",<\n>                  "resType"
+  : "GBR",<\n>                  "qci" : "4",<\n>                  "delayTarget" :
+  "300ms",<\n>                  "enforceTtiBundling" : "false",<\n>                  "l2OHFactorDL"
+  : "16",<\n>                  "dscp" : "28",<\n>                  "prio" : "5",<\n>                  "rlcProfIdx"
+  : "2",<\n>                  "schedulPrio" : "8",<\n>                  "l2OHFactorUL"
+  : "35",<\n>                  "schedulBSD" : "300ms",<\n>                  "maxGbrUl"
+  : "32"<\n>               }<\n>            ]<\n>         },<\n>         "amRlcPBTab5"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "ulPollByte"
+  : "1000kB",<\n>                  "dlPollByte" : "375kB",<\n>                  "ueCategory"
+  : "5"<\n>               }<\n>            ]<\n>         },<\n>         "caMinDlAmbr"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "512"<\n>         },<\n>         "tagMaxAM"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "10"<\n>         },<\n>         "actLPPaEcid"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "sCellDeactivationTimereNB"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "rf128"<\n>         },<\n>         "actTempRadioMaster"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "act8EpsBearers"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "rlcProf4"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tPollRetr"
+  : "120ms",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "4",<\n>                  "pollPdu" : "64",<\n>                  "tProhib" : "50ms"<\n>               }<\n>            ]<\n>         },<\n>         "tagMaxUM"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "10"<\n>         },<\n>         "actHOtoWcdma"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actMFBI"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "enableGrflShdn"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "Enabled"<\n>         },<\n>         "pbrNonGbr"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "8kBps"<\n>         },<\n>         "actEmerCallRedir"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "Disabled"<\n>         },<\n>         "rlcProf102"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "snFieldLengthDL"
+  : "5bit",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "102",<\n>                  "snFieldLengthUL" : "5bit"<\n>               }<\n>            ]<\n>         },<\n>         "idleTimeThresUtranNR"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "96"<\n>         },<\n>         "actCplaneOvlHandling"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actSelMobPrf"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "pdcpProf2"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "statusRepReq"
+  : "3",<\n>                  "tDiscard" : "750ms",<\n>                  "pdcpProfileId"
+  : "2"<\n>               }<\n>            ]<\n>         },<\n>         "rachAccessForHoFromUtran"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "contentionBased"<\n>         },<\n>         "shutdownStepAmount"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "6"<\n>         },<\n>         "actIdleLB"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "shutdownWindow"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "60"<\n>         },<\n>         "actServBasedMobThr"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "enableAutoLock"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "Enabled"<\n>         },<\n>         "actRIMforGSM"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "s1InducedCellDeactDelayTime"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "900"<\n>         },<\n>         "actAmle"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "nullFallback"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actPdcpRohc"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "pdcpProf5"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "statusRepReq"
+  : "3",<\n>                  "tDiscard" : "750ms",<\n>                  "pdcpProfileId"
+  : "5"<\n>               }<\n>            ]<\n>         },<\n>         "defProfIdxAM"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "2"<\n>         },<\n>         "actHoFromUtran"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "tRimKaG"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "150"<\n>         },<\n>         "moProfileSelect"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "spid"<\n>         },<\n>         "qciTab2"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "pdcpProfIdx"
+  : "102",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "2",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "144",<\n>                  "rlcMode" : "RLC_UM",<\n>                  "resType"
+  : "GBR",<\n>                  "qci" : "2",<\n>                  "delayTarget" :
+  "80ms",<\n>                  "enforceTtiBundling" : "false",<\n>                  "l2OHFactorDL"
+  : "16",<\n>                  "dscp" : "26",<\n>                  "prio" : "4",<\n>                  "rlcProfIdx"
+  : "102",<\n>                  "schedulPrio" : "7",<\n>                  "l2OHFactorUL"
+  : "35",<\n>                  "schedulBSD" : "100ms",<\n>                  "maxGbrUl"
+  : "144"<\n>               }<\n>            ]<\n>         },<\n>         "actTempHoBlacklisting"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actAutoAcBarring"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actCRAN"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actEnhAcAndGbrServices"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "cipherPrefL"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "eea3"
+  : "8",<\n>                  "eea0" : "1",<\n>                  "eea2" : "9",<\n>                  "eea1"
+  : "8"<\n>               }<\n>            ]<\n>         },<\n>         "consecHoFailThres"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "3"<\n>         },<\n>         "actImmXrtt"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "maxNumX2LinksIn"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "64"<\n>         },<\n>         "actIMSEmerSessR9"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actS1Flex"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "enabled"<\n>         },<\n>         "actRIMforUTRAN"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actDedVoLteInterFreqHo"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actLocRep"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "voiceSuppMatchInd"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "errorIndication"<\n>         },<\n>         "actHeNBMobility"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "qciTab9"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "enforceTtiBundling"
+  : "false",<\n>                  "pdcpProfIdx" : "2",<\n>                  "dscp"
+  : "0",<\n>                  "prio" : "9",<\n>                  "rlcProfIdx" : "2",<\n>                  "schedulPrio"
+  : "12",<\n>                  "drxProfileIndex" : "3",<\n>                  "lcgid"
+  : "3",<\n>                  "rlcProfIdx3cc" : "6",<\n>                  "qciSupp"
+  : "ENABLE",<\n>                  "schedulWeight" : "1",<\n>                  "schedulBSD"
+  : "300ms",<\n>                  "rlcMode" : "RLC_AM",<\n>                  "resType"
+  : "nonGBR",<\n>                  "qci" : "9"<\n>               }<\n>            ]<\n>         },<\n>         "pdcpProf104"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tDiscard"
+  : "500ms",<\n>                  "snSize" : "12bit",<\n>                  "pdcpProfileId"
+  : "104"<\n>               }<\n>            ]<\n>         },<\n>         "tRimKaU"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "150"<\n>         },<\n>         "mcc"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "244"<\n>         },<\n>         "rlcProf1"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tPollRetr"
+  : "120ms",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "1",<\n>                  "pollPdu" : "64",<\n>                  "tProhib" : "50ms"<\n>               }<\n>            ]<\n>         },<\n>         "rlcProf3"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tPollRetr"
+  : "120ms",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "3",<\n>                  "pollPdu" : "64",<\n>                  "tProhib" : "50ms"<\n>               }<\n>            ]<\n>         },<\n>         "ulpcRssiMaxIAw"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "-70"<\n>         },<\n>         "actRtPerfMonitoring"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actRrcConnNoActivity"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "recoveryResetDelay"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "0"<\n>         },<\n>         "actSrvccToGsm"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actPeriodicCarrierBlinking"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "amRlcPBTab2"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "ulPollByte"
+  : "250kB",<\n>                  "dlPollByte" : "125kB",<\n>                  "ueCategory"
+  : "2"<\n>               }<\n>            ]<\n>         },<\n>         "actUeBasedAnrIntraFreqLte"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actNonGbrServiceDiff"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actUeBasedAnrInterFreqLte"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "qciTab5"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "enforceTtiBundling"
+  : "false",<\n>                  "pdcpProfIdx" : "1",<\n>                  "dscp"
+  : "34",<\n>                  "prio" : "1",<\n>                  "rlcProfIdx" : "1",<\n>                  "schedulPrio"
+  : "9",<\n>                  "drxProfileIndex" : "3",<\n>                  "lcgid"
+  : "0",<\n>                  "qciSupp" : "ENABLE",<\n>                  "schedulWeight"
+  : "40",<\n>                  "schedulBSD" : "100ms",<\n>                  "rlcMode"
+  : "RLC_AM",<\n>                  "resType" : "nonGBR",<\n>                  "qci"
+  : "5",<\n>                  "schedulType" : "SIGNALLING"<\n>               }<\n>            ]<\n>         },<\n>         "supportedNumOfAnrMoi"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "4000"<\n>         },<\n>         "otnRecoveryPeriod"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "500"<\n>         },<\n>         "actCellTrace"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "scellActivationLevel"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "1TTI"<\n>         },<\n>         "actCellTraceWithIMSI"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "tRimPollU"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "150"<\n>         },<\n>         "x2PrdRevalWaitTmr"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "480min"<\n>         },<\n>         "enbName"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "WMP-TL5"<\n>         },<\n>         "actConvVoice"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actDlIntShaping"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "txPathFailureMode"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "keepCellInService"<\n>         },<\n>         "maxNumPreEmptions"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "20"<\n>         },<\n>         "anrIfTRSC"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "1000"<\n>         },<\n>         "actDistributedSite"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "mnc"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "8"<\n>         },<\n>         "actInterFreqServiceBasedHo"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "acteNACCtoGSM"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actHighRrc"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         }<\n>      }<\n>   }<\n>],"id":
+  12}<\n>'
+Type_of_record: '>'
+---
+Nr: 29
+Time: '13:25:30.51 '
+Epoch: '1438601130.511287 '
+Payload: '{"id": 13,"jsonrpc": "2.0","method": "object_call","params": {"expect":
+  "scalar","method": "get","object_id": "Connection::EMSS=HASH(0x2c32470)","params":
+  ["-HOST"]}}'
+Type_of_record: ' '
+---
+Nr: 30
+Time: '13:25:30.51 '
+Epoch: '1438601130.512645 '
+Payload: '{"jsonrpc": "2.0","result": "10.83.202.52","id": 13}<\n>'
+Type_of_record: '>'
+---
+Nr: 31
+Time: '13:25:30.54 '
+Epoch: '1438601130.543040 '
+Payload: '{"id": 14,"jsonrpc": "2.0","method": "object_call","params": {"expect":
+  "object_instance","method": "event_generic_wait4","object_id": "Device::Unix=HASH(0x2aebc58)","params":
+  {"-ANTI_PATTERNS": [],"-COLLECT_RAW_OUTPUT": 0,"-MATCH": "SEQUENCE","-NEW_INSTANCE":
+  null,"-PATTERNS": ["^Connection to .* closed"],"-REPORT_EACH_OCCURRENCE": 1,"-TILL_OCCURS_TIMES":
+  null,"-TIMEOUT": 1036800}}}'
+Type_of_record: ' '
+---
+Nr: 32
+Time: '13:25:30.57 '
+Epoch: '1438601130.570680 '
+Payload: '{"jsonrpc": "2.0","result": "Event::wait4=HASH(0x2cf4420)","id": 14}<\n>'
+Type_of_record: '>'
+---
+Nr: 33
+Time: '13:25:30.57 '
+Epoch: '1438601130.572273 '
+Payload: '{"id": 15,"jsonrpc": "2.0","method": "object_call","params": {"expect":
+  "scalar","method": "run_bg","object_id": "Event::wait4=HASH(0x2cf4420)","params":
+  {"-REPORT_EACH_OCCURRENCE": 1,"-TILL_OCCURS_TIMES": null,"-TIMEOUT": 1036800}}}'
+Type_of_record: ' '
+---
+Nr: 34
+Time: '13:25:30.60 '
+Epoch: '1438601130.596435 '
+Payload: '{"jsonrpc": "2.0","result": "1","id": 15}<\n>'
+Type_of_record: '>'
+---
+Nr: 35
+Time: '13:25:30.60 '
+Epoch: '1438601130.598189 '
+Payload: '{"id": 16,"jsonrpc": "2.0","method": "object_call","params": {"expect":
+  "scalar","method": "run_bg","object_id": "Event::wait4=HASH(0x2cf4420)","params":
+  {"-REPORT_EACH_OCCURRENCE": 1,"-TILL_OCCURS_TIMES": null,"-TIMEOUT": 1036800}}}'
+Type_of_record: ' '
+---
+Nr: 36
+Time: '13:25:30.60 '
+Epoch: '1438601130.600421 '
+Payload: '{"jsonrpc": "2.0","result": 0,"id": 16}<\n>'
+Type_of_record: '>'
+---
+Nr: 37
+Time: '13:25:30.60 '
+Epoch: '1438601130.601881 '
+Payload: '{"id": 17,"jsonrpc": "2.0","method": "class_call","params": {"class": "DevMgr","expect":
+  "scalar","method": "find_existed_device_name","params": {"-NAME": "ENB2"}}}'
+Type_of_record: ' '
+---
+Nr: 38
+Time: '13:25:30.60 '
+Epoch: '1438601130.603073 '
+Payload: '{"jsonrpc": "2.0","result": null,"id": 17}<\n>'
+Type_of_record: '>'
+---
+Nr: 39
+Time: '13:25:30.61 '
+Epoch: '1438601130.606925 '
+Payload: '{"id": 18,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot suite:   Tests"}}}'
+Type_of_record: ' '
+---
+Nr: 40
+Time: '13:25:30.61 '
+Epoch: '1438601130.608122 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 18}<\n>'
+Type_of_record: '>'
+---
+Nr: 41
+Time: '13:25:30.61 '
+Epoch: '1438601130.609683 '
+Payload: '{"id": 19,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot keyword: configure all
+  for LTE1841"}}}'
+Type_of_record: ' '
+---
+Nr: 42
+Time: '13:25:30.61 '
+Epoch: '1438601130.610899 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 19}<\n>'
+Type_of_record: '>'
+---
+Nr: 43
+Time: '13:25:30.61 '
+Epoch: '1438601130.612289 '
+Payload: '{"id": 20,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "error","params": {"-DUMP": ["configure all for LTE1841"],"-FILENAME":
+  "/home/ute/auto/ruff/ruff/testmanager.py","-LINE": 32,"-TEXT": "*** Robot FAIL :
+  No keyword with name ''configure all for LTE1841'' found.  ***#\nRobot keywords
+  stack:"}}}'
+Type_of_record: ' '
+---
+Nr: 44
+Time: '13:25:30.61 '
+Epoch: '1438601130.614620 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   0<\n>],"id": 20}<\n>'
+Type_of_record: '>'
+---
+Nr: 45
+Time: '13:25:30.62 '
+Epoch: '1438601130.618373 '
+Payload: '{"id": 21,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot suite:   Tests.TC1"}}}'
+Type_of_record: ' '
+---
+Nr: 46
+Time: '13:25:30.62 '
+Epoch: '1438601130.619555 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 21}<\n>'
+Type_of_record: '>'
+---
+Nr: 47
+Time: '13:25:30.62 '
+Epoch: '1438601130.622516 '
+Payload: '{"id": 22,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "clear_tc","params": {"-TC": "[1]C-Pln_LTE1841-A-c No activation
+  of A4 AMLE measurement because of max AMLE HOs to one target - multi AMLE targets"}}}'
+Type_of_record: ' '
+---
+Nr: 48
+Time: '13:25:30.62 '
+Epoch: '1438601130.623690 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 22}<\n>'
+Type_of_record: '>'
+---
+Nr: 49
+Time: '13:25:30.62 '
+Epoch: '1438601130.624755 '
+Payload: '{"id": 23,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "hash_ref","method": "TC_START","params": {"-TC": "[1]C-Pln_LTE1841-A-c No activation
+  of A4 AMLE measurement because of max AMLE HOs to one target - multi AMLE targets"}}}'
+Type_of_record: ' '
+---
+Nr: 50
+Time: '13:25:30.63 '
+Epoch: '1438601130.627750 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:25:30.63 ########################### tc=[1]C-Pln_LTE1841-A-c
+  No activation of A4 AMLE measurement because of max AMLE HOs to one target - multi
+  AMLE targets run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 51
+Time: '13:25:30.63 '
+Epoch: '1438601130.630942 '
+Payload: '{"jsonrpc": "2.0","result": {<\n>   "-PASS_CRITERIA" : "",<\n>   "-VARS"
+  : {},<\n>   "-PARAMETERS" : {},<\n>   "-INFO" : {},<\n>   "-PURPOSE" : "",<\n>   "-DEPENDENCY"
+  : "",<\n>   "-PARAMS_VALUES" : {},<\n>   "-NOTES" : {},<\n>   "-REQUIREMENTS" :
+  "",<\n>   "-STATS" : {<\n>      "executions" : {},<\n>      "duration" : {<\n>         "average"
+  : null,<\n>         "min" : null,<\n>         "last" : null,<\n>         "max" :
+  null<\n>      }<\n>   },<\n>   "-CLEANUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-TEXT"
+  : null,<\n>   "-CI" : "",<\n>   "-ON_STEP_FAIL" : {<\n>      "-PARAMS" : {}<\n>   },<\n>   "-FINAL_TEXT"
+  : null,<\n>   "-TP" : null,<\n>   "start_time" : 1438601130.62836,<\n>   "-TG" :
+  null,<\n>   "-SETUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS"
+  : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-EXECUTION" : {<\n>      "-PARAMS"
+  : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES"
+  : {}<\n>   },<\n>   "-TRACE" : [],<\n>   "-RECOVERY" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   }<\n>},"id":
+  23}<\n>'
+Type_of_record: '>'
+---
+Nr: 52
+Time: '13:25:30.63 '
+Epoch: '1438601130.633349 '
+Payload: '{"id": 24,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "scalar","method": "TC_END","params": {"-TC": "[1]C-Pln_LTE1841-A-c No activation
+  of A4 AMLE measurement because of max AMLE HOs to one target - multi AMLE targets"}}}'
+Type_of_record: ' '
+---
+Nr: 53
+Time: '13:25:30.64 '
+Epoch: '1438601130.636185 '
+Payload: '{"jsonrpc": "2.0","result": "NOT_EXECUTED","id": 24}<\n>'
+Type_of_record: '>'
+---
+Nr: 54
+Time: '13:25:30.64 '
+Epoch: '1438601130.638902 '
+Payload: '{"id": 25,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 55
+Time: '13:25:30.65 '
+Epoch: '1438601130.646082 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 25}<\n>'
+Type_of_record: '>'
+---
+Nr: 56
+Time: '13:25:30.65 '
+Epoch: '1438601130.649198 '
+Payload: '{"id": 26,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot suite:   Tests.TC2"}}}'
+Type_of_record: ' '
+---
+Nr: 57
+Time: '13:25:30.65 '
+Epoch: '1438601130.650533 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 26}<\n>'
+Type_of_record: '>'
+---
+Nr: 58
+Time: '13:25:30.65 '
+Epoch: '1438601130.653106 '
+Payload: '{"id": 27,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "clear_tc","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states -
+  CAC above maxCacThreshold"}}}'
+Type_of_record: ' '
+---
+Nr: 59
+Time: '13:25:30.65 '
+Epoch: '1438601130.654205 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 27}<\n>'
+Type_of_record: '>'
+---
+Nr: 60
+Time: '13:25:30.66 '
+Epoch: '1438601130.655277 '
+Payload: '{"id": 28,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "hash_ref","method": "TC_START","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states
+  - CAC above maxCacThreshold"}}}'
+Type_of_record: ' '
+---
+Nr: 61
+Time: '13:25:30.66 '
+Epoch: '1438601130.658434 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:25:30.66 ########################### tc=[1]C-Pln_LTE1841-A-b
+  AMLE states - CAC above maxCacThreshold run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 62
+Time: '13:25:30.66 '
+Epoch: '1438601130.659825 '
+Payload: '{"jsonrpc": "2.0","result": {<\n>   "-PASS_CRITERIA" : "",<\n>   "-VARS"
+  : {},<\n>   "-PARAMETERS" : {},<\n>   "-INFO" : {},<\n>   "-PURPOSE" : "",<\n>   "-DEPENDENCY"
+  : "",<\n>   "-PARAMS_VALUES" : {},<\n>   "-NOTES" : {},<\n>   "-REQUIREMENTS" :
+  "",<\n>   "-STATS" : {<\n>      "executions" : {},<\n>      "duration" : {<\n>         "average"
+  : null,<\n>         "min" : null,<\n>         "last" : null,<\n>         "max" :
+  null<\n>      }<\n>   },<\n>   "-CLEANUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-TEXT"
+  : null,<\n>   "-CI" : "",<\n>   "-ON_STEP_FAIL" : {<\n>      "-PARAMS" : {}<\n>   },<\n>   "-FINAL_TEXT"
+  : null,<\n>   "-TP" : null,<\n>   "start_time" : 1438601130.65889,<\n>   "-TG" :
+  null,<\n>   "-SETUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS"
+  : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-EXECUTION" : {<\n>      "-PARAMS"
+  : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES"
+  : {}<\n>   },<\n>   "-TRACE" : [],<\n>   "-RECOVERY" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   }<\n>},"id":
+  28}<\n>'
+Type_of_record: '>'
+---
+Nr: 63
+Time: '13:25:30.66 '
+Epoch: '1438601130.661787 '
+Payload: '{"id": 29,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "scalar","method": "TC_END","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states
+  - CAC above maxCacThreshold"}}}'
+Type_of_record: ' '
+---
+Nr: 64
+Time: '13:25:30.66 '
+Epoch: '1438601130.664471 '
+Payload: '{"jsonrpc": "2.0","result": "NOT_EXECUTED","id": 29}<\n>'
+Type_of_record: '>'
+---
+Nr: 65
+Time: '13:25:30.67 '
+Epoch: '1438601130.667066 '
+Payload: '{"id": 30,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 66
+Time: '13:25:30.67 '
+Epoch: '1438601130.673282 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 30}<\n>'
+Type_of_record: '>'
+---
+Nr: 67
+Time: '13:25:30.68 '
+Epoch: '1438601130.675670 '
+Payload: '{"id": 31,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot suite:   Tests.TC3"}}}'
+Type_of_record: ' '
+---
+Nr: 68
+Time: '13:25:30.68 '
+Epoch: '1438601130.676996 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 31}<\n>'
+Type_of_record: '>'
+---
+Nr: 69
+Time: '13:25:30.68 '
+Epoch: '1438601130.679261 '
+Payload: '{"id": 32,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "clear_tc","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states -
+  cell in active LB state"}}}'
+Type_of_record: ' '
+---
+Nr: 70
+Time: '13:25:30.68 '
+Epoch: '1438601130.680361 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 32}<\n>'
+Type_of_record: '>'
+---
+Nr: 71
+Time: '13:25:30.68 '
+Epoch: '1438601130.683753 '
+Payload: '{"id": 33,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "hash_ref","method": "TC_START","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states
+  - cell in active LB state"}}}'
+Type_of_record: ' '
+---
+Nr: 72
+Time: '13:25:30.69 '
+Epoch: '1438601130.686159 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:25:30.69 ########################### tc=[1]C-Pln_LTE1841-A-b
+  AMLE states - cell in active LB state run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 73
+Time: '13:25:30.69 '
+Epoch: '1438601130.687754 '
+Payload: '{"jsonrpc": "2.0","result": {<\n>   "-PASS_CRITERIA" : "",<\n>   "-VARS"
+  : {},<\n>   "-PARAMETERS" : {},<\n>   "-INFO" : {},<\n>   "-PURPOSE" : "",<\n>   "-DEPENDENCY"
+  : "",<\n>   "-PARAMS_VALUES" : {},<\n>   "-NOTES" : {},<\n>   "-REQUIREMENTS" :
+  "",<\n>   "-STATS" : {<\n>      "executions" : {},<\n>      "duration" : {<\n>         "average"
+  : null,<\n>         "min" : null,<\n>         "last" : null,<\n>         "max" :
+  null<\n>      }<\n>   },<\n>   "-CLEANUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-TEXT"
+  : null,<\n>   "-CI" : "",<\n>   "-ON_STEP_FAIL" : {<\n>      "-PARAMS" : {}<\n>   },<\n>   "-FINAL_TEXT"
+  : null,<\n>   "-TP" : null,<\n>   "start_time" : 1438601130.68671,<\n>   "-TG" :
+  null,<\n>   "-SETUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS"
+  : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-EXECUTION" : {<\n>      "-PARAMS"
+  : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES"
+  : {}<\n>   },<\n>   "-TRACE" : [],<\n>   "-RECOVERY" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   }<\n>},"id":
+  33}<\n>'
+Type_of_record: '>'
+---
+Nr: 74
+Time: '13:25:30.69 '
+Epoch: '1438601130.689588 '
+Payload: '{"id": 34,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "scalar","method": "TC_END","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states
+  - cell in active LB state"}}}'
+Type_of_record: ' '
+---
+Nr: 75
+Time: '13:25:30.70 '
+Epoch: '1438601130.695162 '
+Payload: '{"jsonrpc": "2.0","result": "NOT_EXECUTED","id": 34}<\n>'
+Type_of_record: '>'
+---
+Nr: 76
+Time: '13:25:30.70 '
+Epoch: '1438601130.699215 '
+Payload: '{"id": 35,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 77
+Time: '13:25:30.71 '
+Epoch: '1438601130.705146 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 35}<\n>'
+Type_of_record: '>'
+---
+Nr: 78
+Time: '13:25:30.71 '
+Epoch: '1438601130.707605 '
+Payload: '{"id": 36,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot suite:   Tests.TC4"}}}'
+Type_of_record: ' '
+---
+Nr: 79
+Time: '13:25:30.71 '
+Epoch: '1438601130.710917 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 36}<\n>'
+Type_of_record: '>'
+---
+Nr: 80
+Time: '13:25:30.71 '
+Epoch: '1438601130.713624 '
+Payload: '{"id": 37,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "clear_tc","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states -
+  delta CAC"}}}'
+Type_of_record: ' '
+---
+Nr: 81
+Time: '13:25:30.71 '
+Epoch: '1438601130.714753 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 37}<\n>'
+Type_of_record: '>'
+---
+Nr: 82
+Time: '13:25:30.72 '
+Epoch: '1438601130.715897 '
+Payload: '{"id": 38,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "hash_ref","method": "TC_START","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states
+  - delta CAC"}}}'
+Type_of_record: ' '
+---
+Nr: 83
+Time: '13:25:30.72 '
+Epoch: '1438601130.718240 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:25:30.72 ########################### tc=[1]C-Pln_LTE1841-A-b
+  AMLE states - delta CAC run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 84
+Time: '13:25:30.72 '
+Epoch: '1438601130.719723 '
+Payload: '{"jsonrpc": "2.0","result": {<\n>   "-PASS_CRITERIA" : "",<\n>   "-VARS"
+  : {},<\n>   "-PARAMETERS" : {},<\n>   "-INFO" : {},<\n>   "-PURPOSE" : "",<\n>   "-DEPENDENCY"
+  : "",<\n>   "-PARAMS_VALUES" : {},<\n>   "-NOTES" : {},<\n>   "-REQUIREMENTS" :
+  "",<\n>   "-STATS" : {<\n>      "executions" : {},<\n>      "duration" : {<\n>         "average"
+  : null,<\n>         "min" : null,<\n>         "last" : null,<\n>         "max" :
+  null<\n>      }<\n>   },<\n>   "-CLEANUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-TEXT"
+  : null,<\n>   "-CI" : "",<\n>   "-ON_STEP_FAIL" : {<\n>      "-PARAMS" : {}<\n>   },<\n>   "-FINAL_TEXT"
+  : null,<\n>   "-TP" : null,<\n>   "start_time" : 1438601130.71871,<\n>   "-TG" :
+  null,<\n>   "-SETUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS"
+  : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-EXECUTION" : {<\n>      "-PARAMS"
+  : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES"
+  : {}<\n>   },<\n>   "-TRACE" : [],<\n>   "-RECOVERY" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   }<\n>},"id":
+  38}<\n>'
+Type_of_record: '>'
+---
+Nr: 85
+Time: '13:25:30.72 '
+Epoch: '1438601130.722500 '
+Payload: '{"id": 39,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "scalar","method": "TC_END","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states
+  - delta CAC"}}}'
+Type_of_record: ' '
+---
+Nr: 86
+Time: '13:25:30.73 '
+Epoch: '1438601130.725019 '
+Payload: '{"jsonrpc": "2.0","result": "NOT_EXECUTED","id": 39}<\n>'
+Type_of_record: '>'
+---
+Nr: 87
+Time: '13:25:30.73 '
+Epoch: '1438601130.727478 '
+Payload: '{"id": 40,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 88
+Time: '13:25:30.73 '
+Epoch: '1438601130.733311 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 40}<\n>'
+Type_of_record: '>'
+---
+Nr: 89
+Time: '13:25:30.74 '
+Epoch: '1438601130.736043 '
+Payload: '{"id": 41,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot suite:   Tests.TC5"}}}'
+Type_of_record: ' '
+---
+Nr: 90
+Time: '13:25:30.74 '
+Epoch: '1438601130.743276 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 41}<\n>'
+Type_of_record: '>'
+---
+Nr: 91
+Time: '13:25:30.75 '
+Epoch: '1438601130.745908 '
+Payload: '{"id": 42,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "clear_tc","params": {"-TC": "[1]C-Pln_LTE1841-A_a_Feature activation
+  and CAC measurements exchange"}}}'
+Type_of_record: ' '
+---
+Nr: 92
+Time: '13:25:30.75 '
+Epoch: '1438601130.747228 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 42}<\n>'
+Type_of_record: '>'
+---
+Nr: 93
+Time: '13:25:30.75 '
+Epoch: '1438601130.748411 '
+Payload: '{"id": 43,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "hash_ref","method": "TC_START","params": {"-TC": "[1]C-Pln_LTE1841-A_a_Feature
+  activation and CAC measurements exchange"}}}'
+Type_of_record: ' '
+---
+Nr: 94
+Time: '13:25:30.75 '
+Epoch: '1438601130.751790 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:25:30.75 ########################### tc=[1]C-Pln_LTE1841-A_a_Feature
+  activation and CAC measurements exchange run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 95
+Time: '13:25:30.75 '
+Epoch: '1438601130.753397 '
+Payload: '{"jsonrpc": "2.0","result": {<\n>   "-PASS_CRITERIA" : "",<\n>   "-VARS"
+  : {},<\n>   "-PARAMETERS" : {},<\n>   "-INFO" : {},<\n>   "-PURPOSE" : "",<\n>   "-DEPENDENCY"
+  : "",<\n>   "-PARAMS_VALUES" : {},<\n>   "-NOTES" : {},<\n>   "-REQUIREMENTS" :
+  "",<\n>   "-STATS" : {<\n>      "executions" : {},<\n>      "duration" : {<\n>         "average"
+  : null,<\n>         "min" : null,<\n>         "last" : null,<\n>         "max" :
+  null<\n>      }<\n>   },<\n>   "-CLEANUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-TEXT"
+  : null,<\n>   "-CI" : "",<\n>   "-ON_STEP_FAIL" : {<\n>      "-PARAMS" : {}<\n>   },<\n>   "-FINAL_TEXT"
+  : null,<\n>   "-TP" : null,<\n>   "start_time" : 1438601130.75233,<\n>   "-TG" :
+  null,<\n>   "-SETUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS"
+  : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-EXECUTION" : {<\n>      "-PARAMS"
+  : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES"
+  : {}<\n>   },<\n>   "-TRACE" : [],<\n>   "-RECOVERY" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   }<\n>},"id":
+  43}<\n>'
+Type_of_record: '>'
+---
+Nr: 96
+Time: '13:25:30.76 '
+Epoch: '1438601130.755664 '
+Payload: '{"id": 44,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "scalar","method": "TC_END","params": {"-TC": "[1]C-Pln_LTE1841-A_a_Feature activation
+  and CAC measurements exchange"}}}'
+Type_of_record: ' '
+---
+Nr: 97
+Time: '13:25:30.76 '
+Epoch: '1438601130.758295 '
+Payload: '{"jsonrpc": "2.0","result": "NOT_EXECUTED","id": 44}<\n>'
+Type_of_record: '>'
+---
+Nr: 98
+Time: '13:25:30.76 '
+Epoch: '1438601130.761024 '
+Payload: '{"id": 45,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 99
+Time: '13:25:30.77 '
+Epoch: '1438601130.769332 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 45}<\n>'
+Type_of_record: '>'
+---
+Nr: 100
+Time: '13:25:30.77 '
+Epoch: '1438601130.772049 '
+Payload: '{"id": 46,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot suite:   Tests.TC8"}}}'
+Type_of_record: ' '
+---
+Nr: 101
+Time: '13:25:30.77 '
+Epoch: '1438601130.773227 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 46}<\n>'
+Type_of_record: '>'
+---
+Nr: 102
+Time: '13:25:30.78 '
+Epoch: '1438601130.776973 '
+Payload: '{"id": 47,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "clear_tc","params": {"-TC": "[1]C-Pln_LTE1841-A-e Activation and
+  deactivation of load exchange - requesting site"}}}'
+Type_of_record: ' '
+---
+Nr: 103
+Time: '13:25:30.78 '
+Epoch: '1438601130.778461 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 47}<\n>'
+Type_of_record: '>'
+---
+Nr: 104
+Time: '13:25:30.78 '
+Epoch: '1438601130.779709 '
+Payload: '{"id": 48,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "hash_ref","method": "TC_START","params": {"-TC": "[1]C-Pln_LTE1841-A-e Activation
+  and deactivation of load exchange - requesting site"}}}'
+Type_of_record: ' '
+---
+Nr: 105
+Time: '13:25:30.78 '
+Epoch: '1438601130.783541 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:25:30.78 ########################### tc=[1]C-Pln_LTE1841-A-e
+  Activation and deactivation of load exchange - requesting site run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 106
+Time: '13:25:30.79 '
+Epoch: '1438601130.785329 '
+Payload: '{"jsonrpc": "2.0","result": {<\n>   "-PASS_CRITERIA" : "",<\n>   "-VARS"
+  : {},<\n>   "-PARAMETERS" : {},<\n>   "-INFO" : {},<\n>   "-PURPOSE" : "",<\n>   "-DEPENDENCY"
+  : "",<\n>   "-PARAMS_VALUES" : {},<\n>   "-NOTES" : {},<\n>   "-REQUIREMENTS" :
+  "",<\n>   "-STATS" : {<\n>      "executions" : {},<\n>      "duration" : {<\n>         "average"
+  : null,<\n>         "min" : null,<\n>         "last" : null,<\n>         "max" :
+  null<\n>      }<\n>   },<\n>   "-CLEANUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-TEXT"
+  : null,<\n>   "-CI" : "",<\n>   "-ON_STEP_FAIL" : {<\n>      "-PARAMS" : {}<\n>   },<\n>   "-FINAL_TEXT"
+  : null,<\n>   "-TP" : null,<\n>   "start_time" : 1438601130.78417,<\n>   "-TG" :
+  null,<\n>   "-SETUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS"
+  : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-EXECUTION" : {<\n>      "-PARAMS"
+  : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES"
+  : {}<\n>   },<\n>   "-TRACE" : [],<\n>   "-RECOVERY" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   }<\n>},"id":
+  48}<\n>'
+Type_of_record: '>'
+---
+Nr: 107
+Time: '13:25:30.79 '
+Epoch: '1438601130.787575 '
+Payload: '{"id": 49,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "scalar","method": "TC_END","params": {"-TC": "[1]C-Pln_LTE1841-A-e Activation and
+  deactivation of load exchange - requesting site"}}}'
+Type_of_record: ' '
+---
+Nr: 108
+Time: '13:25:30.79 '
+Epoch: '1438601130.792352 '
+Payload: '{"jsonrpc": "2.0","result": "NOT_EXECUTED","id": 49}<\n>'
+Type_of_record: '>'
+---
+Nr: 109
+Time: '13:25:30.79 '
+Epoch: '1438601130.794815 '
+Payload: '{"id": 50,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 110
+Time: '13:25:30.81 '
+Epoch: '1438601130.806284 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 50}<\n>'
+Type_of_record: '>'
+---
+Nr: 111
+Time: '13:25:30.81 '
+Epoch: '1438601130.808799 '
+Payload: '{"id": 51,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot keyword: deconfigure all
+  for LTE1841"}}}'
+Type_of_record: ' '
+---
+Nr: 112
+Time: '13:25:30.81 '
+Epoch: '1438601130.812367 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 51}<\n>'
+Type_of_record: '>'
+---
+Nr: 113
+Time: '13:25:30.81 '
+Epoch: '1438601130.814665 '
+Payload: '{"id": 52,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "error","params": {"-DUMP": ["deconfigure all for LTE1841"],"-FILENAME":
+  "/home/ute/auto/ruff/ruff/testmanager.py","-LINE": 32,"-TEXT": "*** Robot FAIL :
+  No keyword with name ''deconfigure all for LTE1841'' found.  ***#\nRobot keywords
+  stack:"}}}'
+Type_of_record: ' '
+---
+Nr: 114
+Time: '13:25:30.82 '
+Epoch: '1438601130.817106 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   0<\n>],"id": 52}<\n>'
+Type_of_record: '>'
+---
+Nr: 115
+Time: '13:25:30.82 '
+Epoch: '1438601130.819592 '
+Payload: '{"id": 53,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 116
+Time: '13:25:30.83 '
+Epoch: '1438601130.831730 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 53}<\n>'
+Type_of_record: '>'
+---
+Nr: 117
+Time: '13:25:30.83 '
+Epoch: '1438601130.834854 '
+Payload: '{"id": 54,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 118
+Time: '13:25:30.85 '
+Epoch: '1438601130.847217 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 54}<\n>'
+Type_of_record: '>'
+---
+Nr: 119
+Time: '13:25:30.85 '
+Epoch: '1438601130.851572 '
+Payload: '{"id": 55,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 120
+Time: '13:25:30.86 '
+Epoch: '1438601130.858961 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 55}<\n>'
+Type_of_record: '>'
+---
+Nr: 121
+Time: '13:25:31.28 '
+Epoch: '1438601131.283437 '
+Payload: 'Connection ''127.0.0.1.34255'' (tcp 127.0.0.1:34255  (not connected)) dropped
+  (close #1)<\n>'
+Type_of_record: C
+---
+Nr: 122
+Time: '13:25:31.28 '
+Epoch: '1438601131.284287 '
+Payload: stopped,Event::JsonRpcRequest<\n>
+Type_of_record: H
+---
+Nr: 123
+Time: '13:28:11.81 '
+Epoch: '1438601291.806406 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:28:11.81 ########################### tc=[1]C-Pln_LTE1841-A-c
+  No activation of A4 AMLE measurement because of max AMLE HOs to one target - multi
+  AMLE targets run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 124
+Time: '13:28:11.84 '
+Epoch: '1438601291.839926 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:28:11.84 ########################### tc=[1]C-Pln_LTE1841-A-b
+  AMLE states - CAC above maxCacThreshold run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 125
+Time: '13:28:11.87 '
+Epoch: '1438601291.872229 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:28:11.87 ########################### tc=[1]C-Pln_LTE1841-A-b
+  AMLE states - cell in active LB state run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 126
+Time: '13:28:11.93 '
+Epoch: '1438601291.929602 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:28:11.93 ########################### tc=[1]C-Pln_LTE1841-A-b
+  AMLE states - delta CAC run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 127
+Time: '13:28:11.97 '
+Epoch: '1438601291.974330 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:28:11.97 ########################### tc=[1]C-Pln_LTE1841-A_a_Feature
+  activation and CAC measurements exchange run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 128
+Time: '13:28:12.01 '
+Epoch: '1438601292.014651 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:28:12.01 ########################### tc=[1]C-Pln_LTE1841-A-e
+  Activation and deactivation of load exchange - requesting site run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 1
+Time: '12:26:53.82 '
+Epoch: '1438597613.820000 '
+Payload: <\n><\n><\n>##:LOG:############################################################################<\n>##
+  LID=2015/08/03-12:26:53.82<\n><\n>
+Type_of_record: S
+---
+Nr: 2
+Time: '13:25:27.75 '
+Epoch: '1438601127.749472 '
+Payload: ''
+Type_of_record: O
+---
+Nr: 3
+Time: '13:25:27.75 '
+Epoch: '1438601127.750268 '
+Payload: 'Connection ''127.0.0.1.34255'' established via tcp 127.0.0.1:34255 9854
+  (open #1)<\n>'
+Type_of_record: O
+---
+Nr: 4
+Time: '13:25:27.75 '
+Epoch: '1438601127.752658 '
+Payload: starting,Event::JsonRpcRequest<\n>
+Type_of_record: H
+---
+Nr: 5
+Time: '13:25:27.75 '
+Epoch: '1438601127.753127 '
+Payload: '{"id": 1,"jsonrpc": "2.0","method": "register_callback_handler","params":
+  {"callback_name": "server_async_calls"}}'
+Type_of_record: ' '
+---
+Nr: 6
+Time: '13:25:27.85 '
+Epoch: '1438601127.853814 '
+Payload: '{"jsonrpc": "2.0","result": 1,"id": 1}<\n>'
+Type_of_record: '>'
+---
+Nr: 7
+Time: '13:25:27.86 '
+Epoch: '1438601127.856105 '
+Payload: '{"id": 2,"jsonrpc": "2.0","method": "class_call","params": {"class": "DevMgr","expect":
+  "scalar","method": "find_existed_device_name","params": {"-NAME": "ENB1"}}}'
+Type_of_record: ' '
+---
+Nr: 8
+Time: '13:25:27.86 '
+Epoch: '1438601127.857603 '
+Payload: '{"jsonrpc": "2.0","result": "ENB1","id": 2}<\n>'
+Type_of_record: '>'
+---
+Nr: 9
+Time: '13:25:27.86 '
+Epoch: '1438601127.858999 '
+Payload: '{"id": 3,"jsonrpc": "2.0","method": "class_call","params": {"class": "DevMgr","expect":
+  "object_instance","method": "get_device","params": {"-NAME": "ENB1"}}}'
+Type_of_record: ' '
+---
+Nr: 10
+Time: '13:25:29.91 '
+Epoch: '1438601129.909487 '
+Payload: '{"jsonrpc": "2.0","result": "Device::Unix=HASH(0x2aebc58)","id": 3}<\n>'
+Type_of_record: '>'
+---
+Nr: 11
+Time: '13:25:29.91 '
+Epoch: '1438601129.911484 '
+Payload: '{"id": 4,"jsonrpc": "2.0","method": "object_call","params": {"expect": "object_instance","method":
+  "get_connection","object_id": "Device::Unix=HASH(0x2aebc58)","params": null}}'
+Type_of_record: ' '
+---
+Nr: 12
+Time: '13:25:29.91 '
+Epoch: '1438601129.912643 '
+Payload: '{"jsonrpc": "2.0","result": "Connection::Ssh=HASH(0x2aec678)","id": 4}<\n>'
+Type_of_record: '>'
+---
+Nr: 13
+Time: '13:25:29.91 '
+Epoch: '1438601129.913845 '
+Payload: '{"id": 5,"jsonrpc": "2.0","method": "class_call","params": {"class": "DevMgr","expect":
+  "object_instance","method": "get_device","params": {"-NAME": "emss1"}}}'
+Type_of_record: ' '
+---
+Nr: 14
+Time: '13:25:30.02 '
+Epoch: '1438601130.021315 '
+Payload: '{"jsonrpc": "2.0","result": "Device::EMSS=HASH(0x2bd0210)","id": 5}<\n>'
+Type_of_record: '>'
+---
+Nr: 15
+Time: '13:25:30.02 '
+Epoch: '1438601130.022561 '
+Payload: '{"id": 6,"jsonrpc": "2.0","method": "object_call","params": {"expect": "object_instance","method":
+  "get_connection","object_id": "Device::EMSS=HASH(0x2bd0210)","params": null}}'
+Type_of_record: ' '
+---
+Nr: 16
+Time: '13:25:30.02 '
+Epoch: '1438601130.023694 '
+Payload: '{"jsonrpc": "2.0","result": "Connection::EMSS=HASH(0x2c32470)","id": 6}<\n>'
+Type_of_record: '>'
+---
+Nr: 17
+Time: '13:25:30.03 '
+Epoch: '1438601130.026013 '
+Payload: '{"id": 7,"jsonrpc": "2.0","method": "object_call","params": {"expect": "object_instance","method":
+  "cmd_disp_all","object_id": "Device::EMSS=HASH(0x2bd0210)","params": {"-NEW_INSTANCE":
+  95774352,"-OBJECT": "LNBTS","-TIMEOUT": 10}}}'
+Type_of_record: ' '
+---
+Nr: 18
+Time: '13:25:30.06 '
+Epoch: '1438601130.058152 '
+Payload: '{"jsonrpc": "2.0","result": "Command::EMSS::FLEXI::disp_all=HASH(0x2c492e0)","id":
+  7}<\n>'
+Type_of_record: '>'
+---
+Nr: 19
+Time: '13:25:30.06 '
+Epoch: '1438601130.059704 '
+Payload: '{"id": 8,"jsonrpc": "2.0","method": "object_call","params": {"expect": "scalar","method":
+  "run","object_id": "Command::EMSS::FLEXI::disp_all=HASH(0x2c492e0)","params": {"-OBJECT":
+  "LNBTS","-TIMEOUT": 10}}}'
+Type_of_record: ' '
+---
+Nr: 20
+Time: '13:25:30.49 '
+Epoch: '1438601130.486599 '
+Payload: '{"jsonrpc": "2.0","result": "1","id": 8}<\n>'
+Type_of_record: '>'
+---
+Nr: 21
+Time: '13:25:30.49 '
+Epoch: '1438601130.487955 '
+Payload: '{"id": 9,"jsonrpc": "2.0","method": "object_call","params": {"expect": "scalar","method":
+  "get","object_id": "Command::EMSS::FLEXI::disp_all=HASH(0x2c492e0)","params": ["-STATUS"]}}'
+Type_of_record: ' '
+---
+Nr: 22
+Time: '13:25:30.49 '
+Epoch: '1438601130.489220 '
+Payload: '{"jsonrpc": "2.0","result": "SUCCESS","id": 9}<\n>'
+Type_of_record: '>'
+---
+Nr: 23
+Time: '13:25:30.49 '
+Epoch: '1438601130.490256 '
+Payload: '{"id": 10,"jsonrpc": "2.0","method": "object_call","params": {"expect":
+  "scalar","method": "await_finish","object_id": "Command::EMSS::FLEXI::disp_all=HASH(0x2c492e0)","params":
+  {"-TIMEOUT": 9.5693199634552}}}'
+Type_of_record: ' '
+---
+Nr: 24
+Time: '13:25:30.49 '
+Epoch: '1438601130.491308 '
+Payload: '{"jsonrpc": "2.0","result": 1,"id": 10}<\n>'
+Type_of_record: '>'
+---
+Nr: 25
+Time: '13:25:30.49 '
+Epoch: '1438601130.492427 '
+Payload: '{"id": 11,"jsonrpc": "2.0","method": "object_call","params": {"expect":
+  "scalar","method": "get","object_id": "Command::EMSS::FLEXI::disp_all=HASH(0x2c492e0)","params":
+  ["-STATUS"]}}'
+Type_of_record: ' '
+---
+Nr: 26
+Time: '13:25:30.49 '
+Epoch: '1438601130.493355 '
+Payload: '{"jsonrpc": "2.0","result": "SUCCESS","id": 11}<\n>'
+Type_of_record: '>'
+---
+Nr: 27
+Time: '13:25:30.49 '
+Epoch: '1438601130.494481 '
+Payload: '{"id": 12,"jsonrpc": "2.0","method": "object_call","params": {"expect":
+  null,"method": "returned_data","object_id": "Command::EMSS::FLEXI::disp_all=HASH(0x2c492e0)","params":
+  {}}}'
+Type_of_record: ' '
+---
+Nr: 28
+Time: '13:25:30.51 '
+Epoch: '1438601130.506427 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   {<\n>      "LNBTS-99" : {<\n>         "actHighPrioServices"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "rlfBasedRCRdefault"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actL1PM"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actDualBand"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "minNotActivatedUtraRSCFS"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "24"<\n>         },<\n>         "actHOtoHrpd"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "prohibitPsHOtoWcdma"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "rlcProf103"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "snFieldLengthDL"
+  : "10bit",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "103",<\n>                  "snFieldLengthUL" : "10bit"<\n>               }<\n>            ]<\n>         },<\n>         "tS1RelPrepU"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "2000"<\n>         },<\n>         "keyRefrMarg"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "50000"<\n>         },<\n>         "actOperatorQCIGBR"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "rlcProf101"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "snFieldLengthDL"
+  : "5bit",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "101",<\n>                  "snFieldLengthUL" : "5bit"<\n>               }<\n>            ]<\n>         },<\n>         "actMroInterRatUtran"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "congWeightAlg"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "qciPrio"<\n>         },<\n>         "actLPPaOtdoa"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actFlexScellSelect"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actCompChecks"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "anrUtraTRSCFS"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "5000ms"<\n>         },<\n>         "actNwReqUeCapa"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "amRlcPBTab4"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "ulPollByte"
+  : "750kB",<\n>                  "dlPollByte" : "250kB",<\n>                  "ueCategory"
+  : "4"<\n>               }<\n>            ]<\n>         },<\n>         "qciTab6"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "enforceTtiBundling"
+  : "false",<\n>                  "pdcpProfIdx" : "2",<\n>                  "dscp"
+  : "18",<\n>                  "prio" : "6",<\n>                  "rlcProfIdx" : "2",<\n>                  "schedulPrio"
+  : "9",<\n>                  "drxProfileIndex" : "3",<\n>                  "lcgid"
+  : "3",<\n>                  "rlcProfIdx3cc" : "6",<\n>                  "qciSupp"
+  : "ENABLE",<\n>                  "schedulWeight" : "20",<\n>                  "schedulBSD"
+  : "300ms",<\n>                  "rlcMode" : "RLC_AM",<\n>                  "resType"
+  : "nonGBR",<\n>                  "qci" : "6"<\n>               }<\n>            ]<\n>         },<\n>         "actMultBearers"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actUtranLoadBal"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actMBMS"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actUserLayerTcpMssClamping"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actMDTloggedCellTrace"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "qciTab1"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "pdcpProfIdx"
+  : "101",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "1",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "31",<\n>                  "rlcMode" : "RLC_UM",<\n>                  "resType"
+  : "GBR",<\n>                  "qci" : "1",<\n>                  "delayTarget" :
+  "80ms",<\n>                  "enforceTtiBundling" : "true",<\n>                  "dscp"
+  : "46",<\n>                  "prio" : "2",<\n>                  "rlcProfIdx" : "101",<\n>                  "schedulPrio"
+  : "5",<\n>                  "schedulBSD" : "100ms",<\n>                  "maxGbrUl"
+  : "31"<\n>               }<\n>            ]<\n>         },<\n>         "qciTab8"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "enforceTtiBundling"
+  : "false",<\n>                  "pdcpProfIdx" : "2",<\n>                  "dscp"
+  : "10",<\n>                  "prio" : "8",<\n>                  "rlcProfIdx" : "2",<\n>                  "schedulPrio"
+  : "11",<\n>                  "drxProfileIndex" : "3",<\n>                  "lcgid"
+  : "3",<\n>                  "rlcProfIdx3cc" : "6",<\n>                  "qciSupp"
+  : "ENABLE",<\n>                  "schedulWeight" : "5",<\n>                  "schedulBSD"
+  : "300ms",<\n>                  "rlcMode" : "RLC_AM",<\n>                  "resType"
+  : "nonGBR",<\n>                  "qci" : "8"<\n>               }<\n>            ]<\n>         },<\n>         "actOTNRecovery"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actDualRx1xCsfb"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actERabModify"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actCMAS"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "pdcpProf102"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tDiscard"
+  : "150ms",<\n>                  "snSize" : "7bit",<\n>                  "pdcpProfileId"
+  : "102"<\n>               }<\n>            ]<\n>         },<\n>         "scellMeasCycle"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "sf320"<\n>         },<\n>         "utranPrdRevalWaitTmr"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "960min"<\n>         },<\n>         "actInterEnbDLCAggr"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actMultGbrBearers"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "rlcProf5"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tPollRetr"
+  : "120ms",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "5",<\n>                  "pollPdu" : "64",<\n>                  "tProhib" : "50ms"<\n>               }<\n>            ]<\n>         },<\n>         "actRfChaining"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "pdcpProf3"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "statusRepReq"
+  : "3",<\n>                  "tDiscard" : "750ms",<\n>                  "pdcpProfileId"
+  : "3"<\n>               }<\n>            ]<\n>         },<\n>         "rlcProf2"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tPollRetr"
+  : "120ms",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "2",<\n>                  "pollPdu" : "64",<\n>                  "tProhib" : "50ms"<\n>               }<\n>            ]<\n>         },<\n>         "mncLength"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "2"<\n>         },<\n>         "pdcpProf1"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "statusRepReq"
+  : "3",<\n>                  "tDiscard" : "750ms",<\n>                  "pdcpProfileId"
+  : "1"<\n>               }<\n>            ]<\n>         },<\n>         "actDualCarrier"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actLTES1Ho"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actAutoUtranNeighRemoval"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "operationalState"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "onAir"<\n>         },<\n>         "actUeBasedAnrUtran"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actSdl"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actLBPowerSaving"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "sCellpCellHARQFdbkUsage"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "conservative"<\n>         },<\n>         "actMeasBasedIMLB"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actSubscriberTrace"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "caSchedFairFact"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "0"<\n>         },<\n>         "anrRobLevelUtran"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "middle"<\n>         },<\n>         "actETWS"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actFlexBbUsage"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actOperatorQCI"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "nRimRirU"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "3"<\n>         },<\n>         "defProfIdxUM"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "104"<\n>         },<\n>         "sCellActivationCyclePeriod"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "2s"<\n>         },<\n>         "actMDTCellTrace"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "mmeAssignmentMode"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "selectZeroCapacityToo"<\n>         },<\n>         "consecUtranHoFailThres"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "3"<\n>         },<\n>         "pdcpProf101"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "rohcMaxCid"
+  : "4",<\n>                  "tDiscard" : "100ms",<\n>                  "snSize"
+  : "7bit",<\n>                  "pdcpProfileId" : "101"<\n>               }<\n>            ]<\n>         },<\n>         "tS1RelPrepL"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "500"<\n>         },<\n>         "tRsrResFirst"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "10"<\n>         },<\n>         "maxNumAnrMoiAllowed"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "4000"<\n>         },<\n>         "actGsmRedirWithSI"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "amRlcPBTab1"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "ulPollByte"
+  : "50kB",<\n>                  "dlPollByte" : "25kB",<\n>                  "ueCategory"
+  : "1"<\n>               }<\n>            ]<\n>         },<\n>         "qciTabOperator"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "pdcpProfIdx"
+  : "103",<\n>                  "l2OHFactorDl" : "16",<\n>                  "l2OHFactorUl"
+  : "35",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "2",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "2048",<\n>                  "rlcMode" : "RLC_UM",<\n>                  "resType"
+  : "GBR",<\n>                  "delayTarget" : "80ms",<\n>                  "qci"
+  : "128",<\n>                  "enforceTtiBundling" : "false",<\n>                  "dscp"
+  : "46",<\n>                  "prio" : "3",<\n>                  "schedulPrio" :
+  "6",<\n>                  "rlcProfIdx" : "103",<\n>                  "rlcProfIdx3cc"
+  : "6",<\n>                  "counterGroup" : "1",<\n>                  "schedulWeight"
+  : "16",<\n>                  "schedulBSD" : "100ms",<\n>                  "maxGbrUl"
+  : "512"<\n>               },<\n>               {<\n>                  "pdcpProfIdx"
+  : "103",<\n>                  "l2OHFactorDl" : "16",<\n>                  "l2OHFactorUl"
+  : "35",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "2",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "128",<\n>                  "rlcMode" : "RLC_UM",<\n>                  "resType"
+  : "GBR",<\n>                  "delayTarget" : "80ms",<\n>                  "qci"
+  : "129",<\n>                  "enforceTtiBundling" : "false",<\n>                  "dscp"
+  : "46",<\n>                  "prio" : "3",<\n>                  "schedulPrio" :
+  "6",<\n>                  "rlcProfIdx" : "103",<\n>                  "rlcProfIdx3cc"
+  : "6",<\n>                  "counterGroup" : "2",<\n>                  "schedulWeight"
+  : "16",<\n>                  "schedulBSD" : "100ms",<\n>                  "maxGbrUl"
+  : "64"<\n>               },<\n>               {<\n>                  "pdcpProfIdx"
+  : "103",<\n>                  "l2OHFactorDl" : "16",<\n>                  "l2OHFactorUl"
+  : "35",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "2",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "128",<\n>                  "rlcMode" : "RLC_UM",<\n>                  "resType"
+  : "GBR",<\n>                  "delayTarget" : "80ms",<\n>                  "qci"
+  : "135",<\n>                  "enforceTtiBundling" : "false",<\n>                  "dscp"
+  : "46",<\n>                  "prio" : "3",<\n>                  "schedulPrio" :
+  "6",<\n>                  "rlcProfIdx" : "103",<\n>                  "rlcProfIdx3cc"
+  : "6",<\n>                  "counterGroup" : "3",<\n>                  "schedulWeight"
+  : "16",<\n>                  "schedulBSD" : "100ms",<\n>                  "maxGbrUl"
+  : "64"<\n>               },<\n>               {<\n>                  "pdcpProfIdx"
+  : "103",<\n>                  "l2OHFactorDl" : "16",<\n>                  "l2OHFactorUl"
+  : "35",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "2",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "128",<\n>                  "rlcMode" : "RLC_UM",<\n>                  "resType"
+  : "GBR",<\n>                  "delayTarget" : "80ms",<\n>                  "qci"
+  : "136",<\n>                  "enforceTtiBundling" : "false",<\n>                  "dscp"
+  : "46",<\n>                  "prio" : "3",<\n>                  "schedulPrio" :
+  "6",<\n>                  "rlcProfIdx" : "103",<\n>                  "rlcProfIdx3cc"
+  : "6",<\n>                  "counterGroup" : "4",<\n>                  "schedulWeight"
+  : "16",<\n>                  "schedulBSD" : "100ms",<\n>                  "maxGbrUl"
+  : "64"<\n>               },<\n>               {<\n>                  "pdcpProfIdx"
+  : "103",<\n>                  "l2OHFactorDl" : "16",<\n>                  "l2OHFactorUl"
+  : "35",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "2",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "2048",<\n>                  "rlcMode" : "RLC_UM",<\n>                  "resType"
+  : "GBR",<\n>                  "delayTarget" : "80ms",<\n>                  "qci"
+  : "254",<\n>                  "enforceTtiBundling" : "false",<\n>                  "dscp"
+  : "46",<\n>                  "prio" : "3",<\n>                  "schedulPrio" :
+  "6",<\n>                  "rlcProfIdx" : "103",<\n>                  "rlcProfIdx3cc"
+  : "6",<\n>                  "counterGroup" : "5",<\n>                  "schedulWeight"
+  : "16",<\n>                  "schedulBSD" : "100ms",<\n>                  "maxGbrUl"
+  : "512"<\n>               },<\n>               {<\n>                  "enforceTtiBundling"
+  : "false",<\n>                  "pdcpProfIdx" : "2",<\n>                  "dscp"
+  : "18",<\n>                  "rlcProfIdx" : "2",<\n>                  "schedulPrio"
+  : "9",<\n>                  "drxProfileIndex" : "3",<\n>                  "lcgid"
+  : "3",<\n>                  "counterGroup" : "6",<\n>                  "rlcProfIdx3cc"
+  : "6",<\n>                  "qciSupp" : "ENABLE",<\n>                  "schedulWeight"
+  : "20",<\n>                  "schedulBSD" : "300ms",<\n>                  "rlcMode"
+  : "RLC_AM",<\n>                  "resType" : "nonGBR",<\n>                  "qci"
+  : "200"<\n>               }<\n>            ]<\n>         },<\n>         "tS1RelPrepG"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "1000"<\n>         },<\n>         "actInterFreqLB"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actIntraFreqLoadBal"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "pdcpProf4"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "statusRepReq"
+  : "3",<\n>                  "tDiscard" : "750ms",<\n>                  "pdcpProfileId"
+  : "4"<\n>               }<\n>            ]<\n>         },<\n>         "act1xCsfb"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "pwsWithEmAreaId"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actImmHRPD"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "maxNumOfLnadjLimit"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "128"<\n>         },<\n>         "prohibitLBHOTimer"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "10s"<\n>         },<\n>         "anrRobLevel"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "middle"<\n>         },<\n>         "tRimRirU"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "5"<\n>         },<\n>         "actZUC"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "tChangeMobilityReq"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "5"<\n>         },<\n>         "tRsrInitWait"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "300"<\n>         },<\n>         "actSrvccToWcdma"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actTaHistCounters"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "etwsPrimNotifBcDur"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "60"<\n>         },<\n>         "integrityPrefL"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "eia0"
+  : "1",<\n>                  "eia1" : "8",<\n>                  "eia2" : "9",<\n>                  "eia3"
+  : "8"<\n>               }<\n>            ]<\n>         },<\n>         "enableBwCombCheck"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "ttiBundlingDuringHoMeas"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "qciTab3"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "pdcpProfIdx"
+  : "103",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "2",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "128",<\n>                  "rlcMode" : "RLC_UM",<\n>                  "resType"
+  : "GBR",<\n>                  "qci" : "3",<\n>                  "delayTarget" :
+  "80ms",<\n>                  "enforceTtiBundling" : "false",<\n>                  "l2OHFactorDL"
+  : "16",<\n>                  "dscp" : "46",<\n>                  "prio" : "3",<\n>                  "rlcProfIdx"
+  : "103",<\n>                  "schedulPrio" : "6",<\n>                  "l2OHFactorUL"
+  : "35",<\n>                  "schedulBSD" : "100ms",<\n>                  "maxGbrUl"
+  : "64"<\n>               }<\n>            ]<\n>         },<\n>         "rlcProf104"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "snFieldLengthDL"
+  : "10bit",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "104",<\n>                  "snFieldLengthUL" : "5bit"<\n>               }<\n>            ]<\n>         },<\n>         "anrOmExtEnable"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actIfHo"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "disabled"<\n>         },<\n>         "actAutoLteNeighRemoval"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "tRimPollG"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "150"<\n>         },<\n>         "actS1OlHandling"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "amRlcPBTab3"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "ulPollByte"
+  : "500kB",<\n>                  "dlPollByte" : "250kB",<\n>                  "ueCategory"
+  : "3"<\n>               }<\n>            ]<\n>         },<\n>         "prioTopoHO"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "all equal"<\n>         },<\n>         "actCiphering"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actCsfbPsHoToUtra"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "nRimRirG"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "3"<\n>         },<\n>         "actCSFBRedir"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "Disabled"<\n>         },<\n>         "pdcpProf103"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tDiscard"
+  : "100ms",<\n>                  "snSize" : "12bit",<\n>                  "pdcpProfileId"
+  : "103"<\n>               }<\n>            ]<\n>         },<\n>         "anrIdleTimeThresLte"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "idleTimeThresNbEnbExch"
+  : "18",<\n>                  "idleTimeThresX2" : "80",<\n>                  "idleTimeThresLteNR"
+  : "72",<\n>                  "idleTimeThresNbeNB" : "48",<\n>                  "nbEnbExchWaitTmr"
+  : "6"<\n>               }<\n>            ]<\n>         },<\n>         "maxNumX2LinksOut"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "60"<\n>         },<\n>         "actOptMmeSelection"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actRadioPosFlexibilty"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "s1PrdRevalWaitTmr"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "60min"<\n>         },<\n>         "actUlCoMp"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actRLFbasedRCR"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "act1xSrvcc"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "supportedNumOfLnadj"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "256"<\n>         },<\n>         "qciTab7"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "enforceTtiBundling"
+  : "false",<\n>                  "pdcpProfIdx" : "1",<\n>                  "dscp"
+  : "20",<\n>                  "prio" : "7",<\n>                  "rlcProfIdx" : "2",<\n>                  "schedulPrio"
+  : "10",<\n>                  "drxProfileIndex" : "3",<\n>                  "lcgid"
+  : "3",<\n>                  "rlcProfIdx3cc" : "6",<\n>                  "qciSupp"
+  : "ENABLE",<\n>                  "schedulWeight" : "10",<\n>                  "schedulBSD"
+  : "100ms",<\n>                  "rlcMode" : "RLC_AM",<\n>                  "resType"
+  : "nonGBR",<\n>                  "qci" : "7"<\n>               }<\n>            ]<\n>         },<\n>         "actDLCAggr"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "timDelACContPreempt"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "100"<\n>         },<\n>         "tRimRirG"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "5"<\n>         },<\n>         "actRedirect"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "enabled"<\n>         },<\n>         "sCellActivationMethod"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "nonGBRBufferBased"<\n>         },<\n>         "actUplaneOvlHandling"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actVendSpecCellTraceEnh"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "rlcProf6"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tPollRetr"
+  : "95ms",<\n>                  "tReord" : "25ms",<\n>                  "rlcProfileId"
+  : "6",<\n>                  "pollPdu" : "64",<\n>                  "tProhib" : "25ms"<\n>               }<\n>            ]<\n>         },<\n>         "btsResetRequest"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "1427979011"<\n>         },<\n>         "qciTab4"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "pdcpProfIdx"
+  : "2",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "2",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "320",<\n>                  "rlcMode" : "RLC_AM",<\n>                  "resType"
+  : "GBR",<\n>                  "qci" : "4",<\n>                  "delayTarget" :
+  "300ms",<\n>                  "enforceTtiBundling" : "false",<\n>                  "l2OHFactorDL"
+  : "16",<\n>                  "dscp" : "28",<\n>                  "prio" : "5",<\n>                  "rlcProfIdx"
+  : "2",<\n>                  "schedulPrio" : "8",<\n>                  "l2OHFactorUL"
+  : "35",<\n>                  "schedulBSD" : "300ms",<\n>                  "maxGbrUl"
+  : "32"<\n>               }<\n>            ]<\n>         },<\n>         "amRlcPBTab5"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "ulPollByte"
+  : "1000kB",<\n>                  "dlPollByte" : "375kB",<\n>                  "ueCategory"
+  : "5"<\n>               }<\n>            ]<\n>         },<\n>         "caMinDlAmbr"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "512"<\n>         },<\n>         "tagMaxAM"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "10"<\n>         },<\n>         "actLPPaEcid"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "sCellDeactivationTimereNB"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "rf128"<\n>         },<\n>         "actTempRadioMaster"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "act8EpsBearers"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "rlcProf4"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tPollRetr"
+  : "120ms",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "4",<\n>                  "pollPdu" : "64",<\n>                  "tProhib" : "50ms"<\n>               }<\n>            ]<\n>         },<\n>         "tagMaxUM"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "10"<\n>         },<\n>         "actHOtoWcdma"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actMFBI"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "enableGrflShdn"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "Enabled"<\n>         },<\n>         "pbrNonGbr"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "8kBps"<\n>         },<\n>         "actEmerCallRedir"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "Disabled"<\n>         },<\n>         "rlcProf102"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "snFieldLengthDL"
+  : "5bit",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "102",<\n>                  "snFieldLengthUL" : "5bit"<\n>               }<\n>            ]<\n>         },<\n>         "idleTimeThresUtranNR"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "96"<\n>         },<\n>         "actCplaneOvlHandling"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actSelMobPrf"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "pdcpProf2"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "statusRepReq"
+  : "3",<\n>                  "tDiscard" : "750ms",<\n>                  "pdcpProfileId"
+  : "2"<\n>               }<\n>            ]<\n>         },<\n>         "rachAccessForHoFromUtran"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "contentionBased"<\n>         },<\n>         "shutdownStepAmount"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "6"<\n>         },<\n>         "actIdleLB"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "shutdownWindow"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "60"<\n>         },<\n>         "actServBasedMobThr"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "enableAutoLock"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "Enabled"<\n>         },<\n>         "actRIMforGSM"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "s1InducedCellDeactDelayTime"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "900"<\n>         },<\n>         "actAmle"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "nullFallback"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actPdcpRohc"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "pdcpProf5"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "statusRepReq"
+  : "3",<\n>                  "tDiscard" : "750ms",<\n>                  "pdcpProfileId"
+  : "5"<\n>               }<\n>            ]<\n>         },<\n>         "defProfIdxAM"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "2"<\n>         },<\n>         "actHoFromUtran"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "tRimKaG"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "150"<\n>         },<\n>         "moProfileSelect"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "spid"<\n>         },<\n>         "qciTab2"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "pdcpProfIdx"
+  : "102",<\n>                  "drxProfileIndex" : "2",<\n>                  "lcgid"
+  : "2",<\n>                  "qciSupp" : "ENABLE",<\n>                  "maxGbrDl"
+  : "144",<\n>                  "rlcMode" : "RLC_UM",<\n>                  "resType"
+  : "GBR",<\n>                  "qci" : "2",<\n>                  "delayTarget" :
+  "80ms",<\n>                  "enforceTtiBundling" : "false",<\n>                  "l2OHFactorDL"
+  : "16",<\n>                  "dscp" : "26",<\n>                  "prio" : "4",<\n>                  "rlcProfIdx"
+  : "102",<\n>                  "schedulPrio" : "7",<\n>                  "l2OHFactorUL"
+  : "35",<\n>                  "schedulBSD" : "100ms",<\n>                  "maxGbrUl"
+  : "144"<\n>               }<\n>            ]<\n>         },<\n>         "actTempHoBlacklisting"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actAutoAcBarring"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actCRAN"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actEnhAcAndGbrServices"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "cipherPrefL"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "eea3"
+  : "8",<\n>                  "eea0" : "1",<\n>                  "eea2" : "9",<\n>                  "eea1"
+  : "8"<\n>               }<\n>            ]<\n>         },<\n>         "consecHoFailThres"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "3"<\n>         },<\n>         "actImmXrtt"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "maxNumX2LinksIn"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "64"<\n>         },<\n>         "actIMSEmerSessR9"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actS1Flex"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "enabled"<\n>         },<\n>         "actRIMforUTRAN"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actDedVoLteInterFreqHo"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actLocRep"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "voiceSuppMatchInd"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "errorIndication"<\n>         },<\n>         "actHeNBMobility"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "qciTab9"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "enforceTtiBundling"
+  : "false",<\n>                  "pdcpProfIdx" : "2",<\n>                  "dscp"
+  : "0",<\n>                  "prio" : "9",<\n>                  "rlcProfIdx" : "2",<\n>                  "schedulPrio"
+  : "12",<\n>                  "drxProfileIndex" : "3",<\n>                  "lcgid"
+  : "3",<\n>                  "rlcProfIdx3cc" : "6",<\n>                  "qciSupp"
+  : "ENABLE",<\n>                  "schedulWeight" : "1",<\n>                  "schedulBSD"
+  : "300ms",<\n>                  "rlcMode" : "RLC_AM",<\n>                  "resType"
+  : "nonGBR",<\n>                  "qci" : "9"<\n>               }<\n>            ]<\n>         },<\n>         "pdcpProf104"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tDiscard"
+  : "500ms",<\n>                  "snSize" : "12bit",<\n>                  "pdcpProfileId"
+  : "104"<\n>               }<\n>            ]<\n>         },<\n>         "tRimKaU"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "150"<\n>         },<\n>         "mcc"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "244"<\n>         },<\n>         "rlcProf1"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tPollRetr"
+  : "120ms",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "1",<\n>                  "pollPdu" : "64",<\n>                  "tProhib" : "50ms"<\n>               }<\n>            ]<\n>         },<\n>         "rlcProf3"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "tPollRetr"
+  : "120ms",<\n>                  "tReord" : "50ms",<\n>                  "rlcProfileId"
+  : "3",<\n>                  "pollPdu" : "64",<\n>                  "tProhib" : "50ms"<\n>               }<\n>            ]<\n>         },<\n>         "ulpcRssiMaxIAw"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "-70"<\n>         },<\n>         "actRtPerfMonitoring"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actRrcConnNoActivity"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "recoveryResetDelay"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "0"<\n>         },<\n>         "actSrvccToGsm"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actPeriodicCarrierBlinking"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "amRlcPBTab2"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "ulPollByte"
+  : "250kB",<\n>                  "dlPollByte" : "125kB",<\n>                  "ueCategory"
+  : "2"<\n>               }<\n>            ]<\n>         },<\n>         "actUeBasedAnrIntraFreqLte"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actNonGbrServiceDiff"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actUeBasedAnrInterFreqLte"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "qciTab5"
+  : {<\n>            "-TYPE" : "TABLE",<\n>            "-VAL" : [<\n>               {<\n>                  "enforceTtiBundling"
+  : "false",<\n>                  "pdcpProfIdx" : "1",<\n>                  "dscp"
+  : "34",<\n>                  "prio" : "1",<\n>                  "rlcProfIdx" : "1",<\n>                  "schedulPrio"
+  : "9",<\n>                  "drxProfileIndex" : "3",<\n>                  "lcgid"
+  : "0",<\n>                  "qciSupp" : "ENABLE",<\n>                  "schedulWeight"
+  : "40",<\n>                  "schedulBSD" : "100ms",<\n>                  "rlcMode"
+  : "RLC_AM",<\n>                  "resType" : "nonGBR",<\n>                  "qci"
+  : "5",<\n>                  "schedulType" : "SIGNALLING"<\n>               }<\n>            ]<\n>         },<\n>         "supportedNumOfAnrMoi"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "4000"<\n>         },<\n>         "otnRecoveryPeriod"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "500"<\n>         },<\n>         "actCellTrace"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "scellActivationLevel"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "1TTI"<\n>         },<\n>         "actCellTraceWithIMSI"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "tRimPollU"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "150"<\n>         },<\n>         "x2PrdRevalWaitTmr"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "480min"<\n>         },<\n>         "enbName"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "WMP-TL5"<\n>         },<\n>         "actConvVoice"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "true"<\n>         },<\n>         "actDlIntShaping"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "txPathFailureMode"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "keepCellInService"<\n>         },<\n>         "maxNumPreEmptions"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "20"<\n>         },<\n>         "anrIfTRSC"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "1000"<\n>         },<\n>         "actDistributedSite"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "mnc"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "8"<\n>         },<\n>         "actInterFreqServiceBasedHo"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "acteNACCtoGSM"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         },<\n>         "actHighRrc"
+  : {<\n>            "-TYPE" : "SCALAR",<\n>            "-VAL" : "false"<\n>         }<\n>      }<\n>   }<\n>],"id":
+  12}<\n>'
+Type_of_record: '>'
+---
+Nr: 29
+Time: '13:25:30.51 '
+Epoch: '1438601130.511287 '
+Payload: '{"id": 13,"jsonrpc": "2.0","method": "object_call","params": {"expect":
+  "scalar","method": "get","object_id": "Connection::EMSS=HASH(0x2c32470)","params":
+  ["-HOST"]}}'
+Type_of_record: ' '
+---
+Nr: 30
+Time: '13:25:30.51 '
+Epoch: '1438601130.512645 '
+Payload: '{"jsonrpc": "2.0","result": "10.83.202.52","id": 13}<\n>'
+Type_of_record: '>'
+---
+Nr: 31
+Time: '13:25:30.54 '
+Epoch: '1438601130.543040 '
+Payload: '{"id": 14,"jsonrpc": "2.0","method": "object_call","params": {"expect":
+  "object_instance","method": "event_generic_wait4","object_id": "Device::Unix=HASH(0x2aebc58)","params":
+  {"-ANTI_PATTERNS": [],"-COLLECT_RAW_OUTPUT": 0,"-MATCH": "SEQUENCE","-NEW_INSTANCE":
+  null,"-PATTERNS": ["^Connection to .* closed"],"-REPORT_EACH_OCCURRENCE": 1,"-TILL_OCCURS_TIMES":
+  null,"-TIMEOUT": 1036800}}}'
+Type_of_record: ' '
+---
+Nr: 32
+Time: '13:25:30.57 '
+Epoch: '1438601130.570680 '
+Payload: '{"jsonrpc": "2.0","result": "Event::wait4=HASH(0x2cf4420)","id": 14}<\n>'
+Type_of_record: '>'
+---
+Nr: 33
+Time: '13:25:30.57 '
+Epoch: '1438601130.572273 '
+Payload: '{"id": 15,"jsonrpc": "2.0","method": "object_call","params": {"expect":
+  "scalar","method": "run_bg","object_id": "Event::wait4=HASH(0x2cf4420)","params":
+  {"-REPORT_EACH_OCCURRENCE": 1,"-TILL_OCCURS_TIMES": null,"-TIMEOUT": 1036800}}}'
+Type_of_record: ' '
+---
+Nr: 34
+Time: '13:25:30.60 '
+Epoch: '1438601130.596435 '
+Payload: '{"jsonrpc": "2.0","result": "1","id": 15}<\n>'
+Type_of_record: '>'
+---
+Nr: 35
+Time: '13:25:30.60 '
+Epoch: '1438601130.598189 '
+Payload: '{"id": 16,"jsonrpc": "2.0","method": "object_call","params": {"expect":
+  "scalar","method": "run_bg","object_id": "Event::wait4=HASH(0x2cf4420)","params":
+  {"-REPORT_EACH_OCCURRENCE": 1,"-TILL_OCCURS_TIMES": null,"-TIMEOUT": 1036800}}}'
+Type_of_record: ' '
+---
+Nr: 36
+Time: '13:25:30.60 '
+Epoch: '1438601130.600421 '
+Payload: '{"jsonrpc": "2.0","result": 0,"id": 16}<\n>'
+Type_of_record: '>'
+---
+Nr: 37
+Time: '13:25:30.60 '
+Epoch: '1438601130.601881 '
+Payload: '{"id": 17,"jsonrpc": "2.0","method": "class_call","params": {"class": "DevMgr","expect":
+  "scalar","method": "find_existed_device_name","params": {"-NAME": "ENB2"}}}'
+Type_of_record: ' '
+---
+Nr: 38
+Time: '13:25:30.60 '
+Epoch: '1438601130.603073 '
+Payload: '{"jsonrpc": "2.0","result": null,"id": 17}<\n>'
+Type_of_record: '>'
+---
+Nr: 39
+Time: '13:25:30.61 '
+Epoch: '1438601130.606925 '
+Payload: '{"id": 18,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot suite:   Tests"}}}'
+Type_of_record: ' '
+---
+Nr: 40
+Time: '13:25:30.61 '
+Epoch: '1438601130.608122 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 18}<\n>'
+Type_of_record: '>'
+---
+Nr: 41
+Time: '13:25:30.61 '
+Epoch: '1438601130.609683 '
+Payload: '{"id": 19,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot keyword: configure all
+  for LTE1841"}}}'
+Type_of_record: ' '
+---
+Nr: 42
+Time: '13:25:30.61 '
+Epoch: '1438601130.610899 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 19}<\n>'
+Type_of_record: '>'
+---
+Nr: 43
+Time: '13:25:30.61 '
+Epoch: '1438601130.612289 '
+Payload: '{"id": 20,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "error","params": {"-DUMP": ["configure all for LTE1841"],"-FILENAME":
+  "/home/ute/auto/ruff/ruff/testmanager.py","-LINE": 32,"-TEXT": "*** Robot FAIL :
+  No keyword with name ''configure all for LTE1841'' found.  ***#\nRobot keywords
+  stack:"}}}'
+Type_of_record: ' '
+---
+Nr: 44
+Time: '13:25:30.61 '
+Epoch: '1438601130.614620 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   0<\n>],"id": 20}<\n>'
+Type_of_record: '>'
+---
+Nr: 45
+Time: '13:25:30.62 '
+Epoch: '1438601130.618373 '
+Payload: '{"id": 21,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot suite:   Tests.TC1"}}}'
+Type_of_record: ' '
+---
+Nr: 46
+Time: '13:25:30.62 '
+Epoch: '1438601130.619555 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 21}<\n>'
+Type_of_record: '>'
+---
+Nr: 47
+Time: '13:25:30.62 '
+Epoch: '1438601130.622516 '
+Payload: '{"id": 22,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "clear_tc","params": {"-TC": "[1]C-Pln_LTE1841-A-c No activation
+  of A4 AMLE measurement because of max AMLE HOs to one target - multi AMLE targets"}}}'
+Type_of_record: ' '
+---
+Nr: 48
+Time: '13:25:30.62 '
+Epoch: '1438601130.623690 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 22}<\n>'
+Type_of_record: '>'
+---
+Nr: 49
+Time: '13:25:30.62 '
+Epoch: '1438601130.624755 '
+Payload: '{"id": 23,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "hash_ref","method": "TC_START","params": {"-TC": "[1]C-Pln_LTE1841-A-c No activation
+  of A4 AMLE measurement because of max AMLE HOs to one target - multi AMLE targets"}}}'
+Type_of_record: ' '
+---
+Nr: 50
+Time: '13:25:30.63 '
+Epoch: '1438601130.627750 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:25:30.63 ########################### tc=[1]C-Pln_LTE1841-A-c
+  No activation of A4 AMLE measurement because of max AMLE HOs to one target - multi
+  AMLE targets run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 51
+Time: '13:25:30.63 '
+Epoch: '1438601130.630942 '
+Payload: '{"jsonrpc": "2.0","result": {<\n>   "-PASS_CRITERIA" : "",<\n>   "-VARS"
+  : {},<\n>   "-PARAMETERS" : {},<\n>   "-INFO" : {},<\n>   "-PURPOSE" : "",<\n>   "-DEPENDENCY"
+  : "",<\n>   "-PARAMS_VALUES" : {},<\n>   "-NOTES" : {},<\n>   "-REQUIREMENTS" :
+  "",<\n>   "-STATS" : {<\n>      "executions" : {},<\n>      "duration" : {<\n>         "average"
+  : null,<\n>         "min" : null,<\n>         "last" : null,<\n>         "max" :
+  null<\n>      }<\n>   },<\n>   "-CLEANUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-TEXT"
+  : null,<\n>   "-CI" : "",<\n>   "-ON_STEP_FAIL" : {<\n>      "-PARAMS" : {}<\n>   },<\n>   "-FINAL_TEXT"
+  : null,<\n>   "-TP" : null,<\n>   "start_time" : 1438601130.62836,<\n>   "-TG" :
+  null,<\n>   "-SETUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS"
+  : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-EXECUTION" : {<\n>      "-PARAMS"
+  : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES"
+  : {}<\n>   },<\n>   "-TRACE" : [],<\n>   "-RECOVERY" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   }<\n>},"id":
+  23}<\n>'
+Type_of_record: '>'
+---
+Nr: 52
+Time: '13:25:30.63 '
+Epoch: '1438601130.633349 '
+Payload: '{"id": 24,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "scalar","method": "TC_END","params": {"-TC": "[1]C-Pln_LTE1841-A-c No activation
+  of A4 AMLE measurement because of max AMLE HOs to one target - multi AMLE targets"}}}'
+Type_of_record: ' '
+---
+Nr: 53
+Time: '13:25:30.64 '
+Epoch: '1438601130.636185 '
+Payload: '{"jsonrpc": "2.0","result": "NOT_EXECUTED","id": 24}<\n>'
+Type_of_record: '>'
+---
+Nr: 54
+Time: '13:25:30.64 '
+Epoch: '1438601130.638902 '
+Payload: '{"id": 25,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 55
+Time: '13:25:30.65 '
+Epoch: '1438601130.646082 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 25}<\n>'
+Type_of_record: '>'
+---
+Nr: 56
+Time: '13:25:30.65 '
+Epoch: '1438601130.649198 '
+Payload: '{"id": 26,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot suite:   Tests.TC2"}}}'
+Type_of_record: ' '
+---
+Nr: 57
+Time: '13:25:30.65 '
+Epoch: '1438601130.650533 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 26}<\n>'
+Type_of_record: '>'
+---
+Nr: 58
+Time: '13:25:30.65 '
+Epoch: '1438601130.653106 '
+Payload: '{"id": 27,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "clear_tc","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states -
+  CAC above maxCacThreshold"}}}'
+Type_of_record: ' '
+---
+Nr: 59
+Time: '13:25:30.65 '
+Epoch: '1438601130.654205 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 27}<\n>'
+Type_of_record: '>'
+---
+Nr: 60
+Time: '13:25:30.66 '
+Epoch: '1438601130.655277 '
+Payload: '{"id": 28,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "hash_ref","method": "TC_START","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states
+  - CAC above maxCacThreshold"}}}'
+Type_of_record: ' '
+---
+Nr: 61
+Time: '13:25:30.66 '
+Epoch: '1438601130.658434 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:25:30.66 ########################### tc=[1]C-Pln_LTE1841-A-b
+  AMLE states - CAC above maxCacThreshold run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 62
+Time: '13:25:30.66 '
+Epoch: '1438601130.659825 '
+Payload: '{"jsonrpc": "2.0","result": {<\n>   "-PASS_CRITERIA" : "",<\n>   "-VARS"
+  : {},<\n>   "-PARAMETERS" : {},<\n>   "-INFO" : {},<\n>   "-PURPOSE" : "",<\n>   "-DEPENDENCY"
+  : "",<\n>   "-PARAMS_VALUES" : {},<\n>   "-NOTES" : {},<\n>   "-REQUIREMENTS" :
+  "",<\n>   "-STATS" : {<\n>      "executions" : {},<\n>      "duration" : {<\n>         "average"
+  : null,<\n>         "min" : null,<\n>         "last" : null,<\n>         "max" :
+  null<\n>      }<\n>   },<\n>   "-CLEANUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-TEXT"
+  : null,<\n>   "-CI" : "",<\n>   "-ON_STEP_FAIL" : {<\n>      "-PARAMS" : {}<\n>   },<\n>   "-FINAL_TEXT"
+  : null,<\n>   "-TP" : null,<\n>   "start_time" : 1438601130.65889,<\n>   "-TG" :
+  null,<\n>   "-SETUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS"
+  : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-EXECUTION" : {<\n>      "-PARAMS"
+  : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES"
+  : {}<\n>   },<\n>   "-TRACE" : [],<\n>   "-RECOVERY" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   }<\n>},"id":
+  28}<\n>'
+Type_of_record: '>'
+---
+Nr: 63
+Time: '13:25:30.66 '
+Epoch: '1438601130.661787 '
+Payload: '{"id": 29,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "scalar","method": "TC_END","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states
+  - CAC above maxCacThreshold"}}}'
+Type_of_record: ' '
+---
+Nr: 64
+Time: '13:25:30.66 '
+Epoch: '1438601130.664471 '
+Payload: '{"jsonrpc": "2.0","result": "NOT_EXECUTED","id": 29}<\n>'
+Type_of_record: '>'
+---
+Nr: 65
+Time: '13:25:30.67 '
+Epoch: '1438601130.667066 '
+Payload: '{"id": 30,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 66
+Time: '13:25:30.67 '
+Epoch: '1438601130.673282 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 30}<\n>'
+Type_of_record: '>'
+---
+Nr: 67
+Time: '13:25:30.68 '
+Epoch: '1438601130.675670 '
+Payload: '{"id": 31,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot suite:   Tests.TC3"}}}'
+Type_of_record: ' '
+---
+Nr: 68
+Time: '13:25:30.68 '
+Epoch: '1438601130.676996 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 31}<\n>'
+Type_of_record: '>'
+---
+Nr: 69
+Time: '13:25:30.68 '
+Epoch: '1438601130.679261 '
+Payload: '{"id": 32,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "clear_tc","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states -
+  cell in active LB state"}}}'
+Type_of_record: ' '
+---
+Nr: 70
+Time: '13:25:30.68 '
+Epoch: '1438601130.680361 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 32}<\n>'
+Type_of_record: '>'
+---
+Nr: 71
+Time: '13:25:30.68 '
+Epoch: '1438601130.683753 '
+Payload: '{"id": 33,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "hash_ref","method": "TC_START","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states
+  - cell in active LB state"}}}'
+Type_of_record: ' '
+---
+Nr: 72
+Time: '13:25:30.69 '
+Epoch: '1438601130.686159 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:25:30.69 ########################### tc=[1]C-Pln_LTE1841-A-b
+  AMLE states - cell in active LB state run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 73
+Time: '13:25:30.69 '
+Epoch: '1438601130.687754 '
+Payload: '{"jsonrpc": "2.0","result": {<\n>   "-PASS_CRITERIA" : "",<\n>   "-VARS"
+  : {},<\n>   "-PARAMETERS" : {},<\n>   "-INFO" : {},<\n>   "-PURPOSE" : "",<\n>   "-DEPENDENCY"
+  : "",<\n>   "-PARAMS_VALUES" : {},<\n>   "-NOTES" : {},<\n>   "-REQUIREMENTS" :
+  "",<\n>   "-STATS" : {<\n>      "executions" : {},<\n>      "duration" : {<\n>         "average"
+  : null,<\n>         "min" : null,<\n>         "last" : null,<\n>         "max" :
+  null<\n>      }<\n>   },<\n>   "-CLEANUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-TEXT"
+  : null,<\n>   "-CI" : "",<\n>   "-ON_STEP_FAIL" : {<\n>      "-PARAMS" : {}<\n>   },<\n>   "-FINAL_TEXT"
+  : null,<\n>   "-TP" : null,<\n>   "start_time" : 1438601130.68671,<\n>   "-TG" :
+  null,<\n>   "-SETUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS"
+  : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-EXECUTION" : {<\n>      "-PARAMS"
+  : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES"
+  : {}<\n>   },<\n>   "-TRACE" : [],<\n>   "-RECOVERY" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   }<\n>},"id":
+  33}<\n>'
+Type_of_record: '>'
+---
+Nr: 74
+Time: '13:25:30.69 '
+Epoch: '1438601130.689588 '
+Payload: '{"id": 34,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "scalar","method": "TC_END","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states
+  - cell in active LB state"}}}'
+Type_of_record: ' '
+---
+Nr: 75
+Time: '13:25:30.70 '
+Epoch: '1438601130.695162 '
+Payload: '{"jsonrpc": "2.0","result": "NOT_EXECUTED","id": 34}<\n>'
+Type_of_record: '>'
+---
+Nr: 76
+Time: '13:25:30.70 '
+Epoch: '1438601130.699215 '
+Payload: '{"id": 35,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 77
+Time: '13:25:30.71 '
+Epoch: '1438601130.705146 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 35}<\n>'
+Type_of_record: '>'
+---
+Nr: 78
+Time: '13:25:30.71 '
+Epoch: '1438601130.707605 '
+Payload: '{"id": 36,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot suite:   Tests.TC4"}}}'
+Type_of_record: ' '
+---
+Nr: 79
+Time: '13:25:30.71 '
+Epoch: '1438601130.710917 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 36}<\n>'
+Type_of_record: '>'
+---
+Nr: 80
+Time: '13:25:30.71 '
+Epoch: '1438601130.713624 '
+Payload: '{"id": 37,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "clear_tc","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states -
+  delta CAC"}}}'
+Type_of_record: ' '
+---
+Nr: 81
+Time: '13:25:30.71 '
+Epoch: '1438601130.714753 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 37}<\n>'
+Type_of_record: '>'
+---
+Nr: 82
+Time: '13:25:30.72 '
+Epoch: '1438601130.715897 '
+Payload: '{"id": 38,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "hash_ref","method": "TC_START","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states
+  - delta CAC"}}}'
+Type_of_record: ' '
+---
+Nr: 83
+Time: '13:25:30.72 '
+Epoch: '1438601130.718240 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:25:30.72 ########################### tc=[1]C-Pln_LTE1841-A-b
+  AMLE states - delta CAC run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 84
+Time: '13:25:30.72 '
+Epoch: '1438601130.719723 '
+Payload: '{"jsonrpc": "2.0","result": {<\n>   "-PASS_CRITERIA" : "",<\n>   "-VARS"
+  : {},<\n>   "-PARAMETERS" : {},<\n>   "-INFO" : {},<\n>   "-PURPOSE" : "",<\n>   "-DEPENDENCY"
+  : "",<\n>   "-PARAMS_VALUES" : {},<\n>   "-NOTES" : {},<\n>   "-REQUIREMENTS" :
+  "",<\n>   "-STATS" : {<\n>      "executions" : {},<\n>      "duration" : {<\n>         "average"
+  : null,<\n>         "min" : null,<\n>         "last" : null,<\n>         "max" :
+  null<\n>      }<\n>   },<\n>   "-CLEANUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-TEXT"
+  : null,<\n>   "-CI" : "",<\n>   "-ON_STEP_FAIL" : {<\n>      "-PARAMS" : {}<\n>   },<\n>   "-FINAL_TEXT"
+  : null,<\n>   "-TP" : null,<\n>   "start_time" : 1438601130.71871,<\n>   "-TG" :
+  null,<\n>   "-SETUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS"
+  : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-EXECUTION" : {<\n>      "-PARAMS"
+  : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES"
+  : {}<\n>   },<\n>   "-TRACE" : [],<\n>   "-RECOVERY" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   }<\n>},"id":
+  38}<\n>'
+Type_of_record: '>'
+---
+Nr: 85
+Time: '13:25:30.72 '
+Epoch: '1438601130.722500 '
+Payload: '{"id": 39,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "scalar","method": "TC_END","params": {"-TC": "[1]C-Pln_LTE1841-A-b AMLE states
+  - delta CAC"}}}'
+Type_of_record: ' '
+---
+Nr: 86
+Time: '13:25:30.73 '
+Epoch: '1438601130.725019 '
+Payload: '{"jsonrpc": "2.0","result": "NOT_EXECUTED","id": 39}<\n>'
+Type_of_record: '>'
+---
+Nr: 87
+Time: '13:25:30.73 '
+Epoch: '1438601130.727478 '
+Payload: '{"id": 40,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 88
+Time: '13:25:30.73 '
+Epoch: '1438601130.733311 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 40}<\n>'
+Type_of_record: '>'
+---
+Nr: 89
+Time: '13:25:30.74 '
+Epoch: '1438601130.736043 '
+Payload: '{"id": 41,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot suite:   Tests.TC5"}}}'
+Type_of_record: ' '
+---
+Nr: 90
+Time: '13:25:30.74 '
+Epoch: '1438601130.743276 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 41}<\n>'
+Type_of_record: '>'
+---
+Nr: 91
+Time: '13:25:30.75 '
+Epoch: '1438601130.745908 '
+Payload: '{"id": 42,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "clear_tc","params": {"-TC": "[1]C-Pln_LTE1841-A_a_Feature activation
+  and CAC measurements exchange"}}}'
+Type_of_record: ' '
+---
+Nr: 92
+Time: '13:25:30.75 '
+Epoch: '1438601130.747228 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 42}<\n>'
+Type_of_record: '>'
+---
+Nr: 93
+Time: '13:25:30.75 '
+Epoch: '1438601130.748411 '
+Payload: '{"id": 43,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "hash_ref","method": "TC_START","params": {"-TC": "[1]C-Pln_LTE1841-A_a_Feature
+  activation and CAC measurements exchange"}}}'
+Type_of_record: ' '
+---
+Nr: 94
+Time: '13:25:30.75 '
+Epoch: '1438601130.751790 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:25:30.75 ########################### tc=[1]C-Pln_LTE1841-A_a_Feature
+  activation and CAC measurements exchange run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 95
+Time: '13:25:30.75 '
+Epoch: '1438601130.753397 '
+Payload: '{"jsonrpc": "2.0","result": {<\n>   "-PASS_CRITERIA" : "",<\n>   "-VARS"
+  : {},<\n>   "-PARAMETERS" : {},<\n>   "-INFO" : {},<\n>   "-PURPOSE" : "",<\n>   "-DEPENDENCY"
+  : "",<\n>   "-PARAMS_VALUES" : {},<\n>   "-NOTES" : {},<\n>   "-REQUIREMENTS" :
+  "",<\n>   "-STATS" : {<\n>      "executions" : {},<\n>      "duration" : {<\n>         "average"
+  : null,<\n>         "min" : null,<\n>         "last" : null,<\n>         "max" :
+  null<\n>      }<\n>   },<\n>   "-CLEANUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-TEXT"
+  : null,<\n>   "-CI" : "",<\n>   "-ON_STEP_FAIL" : {<\n>      "-PARAMS" : {}<\n>   },<\n>   "-FINAL_TEXT"
+  : null,<\n>   "-TP" : null,<\n>   "start_time" : 1438601130.75233,<\n>   "-TG" :
+  null,<\n>   "-SETUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS"
+  : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-EXECUTION" : {<\n>      "-PARAMS"
+  : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES"
+  : {}<\n>   },<\n>   "-TRACE" : [],<\n>   "-RECOVERY" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   }<\n>},"id":
+  43}<\n>'
+Type_of_record: '>'
+---
+Nr: 96
+Time: '13:25:30.76 '
+Epoch: '1438601130.755664 '
+Payload: '{"id": 44,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "scalar","method": "TC_END","params": {"-TC": "[1]C-Pln_LTE1841-A_a_Feature activation
+  and CAC measurements exchange"}}}'
+Type_of_record: ' '
+---
+Nr: 97
+Time: '13:25:30.76 '
+Epoch: '1438601130.758295 '
+Payload: '{"jsonrpc": "2.0","result": "NOT_EXECUTED","id": 44}<\n>'
+Type_of_record: '>'
+---
+Nr: 98
+Time: '13:25:30.76 '
+Epoch: '1438601130.761024 '
+Payload: '{"id": 45,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 99
+Time: '13:25:30.77 '
+Epoch: '1438601130.769332 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 45}<\n>'
+Type_of_record: '>'
+---
+Nr: 100
+Time: '13:25:30.77 '
+Epoch: '1438601130.772049 '
+Payload: '{"id": 46,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot suite:   Tests.TC8"}}}'
+Type_of_record: ' '
+---
+Nr: 101
+Time: '13:25:30.77 '
+Epoch: '1438601130.773227 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 46}<\n>'
+Type_of_record: '>'
+---
+Nr: 102
+Time: '13:25:30.78 '
+Epoch: '1438601130.776973 '
+Payload: '{"id": 47,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "clear_tc","params": {"-TC": "[1]C-Pln_LTE1841-A-e Activation and
+  deactivation of load exchange - requesting site"}}}'
+Type_of_record: ' '
+---
+Nr: 103
+Time: '13:25:30.78 '
+Epoch: '1438601130.778461 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 47}<\n>'
+Type_of_record: '>'
+---
+Nr: 104
+Time: '13:25:30.78 '
+Epoch: '1438601130.779709 '
+Payload: '{"id": 48,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "hash_ref","method": "TC_START","params": {"-TC": "[1]C-Pln_LTE1841-A-e Activation
+  and deactivation of load exchange - requesting site"}}}'
+Type_of_record: ' '
+---
+Nr: 105
+Time: '13:25:30.78 '
+Epoch: '1438601130.783541 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:25:30.78 ########################### tc=[1]C-Pln_LTE1841-A-e
+  Activation and deactivation of load exchange - requesting site run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 106
+Time: '13:25:30.79 '
+Epoch: '1438601130.785329 '
+Payload: '{"jsonrpc": "2.0","result": {<\n>   "-PASS_CRITERIA" : "",<\n>   "-VARS"
+  : {},<\n>   "-PARAMETERS" : {},<\n>   "-INFO" : {},<\n>   "-PURPOSE" : "",<\n>   "-DEPENDENCY"
+  : "",<\n>   "-PARAMS_VALUES" : {},<\n>   "-NOTES" : {},<\n>   "-REQUIREMENTS" :
+  "",<\n>   "-STATS" : {<\n>      "executions" : {},<\n>      "duration" : {<\n>         "average"
+  : null,<\n>         "min" : null,<\n>         "last" : null,<\n>         "max" :
+  null<\n>      }<\n>   },<\n>   "-CLEANUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-TEXT"
+  : null,<\n>   "-CI" : "",<\n>   "-ON_STEP_FAIL" : {<\n>      "-PARAMS" : {}<\n>   },<\n>   "-FINAL_TEXT"
+  : null,<\n>   "-TP" : null,<\n>   "start_time" : 1438601130.78417,<\n>   "-TG" :
+  null,<\n>   "-SETUP" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS"
+  : {},<\n>      "-MODULES" : {}<\n>   },<\n>   "-EXECUTION" : {<\n>      "-PARAMS"
+  : {},<\n>      "-STATUS" : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES"
+  : {}<\n>   },<\n>   "-TRACE" : [],<\n>   "-RECOVERY" : {<\n>      "-PARAMS" : {},<\n>      "-STATUS"
+  : "NOT_EXECUTED",<\n>      "-STEPS" : {},<\n>      "-MODULES" : {}<\n>   }<\n>},"id":
+  48}<\n>'
+Type_of_record: '>'
+---
+Nr: 107
+Time: '13:25:30.79 '
+Epoch: '1438601130.787575 '
+Payload: '{"id": 49,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  "scalar","method": "TC_END","params": {"-TC": "[1]C-Pln_LTE1841-A-e Activation and
+  deactivation of load exchange - requesting site"}}}'
+Type_of_record: ' '
+---
+Nr: 108
+Time: '13:25:30.79 '
+Epoch: '1438601130.792352 '
+Payload: '{"jsonrpc": "2.0","result": "NOT_EXECUTED","id": 49}<\n>'
+Type_of_record: '>'
+---
+Nr: 109
+Time: '13:25:30.79 '
+Epoch: '1438601130.794815 '
+Payload: '{"id": 50,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 110
+Time: '13:25:30.81 '
+Epoch: '1438601130.806284 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 50}<\n>'
+Type_of_record: '>'
+---
+Nr: 111
+Time: '13:25:30.81 '
+Epoch: '1438601130.808799 '
+Payload: '{"id": 51,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "log","params": {"-TEXT": "Running   Robot keyword: deconfigure all
+  for LTE1841"}}}'
+Type_of_record: ' '
+---
+Nr: 112
+Time: '13:25:30.81 '
+Epoch: '1438601130.812367 '
+Payload: '{"jsonrpc": "2.0","result": [],"id": 51}<\n>'
+Type_of_record: '>'
+---
+Nr: 113
+Time: '13:25:30.81 '
+Epoch: '1438601130.814665 '
+Payload: '{"id": 52,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "error","params": {"-DUMP": ["deconfigure all for LTE1841"],"-FILENAME":
+  "/home/ute/auto/ruff/ruff/testmanager.py","-LINE": 32,"-TEXT": "*** Robot FAIL :
+  No keyword with name ''deconfigure all for LTE1841'' found.  ***#\nRobot keywords
+  stack:"}}}'
+Type_of_record: ' '
+---
+Nr: 114
+Time: '13:25:30.82 '
+Epoch: '1438601130.817106 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   0<\n>],"id": 52}<\n>'
+Type_of_record: '>'
+---
+Nr: 115
+Time: '13:25:30.82 '
+Epoch: '1438601130.819592 '
+Payload: '{"id": 53,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 116
+Time: '13:25:30.83 '
+Epoch: '1438601130.831730 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 53}<\n>'
+Type_of_record: '>'
+---
+Nr: 117
+Time: '13:25:30.83 '
+Epoch: '1438601130.834854 '
+Payload: '{"id": 54,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 118
+Time: '13:25:30.85 '
+Epoch: '1438601130.847217 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 54}<\n>'
+Type_of_record: '>'
+---
+Nr: 119
+Time: '13:25:30.85 '
+Epoch: '1438601130.851572 '
+Payload: '{"id": 55,"jsonrpc": "2.0","method": "class_call","params": {"class": "TMgr","expect":
+  null,"method": "report_tcs","params": null}}'
+Type_of_record: ' '
+---
+Nr: 120
+Time: '13:25:30.86 '
+Epoch: '1438601130.858961 '
+Payload: '{"jsonrpc": "2.0","result": [<\n>   null<\n>],"id": 55}<\n>'
+Type_of_record: '>'
+---
+Nr: 121
+Time: '13:25:31.28 '
+Epoch: '1438601131.283437 '
+Payload: 'Connection ''127.0.0.1.34255'' (tcp 127.0.0.1:34255  (not connected)) dropped
+  (close #1)<\n>'
+Type_of_record: C
+---
+Nr: 122
+Time: '13:25:31.28 '
+Epoch: '1438601131.284287 '
+Payload: stopped,Event::JsonRpcRequest<\n>
+Type_of_record: H
+---
+Nr: 123
+Time: '13:28:11.81 '
+Epoch: '1438601291.806406 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:28:11.81 ########################### tc=[1]C-Pln_LTE1841-A-c
+  No activation of A4 AMLE measurement because of max AMLE HOs to one target - multi
+  AMLE targets run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 124
+Time: '13:28:11.84 '
+Epoch: '1438601291.839926 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:28:11.84 ########################### tc=[1]C-Pln_LTE1841-A-b
+  AMLE states - CAC above maxCacThreshold run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 125
+Time: '13:28:11.87 '
+Epoch: '1438601291.872229 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:28:11.87 ########################### tc=[1]C-Pln_LTE1841-A-b
+  AMLE states - cell in active LB state run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 126
+Time: '13:28:11.93 '
+Epoch: '1438601291.929602 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:28:11.93 ########################### tc=[1]C-Pln_LTE1841-A-b
+  AMLE states - delta CAC run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 127
+Time: '13:28:11.97 '
+Epoch: '1438601291.974330 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:28:11.97 ########################### tc=[1]C-Pln_LTE1841-A_a_Feature
+  activation and CAC measurements exchange run 1<\n><\n>'
+Type_of_record: R
+---
+Nr: 128
+Time: '13:28:12.01 '
+Epoch: '1438601292.014651 '
+Payload: '<\n>## TC_RUN_ID=2015/08/03-13:28:12.01 ########################### tc=[1]C-Pln_LTE1841-A-e
+  Activation and deactivation of load exchange - requesting site run 1<\n><\n>'
+Type_of_record: R
