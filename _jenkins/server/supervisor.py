@@ -48,7 +48,7 @@ def _get_tl_name(id):
     reservation = tlr.TestLineReservation(id)
     return reservation.get_reservation_details()['testline']['name']
 
-def send_information(id,tl_name,user_info, test_passed = None):
+def send_information(id,tl_name,user_info, test_passed = None, tests_status = None):
     # user_info['first_name']
     # user_info['last_name']
     # user_info['e-mail']
@@ -62,19 +62,26 @@ def send_information(id,tl_name,user_info, test_passed = None):
                                              rID=id, tl_name=tl_name)
         _subject = "Reservation status update"
 
-    elif test_passed == False:
-        _message = "Hello {f_name} {l_name}! \n\n" \
-                  "All your tests were successful\n\n" \
-                  "Have a nice day!".format(f_name=user_info['first_name'],
-                                            l_name=user_info['last_name'])
-        _subject = "Tests status update"
-
     elif test_passed == True:
         _message = "Hello {f_name} {l_name}! \n\n" \
                   "All your tests were successful\n\n" \
                   "Have a nice day!".format(f_name=user_info['first_name'],
                                             l_name=user_info['last_name'])
-        _subject = "Tests status update"
+        _subject = "Tests status update - finished"
+
+    elif test_passed == False:
+        test_info = ''
+        for test_status_number in range(0, len(tests_status)):
+            test_info += "Test = {test_name}.{file_name}\n".format(
+                test_name=tests_status[test_status_number]['test_name'],
+                file_name=tests_status[test_status_number]['file_name'])
+        _message = "Hello {f_name} {l_name}! \n\n" \
+                  "Few tests didn't pass: \n\n" \
+                  "{test_info}\n\n" \
+                  "Have a nice day!".format(f_name=user_info['first_name'],
+                                            l_name=user_info['last_name'],
+                                            test_info=test_info)
+        _subject = "Tests status update - finished"
 
     send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
     mail = ute_mail.mail.Mail(subject=_subject,message=_message, recipients=user_info['e-mail'], name_from="Reservation Api")
@@ -120,18 +127,31 @@ def _get_job_test_status(job_output):
     for i in range(0,len(match)):
         match[i] = re.sub(" +", "_", match[i])
         if match[i][-3:] == '...': match[i] = match[i][:-3]
+        if match[i][-1:] == '_': match[i] = match[i][:-1]
         try:
-            if re.search('^(T.*).*',(match[i].split('.',2))[2]).groups() != None:
-                match[i] = match[i].split('.',3)
-                tests_dict.append({'test_name' : match[i][1],
-                              'file_name' : match[i][3]})
+            match[i] = re.search('CPLN\.(\w*)\.Tests\.(.*)', match[i]).groups()
+            tests_dict.append({'test_name' : match[i][0],
+                          'file_name' : match[i][1]})
         except:
-            match[i] = match[i].split('.',2)
-            tests_dict.append({'test_name' : match[i][1],
-                              'file_name' : match[i][2]})
-
+            match[i] = re.search('CPLN\.(\w*)\.(.*)', match[i]).groups()
+            tests_dict.append({'test_name' : match[i][0],
+                          'file_name' : match[i][1]})
 
     return tests_dict, has_got_fail
+
+def _check_for_fails(output):
+    return output.find('| FAIL |')
+
+def _end(id, has_got_fail, tl_name, user_info, job_test_status, jenkins_console_output=None):
+    if has_got_fail == False:
+        if _check_for_fails(jenkins_console_output) == -1: test_passed = True
+        else: test_passed = "UNKNOWN_FAIL"
+    else:
+        test_passed = False
+
+    send_information(id, tl_name, user_info, test_passed, job_test_status)
+    return 0
+
 
 
 def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
@@ -150,7 +170,7 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
     tl_name = _get_tl_name(reservationID)
     _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
                         tl_name=tl_name, duration=reservation_data['duration'])
-    #send_information(reservationID, tl_name, user_info)
+
     job = _create_and_build_job(jenkins_info, tl_name)
     jenkins_console_output = _get_jenkins_console_output(jenkins_info, job)
     job_test_status_dict, has_got_fail = _get_job_test_status(job_output=jenkins_console_output)
@@ -174,28 +194,38 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
                          test_passed=True)
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
 #     main()
-    # reservationID = create_reservation_and_run_job(testline_type="CLOUD_F")
-    # print reservationID
-    # time.sleep(2)
-    # print reservation_status(reservationID)
-    # print _get_tl_name(reservationID)
+#     reservationID = create_reservation_and_run_job(testline_type="CLOUD_F", duration=120)
+#     print reservationID
+#     time.sleep(2)
+#     if not reservation_status(reservationID) == 0:
+#         raise "Some weird exception"
+#     print _get_tl_name(reservationID)
+#     print reservation_status(reservationID)
 
-    # jenkins_info = {'name' : 'test_job_tl_99',
-    #                 'parameters' : {
-    #                     'f_name' : 'ttt',
-    #                     't1' : 'inny',
-    #                     't2' : 'jeszcze_inny'},
-    #                 }
-    # job = _create_and_build_job(jenkins_info,tl_name="tl99_test")
-    # jenkins_console_output = _get_jenkins_console_output(jenkins_info, job)
-    # job_test_status_dict, has_got_fail = _get_job_test_status(jenkins_console_output)
-    # print job_test_status_dict, has_got_fail
+    tl_name = 'tl99_test'
+    reservation_data = {'duration' : 120}
+    reservationID = 65554
+    serverID = 124
+    parent_dict = {serverID : {}}
+    _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
+                        tl_name=tl_name, duration=reservation_data['duration'])
+    print parent_dict
+    jenkins_info = {'name' : 'test_job2_tl99',
+                    'parameters' : {
+                        'name' : ''}
+                    }
+    user_info = {'first_name' : 'Pawel',
+                'last_name' : 'Nogiec',
+                'e-mail' : 'pawel.nogiec@nokia.com'}
 
-    # send_information(12343,"tl99",user_info={'first_name' : 'Pawel',
-    #                                          'last_name' : 'Nogiec',
-    #                                          'e-mail' : 'pawel.nogiec@nokia.com'})
-    # send_information(12343,"tl99",user_info={'first_name' : 'Pawel',
-    #                                          'last_name' : 'Nogiec',
-    #                                          'e-mail' : 'pawel.nogiec@nokia.com'}, test_passed=True)
+    job = _create_and_build_job(jenkins_info,tl_name=tl_name)
+    jenkins_console_output = _get_jenkins_console_output(jenkins_info, job)
+    job_test_status_dict, has_got_fail = _get_job_test_status(jenkins_console_output)
+    print job_test_status_dict, has_got_fail
+    _end(id=reservationID, has_got_fail=has_got_fail, tl_name=tl_name,
+         job_test_status=job_test_status_dict, user_info=user_info)
+
+    print parent_dict
+    print "done"
