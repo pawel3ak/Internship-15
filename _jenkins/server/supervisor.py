@@ -186,5 +186,4 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
     job_test_status_dict, has_got_fail = _get_job_test_status(job_output=jenkins_console_output)
     _end(id=reservationID, has_got_fail=has_got_fail, tl_name=tl_name,
          job_test_status=job_test_status_dict, user_info=user_info)
-    del parent_dict[serverID]
     return 0
