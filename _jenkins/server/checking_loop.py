@@ -53,8 +53,7 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
                                server_dictionary, handle_dictionary, loop = True):
     test_reservation = TestLineReservation()
     while True:
-        print "loop"
-        checking_tl_busy(server_dictionary, handle_dictionary)
+        print "reservation loop"
         print (test_reservation.get_available_tl_count_group_by_type())['CLOUD_F']
         print number_of_free_tl
         print queue.check_queue_length(queue_file_name)
@@ -68,13 +67,14 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
                 make_queue_from_test(queue_file_name, '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN')
                 start_reservation(queue_file_name, server_dictionary, handle_dictionary)
             print "SCRIPT"
-        if loop:
-            sleep(30) # 1800??
         else:
+            break
+        if loop is False:
             break
 
 def checking_tl_busy(server_dictionary, handle_dictionary):
     while True:
+        print "busy loop"
         no_busy_reservation = sdictionary.get_first_not_busy(server_dictionary)
         if no_busy_reservation is None:
             break
@@ -85,10 +85,16 @@ def checking_tl_busy(server_dictionary, handle_dictionary):
         del handle_dictionary[no_busy_reservation]
         del server_dictionary[no_busy_reservation]
 
-'''
-def main_checking_loop((queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
-                       server_dictionary, handle_dictionary, loop = True):
-'''
+
+def main_checking_loop(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
+                       server_dictionary, handle_dictionary):
+    while True:
+        print "main loop"
+        checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
+                       server_dictionary, handle_dictionary, False)
+        checking_tl_busy(server_dictionary, handle_dictionary)
+        sleep(30)
+
 
 if __name__ == "__main__":
     directory = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN'

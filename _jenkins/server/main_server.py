@@ -14,7 +14,7 @@ from threading import Thread
 from multiprocessing import Manager
 import tl_reservation
 import reservation_queue as queue
-from checking_loop import checking_reservation_queue
+from checking_loop import main_checking_loop
 
 
 HOST_IP = "127.0.0.1"
@@ -110,7 +110,7 @@ def main_server():
 
     # start checking loop
 
-    thread = Thread(target=checking_reservation_queue, args=[queue_file_name, priority_queue_file_name, free_testline, max_testline, server_dict, handle_dict])
+    thread = Thread(target=main_checking_loop, args=[queue_file_name, priority_queue_file_name, free_testline, max_testline, server_dict, handle_dict])
     thread.daemon = True
     thread.start()
 
