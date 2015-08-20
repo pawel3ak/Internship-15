@@ -26,10 +26,10 @@ def get_catalog_list(dir):
 def make_queue_from_test(queue_file, dir):
     dirlist = get_catalog_list(dir)
     for directory in dirlist:
-        request = {'reservation_data': {},
+        request = {'reservation_data': {'duration': 120},
                    'serverID': queue.get_server_ID_number(),
                    'password': queue.generate_password(),
-                   'user_info': {},
+                   'user_info': None,
                    'jenkins_info': {'parameters': {'name': directory}}
                    }
         queue.write_to_queue(queue_file, request)
