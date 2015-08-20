@@ -27,6 +27,6 @@ def update_record(dictionary, server_id, reservation_id=None, busy_status=None,
 # Get first not busy tl
 def get_first_not_busy(dictionary):
     for record in dictionary:
-        if record['busy_status'] == False:
+        if dictionary[record]['busy_status'] == False:
             return record["server_id"]
     return None
