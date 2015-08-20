@@ -26,9 +26,8 @@ def get_catalog_list(dir):
 def make_queue_from_test(queue_file, dir):
     dirlist = get_catalog_list(dir)
     for directory in dirlist:
-        request = {'reservation_data':
-                       {'testline_type' : 'CLOUD_F',
-                        'duration': 120},
+        request = {'reservation_data': {'testline_type': 'CLOUD_F',
+                                        'duration': 120},
                    'serverID': queue.get_server_ID_number(),
                    'password': queue.generate_password(),
                    'user_info': None,
@@ -46,7 +45,7 @@ def start_reservation(queue_file, server_dictionary, handle_dictionary):
     handle_dictionary[request["serverID"]] = thread
 
 
-def checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, server_dictionary, handle_dictionary, loop = True):
+def checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number, server_dictionary, handle_dictionary, loop = True):
     test_reservation = TestLineReservation()
     while True:
         print "loop"
@@ -54,7 +53,8 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
         print (test_reservation.get_available_tl_count_group_by_type())['CLOUD_F']
         print number_of_free_tl
         print queue.check_queue_length(queue_file_name)
-        if ((test_reservation.get_available_tl_count_group_by_type())['CLOUD_F'] > number_of_free_tl):
+        if ((test_reservation.get_available_tl_count_group_by_type())['CLOUD_F'] > number_of_free_tl) & \
+                (len(server_dictionary)<max_tl_number):
             if queue.check_queue_length(priority_queue_file_name) > 0:
                 start_reservation(priority_queue_file_name, server_dictionary, handle_dictionary)
             elif queue.check_queue_length(queue_file_name) > 0:

@@ -22,6 +22,7 @@ HOST_PORT = 5005
 QUEUE_FILE_NAME = "reservation_queue"
 PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
 FREE_TL = 0
+MAX_TL = 3
 
 
 def response(connect, message, queue_file_name, priority_queue_file_name, server_dictionary):
@@ -84,6 +85,7 @@ def main_server():
     host = args.host
     port = args.port
     free_testline = args.freetl
+    max_testline = MAX_TL
     queue_file_name = args.file
     priority_queue_file_name = args.priority
 
@@ -108,7 +110,7 @@ def main_server():
 
     # start checking loop
 
-    thread = Thread(target=checking_reservation_queue, args=[queue_file_name, priority_queue_file_name, free_testline, server_dict, handle_dict])
+    thread = Thread(target=checking_reservation_queue, args=[queue_file_name, priority_queue_file_name, free_testline, max_testline, server_dict, handle_dict])
     thread.daemon = True
     thread.start()
 
