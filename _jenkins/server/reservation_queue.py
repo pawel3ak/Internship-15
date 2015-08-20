@@ -8,12 +8,11 @@
 """
 
 import json
-import random
 
 
-def create_file(file):
-    with open(file, "ab+") as open_file:
-        pass
+def create_file(new_file):
+    with open(new_file, "ab+") as open_file:
+        open_file.close()
 
 
 def write_to_queue(file_name, record):
@@ -47,7 +46,7 @@ def check_queue_length(file_name):
         # add option to ignor empty lines!!!!!!!!!!!!
 
 
-def get_server_ID_number():
+def get_server_id_number():
     id_file = "temp_id"
     with open(id_file, "ab+") as open_file:
         lines = open_file.readlines()
@@ -68,7 +67,6 @@ def get_server_ID_number():
 
 def generate_password(passw_lenght=4):
     import random
-
     alphabet = "abcdefghijklmnopqrstuvwxyz0123456789"
     password = ""
     for i in range(passw_lenght):
@@ -77,6 +75,5 @@ def generate_password(passw_lenght=4):
     return password
 
 
-
 if __name__ == "__main__":
-    print get_server_ID_number()
+    print get_server_id_number()

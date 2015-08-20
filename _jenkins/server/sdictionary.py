@@ -11,22 +11,22 @@
 def update_record(dictionary, server_id, reservation_id=None, busy_status=None,
                   time_add=None, duration=None, tl_name=None, job_test_status=None):
     if reservation_id is not None:
-        dictionary[server_id]["handle"] = reservation_id
+        dictionary[server_id]["reservation_id"] = reservation_id
     if busy_status is not None:
-        dictionary[server_id]["handle"] = busy_status
+        dictionary[server_id]["busy_status"] = busy_status
     if time_add is not None:
-        dictionary[server_id]["handle"] = time_add
+        dictionary[server_id]["time_add"] = time_add
     if duration is not None:
-        dictionary[server_id]["handle"] = duration
+        dictionary[server_id]["duration"] = duration
     if tl_name is not None:
-        dictionary[server_id]["handle"] = tl_name
+        dictionary[server_id]["tl_name"] = tl_name
     if job_test_status is not None:
-        dictionary[server_id]["handle"] = job_test_status
+        dictionary[server_id]["job_test_status "] = job_test_status
 
 
 # Get first not busy tl
 def get_first_not_busy(dictionary):
     for record in dictionary:
-        if record['busy_status'] == False:
+        if dictionary[record]['busy_status'] == False:
             return record["server_id"]
     return None

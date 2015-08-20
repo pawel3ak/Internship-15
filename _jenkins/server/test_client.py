@@ -12,7 +12,8 @@ import sys
 import json
 
 HOST_IP, HOST_PORT = "127.0.0.1", 5005
-request = "request/available_tl_count"
+# request = "request/available_tl_count"
+request = "request/get_info"
 '''
 request = "request/create_reservation"
 data = json.dumps({'reservation_data' :
@@ -36,11 +37,14 @@ sock.connect((HOST_IP, HOST_PORT))
 sock.send(request)
 while True:
         response = sock.recv(1024)
+        print response
         if response == 'OK':
-            sock.send(data)
+            sock.send("1")
+            response = sock.recv(1024)
+            print response
         elif response == "":
             break
-        print response,
+        #print response,
 sock.close()
 
 

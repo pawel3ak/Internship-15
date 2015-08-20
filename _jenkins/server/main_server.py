@@ -14,7 +14,7 @@ from threading import Thread
 from multiprocessing import Manager
 import tl_reservation
 import reservation_queue as queue
-from checking_loop import checking_reservation_queue
+from checking_loop import main_checking_loop
 
 
 HOST_IP = "127.0.0.1"
@@ -22,6 +22,7 @@ HOST_PORT = 5005
 QUEUE_FILE_NAME = "reservation_queue"
 PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
 FREE_TL = 0
+MAX_TL = 3
 
 
 def response(connect, message, queue_file_name, priority_queue_file_name, server_dictionary):
@@ -29,10 +30,18 @@ def response(connect, message, queue_file_name, priority_queue_file_name, server
         new_request(connect, queue_file_name, priority_queue_file_name, server_dictionary)
     elif message == "request/available_tl_count":
         _get_available_tl_count(connect)
+    elif message == "request/get_info":
+        print "dostalem sie"
+        _get_tests_info(connect, server_dictionary)
     else:
         connect.send("Wrong command")
         connect.close()
 
+def _get_tests_info(connect, parent_dict):
+    connect.send("OK")
+    data = connect.recv(1024).strip()
+    connect.send(str(parent_dict[int(data)]))
+    connect.close()
 
 def _get_available_tl_count(connect):
     testline_handle = tl_reservation.TestLineReservation()
@@ -44,7 +53,7 @@ def new_request(connect, queue_file_name, priority_queue_file_name, server_dicti
     connect.send("OK")
     data = connect.recv(1024).strip()
     request = json.loads(data)
-    request['serverID'] = queue.get_server_ID_number()
+    request['serverID'] = queue.get_server_id_number()
     request['password'] = queue.generate_password()
     if request['priority'] == 0:
         request.pop('priority')
@@ -76,6 +85,7 @@ def main_server():
     host = args.host
     port = args.port
     free_testline = args.freetl
+    max_testline = MAX_TL
     queue_file_name = args.file
     priority_queue_file_name = args.priority
 
@@ -89,6 +99,8 @@ def main_server():
     server_dict = {}
     handle_dict = man.dict()
     handle_dict = {}
+    server_dict[1] = {'cos' : 'innego',
+                      'busy_status' : True}
 
     # set up server
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -98,7 +110,7 @@ def main_server():
 
     # start checking loop
 
-    thread = Thread(target=checking_reservation_queue, args=[queue_file_name, priority_queue_file_name, free_testline, server_dict, handle_dict])
+    thread = Thread(target=main_checking_loop, args=[queue_file_name, priority_queue_file_name, free_testline, max_testline, server_dict, handle_dict])
     thread.daemon = True
     thread.start()
 

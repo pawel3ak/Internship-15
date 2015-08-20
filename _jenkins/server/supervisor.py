@@ -112,11 +112,12 @@ def _get_jenkins_console_output(job):
 
 
 def _update_parent_dict(serverID, parent_dict, id, busy_status, tl_name, duration, job_test_status=None):
-    parent_dict[serverID]['reservationID'] = id
-    parent_dict[serverID]['busy'] = busy_status
-    parent_dict[serverID]['tl_name'] = tl_name
-    parent_dict[serverID]['duration'] = duration
-    parent_dict[serverID]['test_status'] = job_test_status
+    parent_dict[serverID]={
+        'reservationID' : id,
+        'busy_status' : busy_status,
+        'tl_name' : tl_name,
+        'duration' : duration,
+        'test_status' : job_test_status}
 
 
 def _get_job_test_status(job_output):
@@ -157,13 +158,14 @@ def _end(id, has_got_fail, tl_name, user_info, job_test_status, jenkins_console_
 
 
 def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
-    reservationID = create_reservation_and_run_job(reservation_data['testline_type'],
-                                                   reservation_data['enb_build'],
-                                                   reservation_data['ute_build'],
-                                                   reservation_data['sysimage_build'],
-                                                   reservation_data['robotle_revision'],
-                                                   reservation_data['state'],
-                                                   reservation_data['duration'])
+    reservationID = create_reservation_and_run_job(testline_type=reservation_data['testline_type'],
+                                                   # reservation_data['enb_build'],
+                                                   # reservation_data['ute_build'],
+                                                   # reservation_data['sysimage_build'],
+                                                   # reservation_data['robotle_revision'],
+                                                   # reservation_data['state'],
+                                                   duration=reservation_data['duration'])
+    print reservationID
     _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
                         tl_name='', duration=reservation_data['duration'])
     if not reservation_status(reservationID) == 0:
