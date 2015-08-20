@@ -123,21 +123,24 @@ def _update_parent_dict(serverID, parent_dict, id, busy_status, tl_name, duratio
 def _get_job_test_status(job_output):
     has_got_fail = False
     regex = r'[=]\s(.*)\s[=]\W*.*FAIL'
-    match = re.findall(regex,job_output)
-    if len(match) != 0: has_got_fail = True
-    tests_dict=[]
-    for i in range(0,len(match)):
-        match[i] = re.sub(" +", "_", match[i])
-        if match[i][-3:] == '...': match[i] = match[i][:-3]
-        if match[i][-1:] == '_': match[i] = match[i][:-1]
-        try:
-            match[i] = re.search('CPLN\.(\w*)\.Tests\.(.*)', match[i]).groups()
-            tests_dict.append({'test_name' : match[i][0],
-                          'file_name' : match[i][1]})
-        except:
-            match[i] = re.search('CPLN\.(\w*)\.(.*)', match[i]).groups()
-            tests_dict.append({'test_name' : match[i][0],
-                          'file_name' : match[i][1]})
+    try:
+        match = re.findall(regex,job_output)
+        if len(match) != 0: has_got_fail = True
+        tests_dict=[]
+        for i in range(0,len(match)):
+            match[i] = re.sub(" +", "_", match[i])
+            if match[i][-3:] == '...': match[i] = match[i][:-3]
+            if match[i][-1:] == '_': match[i] = match[i][:-1]
+            try:
+                match[i] = re.search('CPLN\.(\w*)\.Tests\.(.*)', match[i]).groups()
+                tests_dict.append({'test_name' : match[i][0],
+                              'file_name' : match[i][1]})
+            except:
+                match[i] = re.search('CPLN\.(\w*)\.(.*)', match[i]).groups()
+                tests_dict.append({'test_name' : match[i][0],
+                                   'file_name' : match[i][1]})
+    except:
+        tests_dict = None
 
     return tests_dict, has_got_fail
 
@@ -175,7 +178,7 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
 
     ############################################################################
     #temporary hard-coded  variables:
-    tl_name = 'tl_99_test'
+    tl_name = 'tl99_test'
     user_info = {'first_name' : 'Pawel',
                 'last_name' : 'Nogiec',
                 'e-mail' : 'pawel.nogiec@nokia.com'}
@@ -189,3 +192,36 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
     _end(id=reservationID, has_got_fail=has_got_fail, tl_name=tl_name,
          job_test_status=job_test_status_dict, user_info=user_info)
     return 0
+
+if __name__=='__main__':
+    serverID=123
+    parent_dict = {serverID : {}}
+    reservationID = 66655
+    reservation_data = {'duration' : 120}
+    jenkins_info = {'parameters' : {'name' : ''}}
+
+    _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
+                        tl_name='', duration=reservation_data['duration'])
+    if not reservation_status(reservationID) == 0:
+        parent_dict[serverID]['busy'] = False
+        # return -1
+        print "fail"
+    tl_name = _get_tl_name(reservationID)
+
+    ############################################################################
+    #temporary hard-coded  variables:
+    tl_name = 'tl99_test'
+    user_info = {'first_name' : 'Pawel',
+                'last_name' : 'Nogiec',
+                'e-mail' : 'pawel.nogiec@nokia.com'}
+    #############################################################################
+    _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
+                        tl_name=tl_name, duration=reservation_data['duration'])
+
+    job = _create_and_build_job(jenkins_info, tl_name)
+    jenkins_console_output = _get_jenkins_console_output(job)
+    job_test_status_dict, has_got_fail = _get_job_test_status(job_output=jenkins_console_output)
+    _end(id=reservationID, has_got_fail=has_got_fail, tl_name=tl_name,
+         job_test_status=job_test_status_dict, user_info=user_info)
+    # return 0
+    print "ok"
