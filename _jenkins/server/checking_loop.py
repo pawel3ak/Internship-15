@@ -28,7 +28,7 @@ def make_queue_from_test(queue_file, dir):
     for directory in dirlist:
         request = {'reservation_data': {'testline_type': 'CLOUD_F',
                                         'duration': 120},
-                   'serverID': queue.get_server_ID_number(),
+                   'serverID': queue.get_server_id_number(),
                    'password': queue.generate_password(),
                    'user_info': None,
                    'jenkins_info': {'parameters': {'name': directory}}
@@ -38,14 +38,19 @@ def make_queue_from_test(queue_file, dir):
 
 def start_reservation(queue_file, server_dictionary, handle_dictionary):
     request = queue.read_next_from_queue(queue_file)
-    # queue.delete_reservation_from_queue(queue_file, request["serverID"], request["password"])
-    thread = Thread(target=supervisor.main, args=[request["serverID"], request["reservation_data"], server_dictionary, request["user_info"], request["jenkins_info"]])
+    queue.delete_reservation_from_queue(queue_file, request["serverID"], request["password"])
+    thread = Thread(target=supervisor.main, args=[request["serverID"],
+                                                  request["reservation_data"],
+                                                  server_dictionary,
+                                                  request["user_info"],
+                                                  request["jenkins_info"]])
     thread.daemon = True
     thread.start()
     handle_dictionary[request["serverID"]] = thread
 
 
-def checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number, server_dictionary, handle_dictionary, loop = True):
+def checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
+                               server_dictionary, handle_dictionary, loop = True):
     test_reservation = TestLineReservation()
     while True:
         print "loop"
@@ -69,11 +74,6 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
             break
 
 def checking_tl_busy(server_dictionary, handle_dictionary):
-    """
-
-    :type server_dictionary:
-    :type handle_dictionary:
-    """
     while True:
         no_busy_reservation = sdictionary.get_first_not_busy(server_dictionary)
         if no_busy_reservation is None:
@@ -85,7 +85,10 @@ def checking_tl_busy(server_dictionary, handle_dictionary):
         del handle_dictionary[no_busy_reservation]
         del server_dictionary[no_busy_reservation]
 
-
+'''
+def main_checking_loop((queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
+                       server_dictionary, handle_dictionary, loop = True):
+'''
 
 if __name__ == "__main__":
     directory = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN'

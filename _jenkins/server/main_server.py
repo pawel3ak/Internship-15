@@ -53,7 +53,7 @@ def new_request(connect, queue_file_name, priority_queue_file_name, server_dicti
     connect.send("OK")
     data = connect.recv(1024).strip()
     request = json.loads(data)
-    request['serverID'] = queue.get_server_ID_number()
+    request['serverID'] = queue.get_server_id_number()
     request['password'] = queue.generate_password()
     if request['priority'] == 0:
         request.pop('priority')
