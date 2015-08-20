@@ -11,6 +11,7 @@ import socket
 import json
 import argparse
 from threading import Thread
+from multiprocessing import Manager
 import tl_reservation
 import reservation_queue as queue
 from checking_loop import checking_reservation_queue
@@ -24,8 +25,10 @@ FREE_TL = 3
 
 
 def response(connect, message, queue_file_name, priority_queue_file_name):
-    if message == "request/create_reservation": new_request(connect, queue_file_name, priority_queue_file_name)
-    elif message == "request/available_tl_count": _get_available_tl_count(connect)
+    if message == "request/create_reservation":
+        new_request(connect, queue_file_name, priority_queue_file_name)
+    elif message == "request/available_tl_count":
+        _get_available_tl_count(connect)
     else:
         connect.send("Wrong command")
         connect.close()
@@ -77,6 +80,11 @@ def main_server():
     # create files if no exist
     queue.create_file(queue_file_name)
     queue.create_file(priority_queue_file_name)
+
+    # create server dictionary
+    man = Manager()
+    parent_dict = man.dict()
+    parent_dict = {}
 
     # set up server
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

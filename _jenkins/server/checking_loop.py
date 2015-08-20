@@ -42,9 +42,9 @@ def start_reservation(queue_file):
 
 
 def checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, loop = True):
+    test_reservation = TestLineReservation()
     while True:
         print "loop"
-        test_reservation = TestLineReservation()
         if ((test_reservation.get_available_tl_count_group_by_type())['CLOUD_F'] > number_of_free_tl):
             if queue.check_queue_length(priority_queue_file_name) > 0:
                 start_reservation(priority_queue_file_name)
@@ -58,7 +58,11 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
             sleep(30) # 1800??
         else:
             break
+'''
+def checking_tl_busy(tl_list):
 
+
+'''
 
 if __name__ == "__main__":
     directory = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN'
