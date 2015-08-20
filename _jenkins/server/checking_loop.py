@@ -67,6 +67,7 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
                 make_queue_from_test(queue_file_name, '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN')
                 start_reservation(queue_file_name, server_dictionary, handle_dictionary)
             print "SCRIPT"
+            sleep(3)
         else:
             break
         if loop is False:
