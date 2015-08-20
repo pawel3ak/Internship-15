@@ -21,12 +21,12 @@ HOST_IP = "127.0.0.1"
 HOST_PORT = 5005
 QUEUE_FILE_NAME = "reservation_queue"
 PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
-FREE_TL = 3
+FREE_TL = 0
 
 
-def response(connect, message, queue_file_name, priority_queue_file_name):
+def response(connect, message, queue_file_name, priority_queue_file_name, server_dictionary):
     if message == "request/create_reservation":
-        new_request(connect, queue_file_name, priority_queue_file_name)
+        new_request(connect, queue_file_name, priority_queue_file_name, server_dictionary)
     elif message == "request/available_tl_count":
         _get_available_tl_count(connect)
     else:
@@ -40,7 +40,7 @@ def _get_available_tl_count(connect):
     connect.close()
 
 
-def new_request(connect, queue_file_name, priority_queue_file_name):
+def new_request(connect, queue_file_name, priority_queue_file_name, server_dictionary):
     connect.send("OK")
     data = connect.recv(1024).strip()
     request = json.loads(data)
@@ -52,8 +52,10 @@ def new_request(connect, queue_file_name, priority_queue_file_name):
     elif request['priority'] == 1:
         request.pop('priority')
         queue.write_to_queue(priority_queue_file_name, request)
+    '''
     if (queue.check_queue_length(queue_file_name) == 1) or (queue.check_queue_length(priority_queue_file_name) == 1):
-        checking_reservation_queue(queue_file_name, priority_queue_file_name, False)
+        checking_reservation_queue(queue_file_name, priority_queue_file_name, server_dictionary, False)
+    '''
     connect.close()
 
 
@@ -81,10 +83,12 @@ def main_server():
     queue.create_file(queue_file_name)
     queue.create_file(priority_queue_file_name)
 
-    # create server dictionary
+    # create server and process dictionary
     man = Manager()
-    parent_dict = man.dict()
-    parent_dict = {}
+    server_dict = man.dict()
+    server_dict = {}
+    handle_dict = man.dict()
+    handle_dict = {}
 
     # set up server
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -94,7 +98,7 @@ def main_server():
 
     # start checking loop
 
-    thread = Thread(target=checking_reservation_queue, args=[queue_file_name, priority_queue_file_name, free_testline])
+    thread = Thread(target=checking_reservation_queue, args=[queue_file_name, priority_queue_file_name, free_testline, server_dict, handle_dict])
     thread.daemon = True
     thread.start()
 
@@ -104,7 +108,7 @@ def main_server():
         data = connect.recv(1024).strip()
         if data == "KONIEC":
             break
-        response(connect, data, queue_file_name, priority_queue_file_name)
+        response(connect, data, queue_file_name, priority_queue_file_name, server_dict)
 
     sock.close()
 
