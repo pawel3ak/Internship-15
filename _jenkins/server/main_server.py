@@ -29,10 +29,18 @@ def response(connect, message, queue_file_name, priority_queue_file_name, server
         new_request(connect, queue_file_name, priority_queue_file_name, server_dictionary)
     elif message == "request/available_tl_count":
         _get_available_tl_count(connect)
+    elif message == "request/get_info":
+        print "dostalem sie"
+        _get_tests_info(connect, server_dictionary)
     else:
         connect.send("Wrong command")
         connect.close()
 
+def _get_tests_info(connect, parent_dict):
+    connect.send("OK")
+    data = connect.recv(1024).strip()
+    connect.send(str(parent_dict[int(data)]))
+    connect.close()
 
 def _get_available_tl_count(connect):
     testline_handle = tl_reservation.TestLineReservation()
@@ -89,6 +97,8 @@ def main_server():
     server_dict = {}
     handle_dict = man.dict()
     handle_dict = {}
+    server_dict[1] = {'cos' : 'innego',
+                      'busy_status' : True}
 
     # set up server
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
