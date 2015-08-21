@@ -24,11 +24,10 @@ def _wait_for_server_response():
             pinging_bash.sendline("exit")
             return 0
 
-def _lmts_upgrade():
 
+def _lmts_executor_start(child_bash):
     # 1 LMTS-executor start
     print "LMTS-executor"
-    child_bash = pexpect.spawn("/bin/bash")
     child_bash.sendline("sudo /etc/init.d/lmts-executor start")
     try:
         child_bash.expect("Starting up LMTS Executor:")
@@ -51,6 +50,8 @@ def _lmts_upgrade():
             return 1
     sleep(2)
 
+
+def _lmts_trace_start(child_bash):
     # 2 LMTS-trace start
     print "LMTS-trace"
     child_bash.sendline("sudo /etc/init.d/lmts-trace start")
@@ -65,6 +66,8 @@ def _lmts_upgrade():
         return 2
     sleep(2)
 
+
+def _telnet_conection_start(child_bash):
     # 3 start telnet connection
     print "start telnet connection"
     child_bash.sendline("telnet 0 1234")
@@ -75,6 +78,8 @@ def _lmts_upgrade():
         print "pexpect.TIMEOUT - telnet connection"
         return 3
 
+
+def _config_update(child_bash):
     # 4 config update
     print "config update"
     child_bash.sendline("config update")
@@ -85,6 +90,8 @@ def _lmts_upgrade():
         print "pexpect.TIMEOUT - config update"
         return 4
 
+
+def _config_remote_reload(child_bash):
     # 5 config remote reload
     print "config remote reload - can take few minutes"
     child_bash.sendline("config remote reload")
@@ -99,6 +106,8 @@ def _lmts_upgrade():
         print "pexpect.TIMEOUT - config remote reload"
         return 5
 
+
+def _condig_ue_reload(child_bash):
     # 6 config ue reload
     print "config ue reload"
     child_bash.sendline("config ue reload")
@@ -110,6 +119,8 @@ def _lmts_upgrade():
         print "pexpect.TIMEOUT - config ue reload"
         return 6
 
+
+def _config_loopback(child_bash):
     # 7 config loopback apply tgrs
     print "config loopback apply tgrs"
     child_bash.sendline("config loopback apply tgrs")
@@ -121,6 +132,8 @@ def _lmts_upgrade():
         print "pexpect.TIMEOUT - config loopback apply tgrs"
         return 7
 
+
+def _cm_server_start(child_bash):
     # 8 cm server start
     print "cm server start"
     child_bash.sendline("cm server start")
@@ -132,19 +145,25 @@ def _lmts_upgrade():
         print "pexpect.TIMEOUT - cm server start"
         return 8
 
+
+def _config_remote_update(child_bash):
     # 9 config remote update
     print 99
     _wait_for_server_response()
     print "config remote update"
     child_bash.sendline("condig remote update")
     try:
-        control_output = child_bash.expect(["CTRL-1: COMMAND: /sbin/reload", "Error connecting to CTRL-1"], timeout=200)
+        control_output = child_bash.expect(["CTRL-1: COMMAND: /sbin/reload",
+                                            "Error connecting to CTRL-1"],
+                                           timeout=200)
         if control_output == 1:
-            #sleep(30)
+            # sleep(30)
             print "retry config remote update"
             child_bash.sendline("condig remote update")
             sleep(1)
-            control_output = child_bash.expect(["CTRL-1: COMMAND: /sbin/reload", "Error connecting to CTRL-1"], timeout=200)
+            control_output = child_bash.expect(["CTRL-1: COMMAND: /sbin/reload",
+                                                "Error connecting to CTRL-1"],
+                                               timeout=200)
             if control_output == 1:
                 print "Error connecting to CTRL-1"
                 return 10
@@ -156,9 +175,31 @@ def _lmts_upgrade():
         print "pexpect.TIMEOUT - config remote update"
         return 10
 
+
+def _lmts_init():
+    child_bash = pexpect.spawn("/bin/bash")
+    # 1 LMTS-executor start
+    _lmts_executor_start(child_bash)
+    # 2 LMTS-trace start
+    _lmts_trace_start(child_bash)
+    # 3 start telnet connection
+    _telnet_conection_start(child_bash)
+    # 4 config update
+    _config_update(child_bash)
+    # 5 config remote reload
+    _config_remote_reload(child_bash)
+    # 6 config ue reload
+    _condig_ue_reload(child_bash)
+    # 7 config loopback apply tgrs
+    _config_loopback(child_bash)
+    # 8 cm server start
+    _cm_server_start(child_bash)
+    # 9 config remote update
+    _config_remote_update(child_bash)
+
     print "all done"
     child_bash.sendline("exit")
 
 
 if __name__ == "__main__":
-    print _lmts_upgrade()
+    print _lmts_init()
