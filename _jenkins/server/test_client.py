@@ -13,7 +13,8 @@ import json
 
 HOST_IP, HOST_PORT = "127.0.0.1", 5005
 # request = "request/available_tl_count"
-request = "request/get_info"
+request = "request/get_all"
+# request = "request/get_info"
 '''
 request = "request/create_reservation"
 data = json.dumps({'reservation_data' :
@@ -35,7 +36,16 @@ sock = socket.socket(socket.AF_INET,
                      socket.SOCK_STREAM)
 sock.connect((HOST_IP, HOST_PORT))
 sock.send(request)
-while True:
+if request == "request/get_all":
+    while True:
+        response = sock.recv(1024)
+        if not response == "":
+            print response
+        elif response == "":
+            break
+    # print response
+elif request == "request/get_info":
+    while True:
         response = sock.recv(1024)
         print response
         if response == 'OK':
@@ -45,6 +55,7 @@ while True:
         elif response == "":
             break
         #print response,
+
 sock.close()
 
 

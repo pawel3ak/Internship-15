@@ -63,9 +63,11 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
     test_reservation = TestLineReservation()
     while True:
         print "reservation loop"
-        print (test_reservation.get_available_tl_count_group_by_type())['CLOUD_F']
-        print number_of_free_tl
-        print queue.check_queue_length(queue_file_name)
+        print "free tl on cloud_f = ",(test_reservation.get_available_tl_count_group_by_type())['CLOUD_F']
+        print "free tl = ",number_of_free_tl
+        print "ile lini w pliku = ",queue.check_queue_length(queue_file_name)
+        print "max tl = ", max_tl_number
+        print "dlugosc slownika = ", len(server_dictionary)
         if ((test_reservation.get_available_tl_count_group_by_type())['CLOUD_F'] > number_of_free_tl) & \
                 (len(server_dictionary)<max_tl_number):
             if queue.check_queue_length(priority_queue_file_name) > 0:

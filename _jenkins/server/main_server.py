@@ -21,8 +21,8 @@ HOST_IP = "127.0.0.1"
 HOST_PORT = 5005
 QUEUE_FILE_NAME = "reservation_queue"
 PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
-FREE_TL = 0
-MAX_TL = 3
+FREE_TL = 1
+MAX_TL = 2
 
 
 def response(connect, message, queue_file_name, priority_queue_file_name, server_dictionary):
