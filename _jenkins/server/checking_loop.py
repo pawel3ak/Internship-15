@@ -49,23 +49,24 @@ def start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_
     handle_dictionary[request["serverID"]] = thread
 
 
-def end_finished_job(server_id, server_dictionary, handle_dictionary, ):
+def end_finished_job(server_id, server_dictionary, handle_dictionary, remove_tl_reservation=True):
     reservation_tl_id = server_dictionary[server_id]["reservation_id"]
     handle_dictionary[server_id].join()
-    tl_reservation = TestLineReservation(reservation_tl_id)
-    tl_reservation.release_reservation()
+    if remove_tl_reservation:
+        tl_reservation = TestLineReservation(reservation_tl_id)
+        tl_reservation.release_reservation()
     del handle_dictionary[server_id]
     del server_dictionary[server_id]
+    if not remove_tl_reservation:
+        return reservation_tl_id
+    return 0
 
 
 def add_new_job_to_tl(queue_file, server_id, server_dictionary, handle_dictionary):
-    # end old task and add new job on reserved tl
-    reservation_id = server_dictionary[server_id]["reservation_id"]
-    # and old job
-    handle_dictionary[server_id].join()
-    del handle_dictionary[server_id]
-    del server_dictionary[server_id]
+    # end old job and get reservation ID number
+    reservation_id = end_finished_job(server_id, server_dictionary, handle_dictionary, False)
     # add new job
+    start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_id)
 
 
 def checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
@@ -73,9 +74,9 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
     test_reservation = TestLineReservation()
     while True:
         print "reservation loop"
-        print "free tl on cloud_f = ",(test_reservation.get_available_tl_count_group_by_type())['CLOUD_F']
-        print "free tl = ",number_of_free_tl
-        print "ile lini w pliku = ",queue.check_queue_length(queue_file_name)
+        print "free tl on cloud_f = ", (test_reservation.get_available_tl_count_group_by_type())['CLOUD_F']
+        print "free tl = ", number_of_free_tl
+        print "ile lini w pliku = ", queue.check_queue_length(queue_file_name)
         print "max tl = ", max_tl_number
         print "dlugosc slownika = ", len(server_dictionary)
         if ((test_reservation.get_available_tl_count_group_by_type())['CLOUD_F'] > number_of_free_tl) & \

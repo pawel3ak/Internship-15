@@ -47,6 +47,7 @@ def _get_tests_info(connect, parent_dict, specific = None):
     connect.send(string_to_send)
     connect.close()
 
+
 def _get_available_tl_count(connect):
     testline_handle = tl_reservation.TestLineReservation()
     connect.send(str((testline_handle.get_available_tl_count_group_by_type())['CLOUD_F']))
