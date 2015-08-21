@@ -2,8 +2,8 @@ __author__ = 'kgadek'
 
 import re
 import yaml
+import sys
 
-yaml_file="_json_rpc_tests--127.0.0.1.34255.yml"
 #my_yaml_file
 
 
@@ -34,4 +34,5 @@ def create_row_files(yaml_file):
     new_raw_time_file.close()
 
 if __name__ == "__main__":
+    yaml_file=sys.argv[1]
     create_row_files(yaml_file)
