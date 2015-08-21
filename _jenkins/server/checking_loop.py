@@ -36,7 +36,7 @@ def make_queue_from_test(queue_file, dir):
         queue.write_to_queue(queue_file, request)
 
 
-def start_reservation(queue_file, server_dictionary, handle_dictionary):
+def start_new_reservation(queue_file, server_dictionary, handle_dictionary):
     request = queue.read_next_from_queue(queue_file)
     queue.delete_reservation_from_queue(queue_file, request["serverID"], request["password"])
     thread = Thread(target=supervisor.main, args=[request["serverID"],
@@ -47,6 +47,15 @@ def start_reservation(queue_file, server_dictionary, handle_dictionary):
     thread.daemon = True
     thread.start()
     handle_dictionary[request["serverID"]] = thread
+
+
+def end_reservation(server_id, server_dictionary, handle_dictionary):
+    reservation_tl_id = server_dictionary[server_id]["reservation_id"]
+    handle_dictionary[server_id].join()
+    tl_reservation = TestLineReservation(reservation_tl_id)
+    tl_reservation.release_reservation()
+    del handle_dictionary[server_id]
+    del server_dictionary[server_id]
 
 
 def checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
@@ -60,12 +69,12 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
         if ((test_reservation.get_available_tl_count_group_by_type())['CLOUD_F'] > number_of_free_tl) & \
                 (len(server_dictionary)<max_tl_number):
             if queue.check_queue_length(priority_queue_file_name) > 0:
-                start_reservation(priority_queue_file_name, server_dictionary, handle_dictionary)
+                start_new_reservation(priority_queue_file_name, server_dictionary, handle_dictionary)
             elif queue.check_queue_length(queue_file_name) > 0:
-                start_reservation(queue_file_name, server_dictionary, handle_dictionary)
+                start_new_reservation(queue_file_name, server_dictionary, handle_dictionary)
             elif queue.check_queue_length(queue_file_name) == 0:
                 make_queue_from_test(queue_file_name, '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN')
-                start_reservation(queue_file_name, server_dictionary, handle_dictionary)
+                start_new_reservation(queue_file_name, server_dictionary, handle_dictionary)
             print "SCRIPT"
             sleep(3)
         else:
@@ -73,27 +82,23 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
         if loop is False:
             break
 
+
 def checking_tl_busy(server_dictionary, handle_dictionary):
     while True:
         print "busy loop"
         no_busy_reservation = sdictionary.get_first_not_busy(server_dictionary)
         if no_busy_reservation is None:
             break
-        reservation_tl_id = server_dictionary[no_busy_reservation]["reservation_id"]
-        handle_dictionary[no_busy_reservation].join()
-        tl_reservation = TestLineReservation(reservation_tl_id)
-        tl_reservation.release_reservation()
-        del handle_dictionary[no_busy_reservation]
-        del server_dictionary[no_busy_reservation]
+        end_reservation(no_busy_reservation, server_dictionary, handle_dictionary)
 
 
 def main_checking_loop(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
                        server_dictionary, handle_dictionary):
     while True:
         print "main loop"
+        checking_tl_busy(server_dictionary, handle_dictionary)
         checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
                        server_dictionary, handle_dictionary, False)
-        checking_tl_busy(server_dictionary, handle_dictionary)
         sleep(30)
 
 
