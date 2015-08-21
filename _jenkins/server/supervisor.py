@@ -178,14 +178,19 @@ def _end(id, has_got_fail, tl_name, user_info, job_test_status, jenkins_console_
     return 0
 
 
-def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
-    reservationID = create_reservation_and_run_job(testline_type=reservation_data['testline_type'],
-                                                   # reservation_data['enb_build'],
-                                                   # reservation_data['ute_build'],
-                                                   # reservation_data['sysimage_build'],
-                                                   # reservation_data['robotle_revision'],
-                                                   # reservation_data['state'],
-                                                   duration=reservation_data['duration'])
+def main(serverID, reservation_data, parent_dict, user_info, jenkins_info, reservationID = None):
+    if not reservationID:
+        reservationID = create_reservation_and_run_job(
+            testline_type=reservation_data['testline_type'],
+            # reservation_data['enb_build'],
+            # reservation_data['ute_build'],
+            # reservation_data['sysimage_build'],
+            # reservation_data['robotle_revision'],
+            # reservation_data['state'],
+            duration=reservation_data['duration'])
+
+    if not reservation_data['duration']: return -1
+
     print reservationID
     _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
                         tl_name='', duration=reservation_data['duration'])
