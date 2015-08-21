@@ -13,7 +13,7 @@ import os
 
 import reservation_queue as queue
 import supervisor
-import sdictionary
+from sdictionary import get_first_not_busy
 from tl_reservation import TestLineReservation
 
 
@@ -106,16 +106,13 @@ def checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, max_
         elif not server_dictionary[record]['busy_status']:
             # no busy
             end_finished_job(record, server_dictionary, handle_dictionary)
-
+    '''
     while True:
-        server_id = sdictionary.get_first_not_busy(server_dictionary)
+        server_id = get_first_not_busy(server_dictionary)
         if server_id is None:
             break
         end_finished_job(server_id, server_dictionary, handle_dictionary)
-    '''
-    no_busy_record_list = sdictionary.get_no_busy_list()
-    for record in no_busy_record_list:
-        end_finished_job(record, server_dictionary, handle_dictionary)
+
 
 def main_checking_loop(queue_file_name, priority_queue_file_name, number_of_free_tl,
                        max_tl_number,server_dictionary, handle_dictionary,

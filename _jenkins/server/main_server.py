@@ -22,7 +22,7 @@ HOST_PORT = 5005
 QUEUE_FILE_NAME = "reservation_queue"
 PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
 FREE_TL = 1
-MAX_TL = 2
+MAX_TL = 3
 MIN_TIME_TO_END = 1
 MAX_TIME_TO_END = 5
 MIN_EXTEND_TIME = 2
@@ -35,7 +35,8 @@ def response(connect, message, queue_file_name, priority_queue_file_name, server
     elif message == "request/available_tl_count":
         _get_available_tl_count(connect)
     elif message == "request/get_info":
-        _get_tests_info(connect, server_dictionary, specific = True)
+        _get_tests_info(connect, server_dictionary, _specific=True)
+
     elif message == "request/get_all":
         _get_tests_info(connect, server_dictionary)
     else:
@@ -43,12 +44,15 @@ def response(connect, message, queue_file_name, priority_queue_file_name, server
         connect.close()
 
 
-def _get_tests_info(connect, parent_dict, specific = None):
+def _get_tests_info(connect, parent_dict, _specific=None):
     connect.send("OK")
     string_to_send = str(parent_dict)
-    if specific:
+    if _specific:
         data = connect.recv(1024).strip()
-        string_to_send = str(parent_dict[int(data)])
+        try:
+            string_to_send = str(parent_dict[int(data)])
+        except:
+            string_to_send = "No information about requested serverID"
     connect.send(string_to_send)
     connect.close()
 
@@ -109,8 +113,6 @@ def main_server():
     server_dict = {}
     handle_dict = man.dict()
     handle_dict = {}
-    server_dict[1] = {'cos' : 'innego',
-                      'busy_status' : True}
 
     # set up server
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
