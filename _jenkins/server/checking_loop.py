@@ -84,12 +84,14 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
 
 
 def checking_tl_busy(server_dictionary, handle_dictionary):
-    while True:
-        print "busy loop"
-        no_busy_reservation = sdictionary.get_first_not_busy(server_dictionary)
-        if no_busy_reservation is None:
-            break
-        end_reservation(no_busy_reservation, server_dictionary, handle_dictionary)
+    for record in server_dictionary:
+        if server_dictionary[record]['busy_status'] == True:
+            # busy
+            pass
+        elif server_dictionary[record]['busy_status'] == False:
+            # no busy
+            end_reservation(server_dictionary[record]["server_id"], server_dictionary, handle_dictionary)
+
 
 
 def main_checking_loop(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
