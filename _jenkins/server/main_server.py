@@ -31,16 +31,20 @@ def response(connect, message, queue_file_name, priority_queue_file_name, server
     elif message == "request/available_tl_count":
         _get_available_tl_count(connect)
     elif message == "request/get_info":
-        print "dostalem sie"
+        _get_tests_info(connect, server_dictionary, specific = True)
+    elif message == "request/get_all":
         _get_tests_info(connect, server_dictionary)
     else:
         connect.send("Wrong command")
         connect.close()
 
-def _get_tests_info(connect, parent_dict):
+def _get_tests_info(connect, parent_dict, specific = None):
     connect.send("OK")
-    data = connect.recv(1024).strip()
-    connect.send(str(parent_dict[int(data)]))
+    string_to_send = str(parent_dict)
+    if specific:
+        data = connect.recv(1024).strip()
+        string_to_send = str(parent_dict[int(data)])
+    connect.send(string_to_send)
     connect.close()
 
 def _get_available_tl_count(connect):
