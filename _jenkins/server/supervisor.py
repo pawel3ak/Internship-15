@@ -161,9 +161,15 @@ def _get_job_test_status(job_output):
 
 
 def _check_if_no_fails(output):
-    if output.find('| FAIL |') == -1:
-        if output.find('[Error]') == -1:
+    try:
+        if output.find('| FAIL |') == -1:
             return True
+    except:
+        try:
+            if output.find('[ ERROR ]') == -1:
+                return True
+        except:
+            pass
     return False
 
 
@@ -214,37 +220,14 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info, reser
     job_test_status_dict, has_got_fail = _get_job_test_status(job_output=jenkins_console_output)
     _end(id=reservationID, has_got_fail=has_got_fail, tl_name=tl_name,
          job_test_status=job_test_status_dict, user_info=user_info)
+    _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=False,
+                        tl_name=tl_name, duration=reservation_data['duration'])
     return 0
 
+
 if __name__=='__main__':
-    serverID=123
-    parent_dict = {serverID : {}}
-    reservationID = 66655
-    reservation_data = {'duration' : 120}
-    jenkins_info = {'parameters' : {'name' : ''}}
 
-    _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
-                        tl_name='', duration=reservation_data['duration'])
-    if not reservation_status(reservationID) == 0:
-        parent_dict[serverID]['busy'] = False
-        # return -1
-        print "fail"
-    tl_name = _get_tl_name(reservationID)
-
-    ############################################################################
-    #temporary hard-coded  variables:
-    tl_name = 'tl99_test'
-    user_info = {'first_name' : 'Pawel',
-                'last_name' : 'Nogiec',
-                'e-mail' : 'pawel.nogiec@nokia.com'}
-    #############################################################################
-    _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
-                        tl_name=tl_name, duration=reservation_data['duration'])
-
-    job = _create_and_build_job(jenkins_info, tl_name)
-    jenkins_console_output = _get_jenkins_console_output(job)
-    job_test_status_dict, has_got_fail = _get_job_test_status(job_output=jenkins_console_output)
-    _end(id=reservationID, has_got_fail=has_got_fail, tl_name=tl_name,
-         job_test_status=job_test_status_dict, user_info=user_info)
-    # return 0
-    print "ok"
+    main(69,reservation_data={'testline_type' : 'CLOUD_F',
+                              'duration' : 120},
+        parent_dict={}, user_info=None, jenkins_info={'parameters' : {'name' : 'LTE1819'}},
+        reservationID=67208)
