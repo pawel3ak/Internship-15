@@ -50,7 +50,7 @@ def start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_
 
 
 def end_finished_job(server_id, server_dictionary, handle_dictionary, remove_tl_reservation=True):
-    reservation_tl_id = server_dictionary[server_id]["reservation_id"]
+    reservation_tl_id = server_dictionary[server_id]["reservationID"]
     handle_dictionary[server_id].join()
     if remove_tl_reservation:
         tl_reservation = TestLineReservation(reservation_tl_id)
@@ -103,7 +103,7 @@ def checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, max_
             pass
         elif not server_dictionary[record]['busy_status']:
             # no busy
-            end_finished_job(server_dictionary[record]["server_id"], server_dictionary, handle_dictionary)
+            end_finished_job(server_dictionary[record], server_dictionary, handle_dictionary)
 
 
 def main_checking_loop(queue_file_name, priority_queue_file_name, number_of_free_tl,
