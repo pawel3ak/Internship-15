@@ -51,20 +51,21 @@ def _get_tl_name(id):
 
 def send_information(id,tl_name,user_info, test_passed = None, tests_status = None):
     if test_passed == None:
-        _message = "Hello {f_name} {l_name}! \n\n" \
+        _message = "Dear {f_name} {l_name}! \n\n" \
                    "Your reservation is pending.\n" \
                    "Reservation ID = {rID}\n" \
                    "Testline name = {tl_name}\n\n" \
                    "Have a nice day!".format(f_name=user_info['first_name'],
-                                             _name=user_info['last_name'],
+                                             l_name=user_info['last_name'],
                                              rID=id, tl_name=tl_name)
         _subject = "Reservation status update"
 
     elif test_passed == True:
-        _message = "Hello {f_name} {l_name}! \n\n" \
-                  "All your tests were successful\n\n" \
-                  "Have a nice day!".format(f_name=user_info['first_name'],
-                                            l_name=user_info['last_name'])
+        _message = "Dear {f_name} {l_name}! \n\n" \
+                   "Your job on {tl_name} were successful\n\n" \
+                   "Have a nice day!".format(f_name=user_info['first_name'],
+                                             l_name=user_info['last_name'],
+                                             tl_name=tl_name)
         _subject = "Tests status update - finished"
 
     elif test_passed == False:
@@ -73,13 +74,24 @@ def send_information(id,tl_name,user_info, test_passed = None, tests_status = No
             test_info += "Test = {test_name}.{file_name}\n".format(
                 test_name=tests_status[test_status_number]['test_name'],
                 file_name=tests_status[test_status_number]['file_name'])
-        _message = "Hello {f_name} {l_name}! \n\n" \
-                  "Few tests didn't pass: \n\n" \
-                  "{test_info}\n\n" \
-                  "Have a nice day!".format(f_name=user_info['first_name'],
+        _message = "Dear {f_name} {l_name}! \n\n" \
+                   "Few tests didn't pass: \n\n" \
+                   "{test_info}\n\n" \
+                   "Have a nice day!".format(f_name=user_info['first_name'],
+                                             l_name=user_info['last_name'],
+                                             test_info=test_info)
+        _subject = "Tests status update - finished with fail"
+
+    elif test_passed == 'UNKNOWN_FAIL':
+        _message = "Dear {f_name} {l_name}! \n\n" \
+                   "Your test on {tl_name} has failed but we couldn't catch where. " \
+                   "Please check logs available at: {logs_link} \n\n" \
+                   "Have a nice day!".format(f_name=user_info['first_name'],
                                             l_name=user_info['last_name'],
-                                            test_info=test_info)
-        _subject = "Tests status update - finished"
+                                            tl_name=tl_name,
+                                            logs_link="")
+        _subject = "Tests status update - finished with fail"
+
 
     send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
     mail = ute_mail.mail.Mail(subject=_subject,message=_message, recipients=user_info['e-mail'], name_from="Reservation Api")
@@ -87,19 +99,22 @@ def send_information(id,tl_name,user_info, test_passed = None, tests_status = No
     send.send(mail)
 
 
-# def _update_tl_name(job, tl_name):
-#     job_config_xml = ET.fromstring(job.get_config())
-#     assignedNode_tag = job_config_xml.find('assignedNode')
-#     assignedNode_tag.text = str(tl_name)
-#     job.update_config(ET.tostring(job_config_xml))
+def _update_tl_name(job, tl_name):
+    job_config_xml = ET.fromstring(job.get_config())
+    assignedNode_tag = job_config_xml.find('assignedNode')
+    assignedNode_tag.text = str(tl_name)
+    job.update_config(ET.tostring(job_config_xml))
 
 
 def _create_and_build_job(jenkins_info, tl_name):
-    _job_name = 'test_on_{tl_name}'.format(tl_name=tl_name)
+    if 'job_name' in jenkins_info:
+        _job_name = jenkins_info['job_name']
+    else:
+        _job_name = 'test_on_{tl_name}'.format(tl_name=tl_name)
     job_parameters = jenkins_info['parameters']
     job_api = jenkinsapi.api.Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
     job = job_api.get_job(_job_name)
-    # _update_tl_name(job, tl_name)
+    _update_tl_name(job, tl_name)
     job_api.build_job(jobname=_job_name, params=job_parameters)
     return job
 
@@ -145,13 +160,16 @@ def _get_job_test_status(job_output):
     return tests_dict, has_got_fail
 
 
-def _check_for_fails(output):
-    return output.find('| FAIL |')
+def _check_if_no_fails(output):
+    if output.find('| FAIL |') == -1:
+        if output.find('[Error]') == -1:
+            return True
+    return False
 
 
 def _end(id, has_got_fail, tl_name, user_info, job_test_status, jenkins_console_output=None):
     if has_got_fail == False:
-        if _check_for_fails(jenkins_console_output) == -1: test_passed = True
+        if _check_if_no_fails(jenkins_console_output) == True: test_passed = True
         else: test_passed = "UNKNOWN_FAIL"
     else:
         test_passed = False
