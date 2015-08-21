@@ -96,7 +96,7 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
             break
 
 
-def checking_tl_busy(server_dictionary, handle_dictionary):
+def checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, max_time_to_end, min_extend_tim, max_extend_time):
     for record in server_dictionary:
         if server_dictionary[record]['busy_status']:
             # busy
@@ -106,11 +106,13 @@ def checking_tl_busy(server_dictionary, handle_dictionary):
             end_finished_job(server_dictionary[record]["server_id"], server_dictionary, handle_dictionary)
 
 
-def main_checking_loop(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
-                       server_dictionary, handle_dictionary):
+def main_checking_loop(queue_file_name, priority_queue_file_name, number_of_free_tl,
+                       max_tl_number,server_dictionary, handle_dictionary,
+                       min_time_to_end, max_time_to_end, min_extend_tim, max_extend_time):
     while True:
         print "main loop"
-        checking_tl_busy(server_dictionary, handle_dictionary)
+        checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, max_time_to_end,
+                         min_extend_tim, max_extend_time)
         checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
                                    server_dictionary, handle_dictionary, False)
         sleep(30)
