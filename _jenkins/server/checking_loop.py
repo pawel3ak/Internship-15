@@ -103,7 +103,7 @@ def checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, max_
             pass
         elif not server_dictionary[record]['busy_status']:
             # no busy
-            end_finished_job(server_dictionary[record], server_dictionary, handle_dictionary)
+            end_finished_job(record, server_dictionary, handle_dictionary)
 
 
 def main_checking_loop(queue_file_name, priority_queue_file_name, number_of_free_tl,
