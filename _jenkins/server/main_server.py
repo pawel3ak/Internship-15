@@ -23,6 +23,10 @@ QUEUE_FILE_NAME = "reservation_queue"
 PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
 FREE_TL = 1
 MAX_TL = 2
+MIN_TIME_TO_END = 1
+MAX_TIME_TO_END = 5
+MIN_EXTEND_TIME = 2
+MAX_EXTEND_TIME = 8
 
 
 def response(connect, message, queue_file_name, priority_queue_file_name, server_dictionary):
@@ -38,6 +42,7 @@ def response(connect, message, queue_file_name, priority_queue_file_name, server
         connect.send("Wrong command")
         connect.close()
 
+
 def _get_tests_info(connect, parent_dict, specific = None):
     connect.send("OK")
     string_to_send = str(parent_dict)
@@ -46,6 +51,7 @@ def _get_tests_info(connect, parent_dict, specific = None):
         string_to_send = str(parent_dict[int(data)])
     connect.send(string_to_send)
     connect.close()
+
 
 def _get_available_tl_count(connect):
     testline_handle = tl_reservation.TestLineReservation()
@@ -113,8 +119,9 @@ def main_server():
     sock.listen(5)
 
     # start checking loop
-
-    thread = Thread(target=main_checking_loop, args=[queue_file_name, priority_queue_file_name, free_testline, max_testline, server_dict, handle_dict])
+    thread = Thread(target=main_checking_loop, args=[queue_file_name, priority_queue_file_name, free_testline,
+                                                     max_testline, server_dict, handle_dict, MIN_TIME_TO_END,
+                                                     MAX_TIME_TO_END, MIN_EXTEND_TIME, MAX_EXTEND_TIME])
     thread.daemon = True
     thread.start()
 
