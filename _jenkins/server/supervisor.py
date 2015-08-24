@@ -15,6 +15,7 @@ import re
 import ute_mail.sender
 import ute_mail.mail
 import os
+import paramiko
 
 
 def create_reservation_and_run_job(testline_type=None, enb_build=None, ute_build=None,
@@ -138,7 +139,7 @@ def _update_parent_dict(serverID, parent_dict, id, busy_status, tl_name, duratio
 
 def _get_job_test_status(job_output):
     has_got_fail = False
-    regex = r'[=]\s(.*)\s[=]\W*.*FAIL'
+    regex = r'\=\s(.*)\s\=\W*.*FAIL'
     try:
         match = re.findall(regex,job_output)
         if len(match) != 0: has_got_fail = True
@@ -148,11 +149,11 @@ def _get_job_test_status(job_output):
             if match[i][-3:] == '...': match[i] = match[i][:-3]
             if match[i][-1:] == '_': match[i] = match[i][:-1]
             try:
-                match[i] = re.search('CPLN\.(\w*)\.Tests\.(.*)', match[i]).groups()
+                match[i] = re.search('(\w*)\.Tests\.(.*)', match[i]).groups()
                 tests_failed_list_with_dict.append({'test_name' : match[i][0],
                               'file_name' : match[i][1]})
             except:
-                match[i] = re.search('CPLN\.(\w*)\.(.*)', match[i]).groups()
+                match[i] = re.search('(\w*)\.(.*)', match[i]).groups()
                 tests_failed_list_with_dict.append({'test_name' : match[i][0],
                                    'file_name' : match[i][1]})
     except:
@@ -181,14 +182,18 @@ def _end(id, has_got_fail, tl_name, user_info, job_test_status, jenkins_console_
     else:
         test_passed = False
 
-    send_information(id, tl_name, user_info, test_passed, job_test_status)
+    send_information(id=id, tl_name=tl_name, user_info=user_info, test_passed=test_passed,
+                     tests_status=job_test_status)
     return 0
 
 def remove_tag_from_file(folder_name, file_name, old_tag, new_tag = ''):
-    directory = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}'.format(folder_name)
-    files = []
-    [files.append(file) for file in os.listdir(directory)
-     if os.path.isfile(os.path.join(directory,file_name))]
+    client = paramiko.SSHClient()
+    client.load_system_host_keys()
+    client.set_missing_host_key_policy(paramiko.WarningPolicy)
+    client.connect('wmp-tl99.lab0.krk-lab.nsn-rdnet.net', username='ute', password='ute')
+    sftp = client.open_sftp()
+    path = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}/tests/'.format(folder_name)
+    files = sftp.listdir(path=path)
 
     for file in range(0,len(files)):
         try:
@@ -197,8 +202,8 @@ def remove_tag_from_file(folder_name, file_name, old_tag, new_tag = ''):
         except:
             pass
 
-    with open(os.path.join(directory, file_name),'rb') as file:
-        lines_in_file = file.readlines()
+    file = sftp.open(os.path.join(path,file_name), 'r')
+    lines_in_file = file.readlines()
 
     for line in range(0, len(lines_in_file)):
         try:
@@ -207,12 +212,11 @@ def remove_tag_from_file(folder_name, file_name, old_tag, new_tag = ''):
         except:
             pass
 
-    with open(os.path.join(directory, file_name),'wb') as file:
-        file.writelines(lines_in_file)
-
-
-
-
+    file.close()
+    file = sftp.open('/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/LTEXYZ/tests/LTEXYZ-a-1.robot', 'w')
+    file.writelines(lines_in_file)
+    file.close()
+    client.close()
 
 
 def main(serverID, reservation_data, parent_dict, user_info, jenkins_info, reservationID = None):
@@ -231,9 +235,9 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info, reser
     print reservationID
     _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
                         tl_name='', duration=reservation_data['duration'])
-    if not reservation_status(reservationID) == 0:
-        parent_dict[serverID]['busy'] = False
-        return -1
+    # if not reservation_status(reservationID) == 0:
+    #     parent_dict[serverID]['busy'] = False
+    #     return -1
     tl_name = _get_tl_name(reservationID)
 
     ############################################################################
@@ -248,6 +252,7 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info, reser
 
     job = _create_and_build_job(jenkins_info, tl_name)
     jenkins_console_output = _get_jenkins_console_output(job)
+    # print jenkins_console_output
     job_test_status_dict, has_got_fail = _get_job_test_status(job_output=jenkins_console_output)
     _end(id=reservationID, has_got_fail=has_got_fail, tl_name=tl_name,
          job_test_status=job_test_status_dict, user_info=user_info)
@@ -255,8 +260,8 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info, reser
                         tl_name=tl_name, duration=reservation_data['duration'])
     if has_got_fail:
         for test in range(0,len(job_test_status_dict)):
-            remove_tag_from_file(folder_name=jenkins_info['paremeters']['name'],
-                                 file_name=job_test_status_dict[test]['name'],
+            remove_tag_from_file(folder_name=jenkins_info['parameters']['name'],
+                                 file_name=str(job_test_status_dict[test]['file_name']),
                                  old_tag= 'enable')
     return 0
 
@@ -264,6 +269,6 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info, reser
 if __name__=='__main__':
 
     main(69,reservation_data={'testline_type' : 'CLOUD_F',
-                              'duration' : 120},
-        parent_dict={}, user_info=None, jenkins_info={'parameters' : {'name' : 'LTE1819'}},
-        reservationID=67208)
+                              'duration' : 600},
+        parent_dict={}, user_info=None, jenkins_info={'parameters' : {'name' : 'LTEXYZ'}},
+        reservationID=67917)
