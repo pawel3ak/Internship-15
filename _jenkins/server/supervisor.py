@@ -264,14 +264,14 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info, reser
     tl_name = _get_tl_name(reservationID)
     tl_address = _get_tl_address(reservationID)
 
-    ############################################################################
+    #############################################################################
     #temporary hard-coded  variables:
     tl_name = 'tl99_test'
     tl_address = 'wmp-tl99.lab0.krk-lab.nsn-rdnet.net'
     user_info = {'first_name' : 'Pawel',
                 'last_name' : 'Nogiec',
                 'e-mail' : 'pawel.nogiec@nokia.com'}
-    #############################################################################
+    ##############################################################################
     _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
                         tl_name=tl_name, duration=reservation_data['duration'])
     job_status = get_job_status(jenkins_info, tl_name)
