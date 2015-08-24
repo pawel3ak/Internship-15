@@ -36,7 +36,8 @@ EXTEND_TIME = 2
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 # create formatter
-formatter = logging.Formatter('%(asctime)s %(levelname)8s: %(name)8s - %(filename)18s - %(funcName)15s: %(message)s')
+formatter = logging.Formatter('%(asctime)s %(levelname)8s: %(name)8s - %(filename)18s - %(funcName)15s: %(message)s',
+                              datefmt='%Y-%m-%d,%H:%M:%S')
 # create file handler to file with logs
 file_handler = logging.handlers.TimedRotatingFileHandler(filename='logs/server.log',
                                                          when='midnight',
