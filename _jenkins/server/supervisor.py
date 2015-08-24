@@ -14,6 +14,7 @@ import xml.etree.ElementTree as ET
 import re
 import ute_mail.sender
 import ute_mail.mail
+import os
 
 
 def create_reservation_and_run_job(testline_type=None, enb_build=None, ute_build=None,
@@ -141,23 +142,23 @@ def _get_job_test_status(job_output):
     try:
         match = re.findall(regex,job_output)
         if len(match) != 0: has_got_fail = True
-        tests_dict=[]
+        tests_failed_list_with_dict=[]
         for i in range(0,len(match)):
             match[i] = re.sub(" +", "_", match[i])
             if match[i][-3:] == '...': match[i] = match[i][:-3]
             if match[i][-1:] == '_': match[i] = match[i][:-1]
             try:
                 match[i] = re.search('CPLN\.(\w*)\.Tests\.(.*)', match[i]).groups()
-                tests_dict.append({'test_name' : match[i][0],
+                tests_failed_list_with_dict.append({'test_name' : match[i][0],
                               'file_name' : match[i][1]})
             except:
                 match[i] = re.search('CPLN\.(\w*)\.(.*)', match[i]).groups()
-                tests_dict.append({'test_name' : match[i][0],
+                tests_failed_list_with_dict.append({'test_name' : match[i][0],
                                    'file_name' : match[i][1]})
     except:
-        tests_dict = None
+        tests_failed_list_with_dict = None
 
-    return tests_dict, has_got_fail
+    return tests_failed_list_with_dict, has_got_fail
 
 
 def _check_if_no_fails(output):
@@ -174,7 +175,7 @@ def _check_if_no_fails(output):
 
 
 def _end(id, has_got_fail, tl_name, user_info, job_test_status, jenkins_console_output=None):
-    if has_got_fail == False:
+    if not has_got_fail:
         if _check_if_no_fails(jenkins_console_output) == True: test_passed = True
         else: test_passed = "UNKNOWN_FAIL"
     else:
@@ -182,6 +183,36 @@ def _end(id, has_got_fail, tl_name, user_info, job_test_status, jenkins_console_
 
     send_information(id, tl_name, user_info, test_passed, job_test_status)
     return 0
+
+def remove_tag_from_file(folder_name, file_name, old_tag, new_tag = ''):
+    directory = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}'.format(folder_name)
+    files = []
+    [files.append(file) for file in os.listdir(directory)
+     if os.path.isfile(os.path.join(directory,file_name))]
+
+    for file in range(0,len(files)):
+        try:
+            file_name = re.search('({name}.*)'.format(name=file_name),files[file]).groups()[0]
+            break
+        except:
+            pass
+
+    with open(os.path.join(directory, file_name),'rb') as file:
+        lines_in_file = file.readlines()
+
+    for line in range(0, len(lines_in_file)):
+        try:
+            tag_line = re.search('\[Tags](.*)', lines_in_file[line]).groups()[0]
+            lines_in_file[line] = re.sub(old_tag, new_tag, lines_in_file[line])
+        except:
+            pass
+
+    with open(os.path.join(directory, file_name),'wb') as file:
+        file.writelines(lines_in_file)
+
+
+
+
 
 
 def main(serverID, reservation_data, parent_dict, user_info, jenkins_info, reservationID = None):
@@ -222,6 +253,11 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info, reser
          job_test_status=job_test_status_dict, user_info=user_info)
     _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=False,
                         tl_name=tl_name, duration=reservation_data['duration'])
+    if has_got_fail:
+        for test in range(0,len(job_test_status_dict)):
+            remove_tag_from_file(folder_name=jenkins_info['paremeters']['name'],
+                                 file_name=job_test_status_dict[test]['name'],
+                                 old_tag= 'enable')
     return 0
 
 
