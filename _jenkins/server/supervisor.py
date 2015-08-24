@@ -50,6 +50,10 @@ def _get_tl_name(id):
     reservation = tlr.TestLineReservation(id)
     return reservation.get_reservation_details()['testline']['name']
 
+def _get_tl_address(id):
+    reservation = tlr.TestLineReservation(id)
+    return reservation.get_address()
+
 
 def send_information(id,tl_name,user_info, test_passed = None, tests_status = None):
     if test_passed == None:
@@ -107,6 +111,14 @@ def _update_tl_name(job, tl_name):
     assignedNode_tag.text = str(tl_name)
     job.update_config(ET.tostring(job_config_xml))
 
+def get_job_status(jenkins_info, tl_name):
+    if 'job_name' in jenkins_info:
+        _job_name = jenkins_info['job_name']
+    else:
+        _job_name = 'test_on_{tl_name}'.format(tl_name=tl_name)
+    job_api = jenkinsapi.api.Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
+    job = job_api.get_job(_job_name)
+    return job.get_last_build().get_status()
 
 def _create_and_build_job(jenkins_info, tl_name):
     if 'job_name' in jenkins_info:
@@ -186,37 +198,48 @@ def _end(id, has_got_fail, tl_name, user_info, job_test_status, jenkins_console_
                      tests_status=job_test_status)
     return 0
 
-def remove_tag_from_file(folder_name, file_name, old_tag, new_tag = ''):
+def remove_tag_from_file(tl_address, folder_name, file_name, old_tag, new_tag = ''):
     client = paramiko.SSHClient()
     client.load_system_host_keys()
     client.set_missing_host_key_policy(paramiko.WarningPolicy)
-    client.connect('wmp-tl99.lab0.krk-lab.nsn-rdnet.net', username='ute', password='ute')
+    client.connect(tl_address, username='ute', password='ute')
     sftp = client.open_sftp()
     path = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}/tests/'.format(folder_name)
-    files = sftp.listdir(path=path)
+    try:
+        files = sftp.listdir(path=path)
+        found = False
+        for file in range(0,len(files)):
+            try:
+                file_name = re.search('({name}.*)'.format(name=file_name),files[file]).groups()[0]
+                found = True
+                break
+            except:
+                pass
+        if not found: return -1
 
-    for file in range(0,len(files)):
-        try:
-            file_name = re.search('({name}.*)'.format(name=file_name),files[file]).groups()[0]
-            break
-        except:
-            pass
+        file = sftp.open(os.path.join(path,file_name), 'r')
+        lines_in_file = file.readlines()
 
-    file = sftp.open(os.path.join(path,file_name), 'r')
-    lines_in_file = file.readlines()
-
-    for line in range(0, len(lines_in_file)):
-        try:
-            tag_line = re.search('\[Tags](.*)', lines_in_file[line]).groups()[0]
-            lines_in_file[line] = re.sub(old_tag, new_tag, lines_in_file[line])
-        except:
-            pass
-
-    file.close()
-    file = sftp.open('/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/LTEXYZ/tests/LTEXYZ-a-1.robot', 'w')
-    file.writelines(lines_in_file)
-    file.close()
-    client.close()
+        found = False
+        for line in range(0, len(lines_in_file)):
+            try:
+                tag_line = re.search('\[Tags](.*)', lines_in_file[line]).groups()[0]
+                try:
+                    lines_in_file[line] = re.sub(old_tag, new_tag, lines_in_file[line])
+                    found = True
+                except:
+                    pass
+            except:
+                pass
+        if not found: return -1
+        file.close()
+        file = sftp.open(os.path.join(path,file_name), 'w')
+        file.writelines(lines_in_file)
+        file.close()
+    except:
+        return -1
+    finally:
+        client.close()
 
 
 def main(serverID, reservation_data, parent_dict, user_info, jenkins_info, reservationID = None):
@@ -235,24 +258,26 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info, reser
     print reservationID
     _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
                         tl_name='', duration=reservation_data['duration'])
-    # if not reservation_status(reservationID) == 0:
-    #     parent_dict[serverID]['busy'] = False
-    #     return -1
+    if not reservation_status(reservationID) == 0:
+        parent_dict[serverID]['busy'] = False
+        return -1
     tl_name = _get_tl_name(reservationID)
+    tl_address = _get_tl_address(reservationID)
 
     ############################################################################
     #temporary hard-coded  variables:
     tl_name = 'tl99_test'
+    tl_address = 'wmp-tl99.lab0.krk-lab.nsn-rdnet.net'
     user_info = {'first_name' : 'Pawel',
                 'last_name' : 'Nogiec',
                 'e-mail' : 'pawel.nogiec@nokia.com'}
     #############################################################################
     _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
                         tl_name=tl_name, duration=reservation_data['duration'])
-
-    job = _create_and_build_job(jenkins_info, tl_name)
+    job_status = get_job_status(jenkins_info, tl_name)
+    if not job_status == None:
+        job = _create_and_build_job(jenkins_info, tl_name)
     jenkins_console_output = _get_jenkins_console_output(job)
-    # print jenkins_console_output
     job_test_status_dict, has_got_fail = _get_job_test_status(job_output=jenkins_console_output)
     _end(id=reservationID, has_got_fail=has_got_fail, tl_name=tl_name,
          job_test_status=job_test_status_dict, user_info=user_info)
@@ -260,7 +285,7 @@ def main(serverID, reservation_data, parent_dict, user_info, jenkins_info, reser
                         tl_name=tl_name, duration=reservation_data['duration'])
     if has_got_fail:
         for test in range(0,len(job_test_status_dict)):
-            remove_tag_from_file(folder_name=jenkins_info['parameters']['name'],
+            remove_tag_from_file(tl_address = tl_address, folder_name=jenkins_info['parameters']['name'],
                                  file_name=str(job_test_status_dict[test]['file_name']),
                                  old_tag= 'enable')
     return 0
