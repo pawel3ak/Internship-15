@@ -23,12 +23,12 @@ HOST_IP = "127.0.0.1"
 HOST_PORT = 5005
 QUEUE_FILE_NAME = "reservation_queue"
 PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
+SERVER_DICTIONARY_FILE_NAME = "server_dictionary_file"
 FREE_TL = 1
 MAX_TL = 3
 MIN_TIME_TO_END = 1
-MAX_TIME_TO_END = 5
-MIN_EXTEND_TIME = 2
-MAX_EXTEND_TIME = 8
+MAX_RESERVATION_TIME = 2
+EXTEND_TIME = 2
 
 
 # create logger
@@ -145,7 +145,7 @@ def main_server():
     logger.info("Start new thread with checking loop")
     thread = Thread(target=main_checking_loop, args=[queue_file_name, priority_queue_file_name, free_testline,
                                                      max_testline, server_dict, handle_dict, MIN_TIME_TO_END,
-                                                     MAX_TIME_TO_END, MIN_EXTEND_TIME, MAX_EXTEND_TIME])
+                                                     MAX_RESERVATION_TIME, EXTEND_TIME])
     thread.daemon = True
     thread.start()
 
