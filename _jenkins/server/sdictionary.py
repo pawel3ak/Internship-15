@@ -6,6 +6,11 @@
 :contact: damian.papiez@nokia.com
 """
 
+import json
+import logging
+
+
+logger = logging.getLogger()
 
 # update record in dictionary
 def update_record(dictionary, server_id, reservation_id=None, busy_status=None,
@@ -24,7 +29,6 @@ def update_record(dictionary, server_id, reservation_id=None, busy_status=None,
         dictionary[server_id]["job_test_status "] = job_test_status
 
 
-# Get first not busy tl
 def get_first_not_busy(dictionary):
     for record in dictionary:
         if dictionary[record]['busy_status'] == False:
@@ -46,3 +50,19 @@ def get_busy_list(dictionary):
         if dictionary[record]['busy_status']:
             record_list.append(record)
     return record_list
+
+
+def create_file(new_file):
+    with open(new_file, "ab+") as open_file:
+        open_file.close()
+
+
+def write_dictionary_to_file (file_name, dictionary):
+    with open(file_name, "wb") as open_file:
+        json.dump(dictionary, open_file)
+
+
+def get_dictionary_from_file(file_name):
+    with open(file_name, "rb") as open_file:
+        dictionary = json.load(open_file)
+    return dictionary

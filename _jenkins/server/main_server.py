@@ -15,6 +15,7 @@ import logging.handlers
 from threading import Thread
 from multiprocessing import Manager
 import tl_reservation
+import sdictionary
 import reservation_queue as queue
 from checking_loop import main_checking_loop
 
@@ -121,7 +122,7 @@ def main_server():
     queue_file_name = args.file
     priority_queue_file_name = args.priority
 
-    # create files if no exist
+    # create files if not exist
     logger.debug("Create servers files")
     queue.create_file(queue_file_name)
     queue.create_file(priority_queue_file_name)
@@ -134,6 +135,11 @@ def main_server():
     handle_dict = man.dict()
     handle_dict = {}
 
+    # create file for server dictionary if not exist and read if exist
+    sdictionary.create_file(SERVER_DICTIONARY_FILE_NAME)
+    server_dict = sdictionary.get_dictionary_from_file(SERVER_DICTIONARY_FILE_NAME)
+
+
     # set up server
     logger.debug("Set up server")
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -143,8 +149,8 @@ def main_server():
 
     # start checking loop
     logger.info("Start new thread with checking loop")
-    thread = Thread(target=main_checking_loop, args=[queue_file_name, priority_queue_file_name, free_testline,
-                                                     max_testline, server_dict, handle_dict, MIN_TIME_TO_END,
+    thread = Thread(target=main_checking_loop, args=[queue_file_name, priority_queue_file_name, SERVER_DICTIONARY_FILE_NAME,
+                                                     free_testline, max_testline, server_dict, handle_dict, MIN_TIME_TO_END,
                                                      MAX_RESERVATION_TIME, EXTEND_TIME])
     thread.daemon = True
     thread.start()

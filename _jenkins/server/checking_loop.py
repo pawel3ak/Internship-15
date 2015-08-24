@@ -33,7 +33,7 @@ def make_queue_from_test(queue_file, directory, max_reservation_time):
     directory_list = get_catalog_list(directory)
     for direct in directory_list:
         request = {'reservation_data': {'testline_type': 'CLOUD_F',
-                                        'duration': 60*(max_reservation_time)},
+                                        'duration': (60*max_reservation_time)},
                    'serverID': queue.get_server_id_number(),
                    'password': queue.generate_password(),
                    'user_info': None,
@@ -42,10 +42,11 @@ def make_queue_from_test(queue_file, directory, max_reservation_time):
         queue.write_to_queue(queue_file, request)
 
 
-def start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_id=None):
-    logger.debug("Get reservation from queue")
-    request = queue.read_next_from_queue(queue_file)
-    queue.delete_reservation_from_queue(queue_file, request["serverID"], request["password"])
+def start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_id=None, request=None):
+    if request is None:
+        logger.debug("Get reservation from queue")
+        request = queue.read_next_from_queue(queue_file)
+        queue.delete_reservation_from_queue(queue_file, request["serverID"], request["password"])
     logger.debug("Start new thread supervisor.main for serverID: %d", request["serverID"])
     thread = Thread(target=supervisor.main, args=[request["serverID"],
                                                   request["reservation_data"],
@@ -122,14 +123,20 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
 
 def checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, extend_time):
     logger.debug("Checking if same reservation are not busy")
-    no_busy_record_list = sdictionary.get_no_busy_list()
+    no_busy_record_list = sdictionary.get_no_busy_list(server_dictionary)
     for record in no_busy_record_list:
         end_finished_job(record, server_dictionary, handle_dictionary)
 
 
-def main_checking_loop(queue_file_name, priority_queue_file_name, number_of_free_tl,
-                       max_tl_number,server_dictionary, handle_dictionary,
+def main_checking_loop(queue_file_name, priority_queue_file_name, server_dictionary_file_name,
+                       number_of_free_tl, max_tl_number,server_dictionary, handle_dictionary,
                        min_time_to_end, max_reservation_time, extend_time):
+    if server_dictionary > 0:
+        logger.info("Start processes for existing reservations")
+        for record in server_dictionary:
+            start_new_job(queue_file_name, server_dictionary, handle_dictionary,
+                          server_dictionary[record]["reservationID"],
+                          (server_dictionary[record] + {"serverID": record}))
     while True:
         logger.info("Main checking loop")
         logger.debug("Check TL busy")
@@ -137,11 +144,9 @@ def main_checking_loop(queue_file_name, priority_queue_file_name, number_of_free
         logger.debug("Check queue")
         checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
                                    server_dictionary, handle_dictionary, max_reservation_time, False)
+        sdictionary.write_dictionary_to_file(server_dictionary_file_name, server_dictionary)
         sleep(30)
 
 
 if __name__ == "__main__":
-    directoryy = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN'
-    queue_filee = 'reservation_queue'
-    make_queue_from_test(queue_filee, directoryy)
-    print "END"
+    pass
