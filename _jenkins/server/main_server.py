@@ -10,6 +10,8 @@
 import socket
 import json
 import argparse
+import logging
+import logging.handlers
 from threading import Thread
 from multiprocessing import Manager
 import tl_reservation
@@ -27,6 +29,22 @@ MIN_TIME_TO_END = 1
 MAX_TIME_TO_END = 5
 MIN_EXTEND_TIME = 2
 MAX_EXTEND_TIME = 8
+
+
+# create logger
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+# create formatter
+formatter = logging.Formatter('%(asctime)s %(levelname)8s: %(name)8s - %(filename)18s - %(funcName)15s: %(message)s')
+# create file handler to file with logs
+file_handler = logging.handlers.TimedRotatingFileHandler(filename='logs/server.log',
+                                                         when='midnight',
+                                                         interval=1,
+                                                         backupCount=30)
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(formatter)
+# add handler to the logger
+logger.addHandler(file_handler)
 
 
 def response(connect, message, queue_file_name, priority_queue_file_name, server_dictionary):
@@ -104,10 +122,12 @@ def main_server():
     priority_queue_file_name = args.priority
 
     # create files if no exist
+    logger.debug("Create servers files")
     queue.create_file(queue_file_name)
     queue.create_file(priority_queue_file_name)
 
     # create server and process dictionary
+    logger.debug("Create servers dictionaries")
     man = Manager()
     server_dict = man.dict()
     server_dict = {}
@@ -115,12 +135,14 @@ def main_server():
     handle_dict = {}
 
     # set up server
+    logger.debug("Set up server")
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((host, port))
     sock.listen(5)
 
     # start checking loop
+    logger.info("Start new thread with checking loop")
     thread = Thread(target=main_checking_loop, args=[queue_file_name, priority_queue_file_name, free_testline,
                                                      max_testline, server_dict, handle_dict, MIN_TIME_TO_END,
                                                      MAX_TIME_TO_END, MIN_EXTEND_TIME, MAX_EXTEND_TIME])
@@ -128,9 +150,11 @@ def main_server():
     thread.start()
 
     # main server loop
+    logger.info("Start server loop - waiting for request")
     while True:
         connect, address = sock.accept()
         data = connect.recv(1024).strip()
+        logger.debug("New request")
         if data == "KONIEC":
             break
         response(connect, data, queue_file_name, priority_queue_file_name, server_dict)
