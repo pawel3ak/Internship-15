@@ -14,7 +14,7 @@ import logging
 
 import reservation_queue as queue
 import supervisor
-from sdictionary import get_first_not_busy
+import sdictionary
 from tl_reservation import TestLineReservation
 
 # create logger
@@ -28,12 +28,12 @@ def get_catalog_list(directory):
     return directory_list
 
 
-def make_queue_from_test(queue_file, directory):
+def make_queue_from_test(queue_file, directory, max_reservation_time):
     logger.debug("Make new queue")
     directory_list = get_catalog_list(directory)
     for direct in directory_list:
         request = {'reservation_data': {'testline_type': 'CLOUD_F',
-                                        'duration': 120},
+                                        'duration': 60*(max_reservation_time)},
                    'serverID': queue.get_server_id_number(),
                    'password': queue.generate_password(),
                    'user_info': None,
@@ -86,7 +86,7 @@ def add_new_job_to_tl(queue_file, server_id, server_dictionary, handle_dictionar
 
 
 def checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
-                               server_dictionary, handle_dictionary, loop=True):
+                               server_dictionary, handle_dictionary, max_reservation_time, loop=True):
     test_reservation = TestLineReservation()
     while True:
         # temporary prints
@@ -109,7 +109,7 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
                 start_new_job(queue_file_name, server_dictionary, handle_dictionary)
             elif queue.check_queue_length(queue_file_name) == 0:
                 logger.info("Add test to queue")
-                make_queue_from_test(queue_file_name, '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN')
+                make_queue_from_test(queue_file_name, '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN', max_reservation_time)
                 logger.info("Start new job from queue")
                 start_new_job(queue_file_name, server_dictionary, handle_dictionary)
             print "SCRIPT"
@@ -120,36 +120,23 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
             break
 
 
-def checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, max_time_to_end, min_extend_tim, max_extend_time):
-    '''
-    for record in server_dictionary:
-        if server_dictionary[record]['busy_status']:
-            # busy
-            pass
-        elif not server_dictionary[record]['busy_status']:
-            # no busy
-            end_finished_job(record, server_dictionary, handle_dictionary)
-    '''
+def checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, extend_time):
     logger.debug("Checking if same reservation are not busy")
-    while True:
-        server_id = get_first_not_busy(server_dictionary)
-        if server_id is None:
-            break
-        logger.debug("End finished server ID: %d", server_id)
-        end_finished_job(server_id, server_dictionary, handle_dictionary)
+    no_busy_record_list = sdictionary.get_no_busy_list()
+    for record in no_busy_record_list:
+        end_finished_job(record, server_dictionary, handle_dictionary)
 
 
 def main_checking_loop(queue_file_name, priority_queue_file_name, number_of_free_tl,
                        max_tl_number,server_dictionary, handle_dictionary,
-                       min_time_to_end, max_time_to_end, min_extend_tim, max_extend_time):
+                       min_time_to_end, max_reservation_time, extend_time):
     while True:
         logger.info("Main checking loop")
         logger.debug("Check TL busy")
-        checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, max_time_to_end,
-                         min_extend_tim, max_extend_time)
+        checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, extend_time)
         logger.debug("Check queue")
         checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
-                                   server_dictionary, handle_dictionary, False)
+                                   server_dictionary, handle_dictionary, max_reservation_time, False)
         sleep(30)
 
 
