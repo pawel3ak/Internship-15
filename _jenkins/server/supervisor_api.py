@@ -17,6 +17,7 @@ import ute_mail.mail
 import os
 import paramiko
 import sys
+from mailing_list import mail_dict
 
 
 class Supervisor(object):
@@ -171,7 +172,7 @@ class Supervisor(object):
     def get_jenkins_console_output(self):
         try:
             job = self.jenkins_info['job_api'].get_job(self.jenkins_info['job_name'])
-            time.sleep(15)      #let the new job build get started
+            time.sleep(20)      #let the new job build get started
             while job.get_last_build().get_status() == None:
                 time.sleep(30)      ###############TODO longer sleep on real tests
             self.jenkins_info['console_output'] = job.get_last_build().get_console()
@@ -203,13 +204,15 @@ class Supervisor(object):
         finally:
             return tests_failed_list_with_dict
 
-    def check_if_no_fails(self, output):
+    def check_if_no_fails(self):
+        output = str(self.jenkins_info['console_output'])
         try:
-            if output.find('| FAIL |') == -1:
+            if not output.find('| FAIL |') == -1:
+                print "znalazlem"
                 return False
         except:
             try:
-                if output.find('[ ERROR ]') == -1:
+                if not output.find('[ ERROR ]') == -1:
                     return False
             except:
                 pass
@@ -217,10 +220,14 @@ class Supervisor(object):
 
     def ending(self):
         if not self.has_got_fail:
-            if self.check_if_no_fails(self.jenkins_info['console_output']) == True: pass
-            else: self.test_end_status = "UNKNOWN_FAIL"
+            if self.check_if_no_fails() == True:
+                self.test_end_status = "PASS"
+            else:
+                self.test_end_status = "UNKNOWN_FAIL"
+                self.has_got_fail = True
         else:
             self.test_end_status = "Failed"
+            self.has_got_fail = True
         return self.test_end_status
 
     def remove_tag_from_file(self, directory, file_name, old_tag, new_tag = ''):
@@ -275,16 +282,23 @@ class Supervisor(object):
     def send_information(self, test_status=None):
         if test_status:
             self.test_end_status = test_status
-        message = ""
+        if self.test_end_status == "PASS":
+            return 0
+        elif self.test_end_status == None:
+            self.test_end_status = 'UNKNOWN_FAIL'
+            self.finish_with_failure(test_status=self.test_end_status)
+
+        message = []
         subject = ""
         if self.test_end_status == "reserv_pending":
-            message = "Dear {f_name} {l_name}! \n\n" \
+            _message = "Dear {f_name} {l_name}! \n\n" \
                        "Your reservation is pending.\n" \
                        "Reservation ID = {rID}\n" \
                        "Testline name = {tl_name}\n\n" \
                        "Have a nice day!".format(f_name=self.user_info['first_name'],
                                                  l_name=self.user_info['last_name'],
                                                  rID=self.TLreservationID, tl_name=self.TLname)
+            message.append({'message' : _message})
             subject = "Reservation status update"
 
 
@@ -293,19 +307,21 @@ class Supervisor(object):
             t = job.get_last_build().get_timestamp()
             build_time = '{}-{:02g}-{:02g}_{:02g}-{:02g}-{:02g}'.format(t.year, t.month, t.day, (t.hour-(time.altzone/3600)), t.minute, t.second)
             logs_link = 'http://10.83.200.35/~ltebox/logs/{}_{}/log.html'.format(self.TLname, build_time)
-            test_info = ''
+
             for test in self.parent_dict[self.serverID]['test_status']:
-                test_info += "Test = {test_name}.{file_name}\n".format(
+                test_info = "Test = {test_name}.{file_name}\n".format(
                     test_name=test['test_name'],
                     file_name=test['file_name'])
-            message = "Dear {f_name} {l_name}! \n\n" \
-                       "Few tests has failed: \n\n" \
-                       "{test_info}\n\n" \
-                       "Logs are available at: {logs_link}\n\n" \
-                       "Have a nice day!".format(f_name=self.user_info['first_name'],
-                                                 l_name=self.user_info['last_name'],
-                                                 test_info=test_info,
-                                                 logs_link=logs_link)
+                _message = "Dear tester! \n\n" \
+                           "Your test have failed: \n\n" \
+                           "{test_info}\n\n" \
+                           "Logs are available at: {logs_link}\n\n" \
+                           "Have a nice day!".format(f_name=self.user_info['first_name'],
+                                                     l_name=self.user_info['last_name'],
+                                                     test_info=test_info,
+                                                     logs_link=logs_link)
+                message.append({'message' : _message,
+                                'feature' : test['test_name']})
             subject = "Tests status update - finished with fail"
 
 
@@ -314,18 +330,33 @@ class Supervisor(object):
             logs_link = '{url}/job/{job_name}/{bn}/console'.format(url= 'http://plkraaa-jenkins.emea.nsn-net.net:8080',
                                                                   job_name=self.jenkins_info['job_name'],
                                                                   bn=job.get_last_buildnumber())
-            message = "Dear {f_name} {l_name}! \n\n" \
+            _message = "Dear {f_name} {l_name}! \n\n" \
                        "Your test on {tl_name} has occured unknown fail.\n" \
                        "Please check logs available at: {logs_link} \n\n" \
                        "Have a nice day!".format(f_name=self.user_info['first_name'],
                                                  l_name=self.user_info['last_name'],
                                                  tl_name=self.TLname,
                                                  logs_link=logs_link)
+            message.append({'message' : _message})
             subject = "Tests status update - finished with fail"
 
 
-        send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
-        mail = ute_mail.mail.Mail(subject=subject,message=message, recipients=self.user_info['e-mail'], name_from="Reservation Api")
-        send.connect()
-        send.send(mail)
+
+
+        if 'feature' in message[0]:
+            for message_number in range(0, len(message)):
+                mail = ute_mail.mail.Mail(subject=subject,message=message[message_number]['message'],
+                                          recipients=mail_dict[message[message_number]['feature']],
+                                          name_from="Reservation Api")
+                print mail_dict[message[message_number]['feature']]
+                send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
+                send.connect()
+                send.send(mail)
+        else:
+            mail = ute_mail.mail.Mail(subject=subject,message=message[0]['message'],
+                                          recipients='pawel.nogiec@nokia.com',
+                                          name_from="Reservation Api")
+            send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
+            send.connect()
+            send.send(mail)
 

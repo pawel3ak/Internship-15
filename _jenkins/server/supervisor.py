@@ -51,7 +51,7 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
 
     job_tests_parsed_status = supervisor.get_job_tests_status()
     supervisor.ending()
-    supervisor.set_parent_dict(busy_status=False, job_tests_parsed_status=job_tests_parsed_status)
+
 
 
     if supervisor.has_got_fail :
@@ -63,7 +63,7 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
 
     supervisor.send_information()
 
-
+    supervisor.set_parent_dict(busy_status=False, job_tests_parsed_status=job_tests_parsed_status)
     return 0
 
 if __name__ == '__main__':
@@ -76,7 +76,7 @@ if __name__ == '__main__':
         jenkins_info={
             'parameters' :
                 {
-                    'name' : 'LTEXYZ'
+                    'name' : 'LTEXYZ-new'
                 }
         },
         TLreservationID=68503)
