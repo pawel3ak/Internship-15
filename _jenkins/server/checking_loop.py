@@ -61,6 +61,8 @@ def start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_
 
 
 def end_finished_job(server_id, server_dictionary, handle_dictionary, remove_tl_reservation=True):
+    print "finish"
+    '''
     logger.debug("Get tl reservation ID")
     reservation_tl_id = server_dictionary[server_id]["reservationID"]
     logger.debug("Checking is thread is end for serverID: %d", server_id)
@@ -74,6 +76,7 @@ def end_finished_job(server_id, server_dictionary, handle_dictionary, remove_tl_
     del server_dictionary[server_id]
     if not remove_tl_reservation:
         return reservation_tl_id
+    '''
     return 0
 
 

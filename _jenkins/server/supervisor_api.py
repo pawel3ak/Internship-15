@@ -45,7 +45,8 @@ class Supervisor(object):
 
     def set_parent_dict(self, busy_status, job_tests_parsed_status=None):
         jen_info = dict(self.jenkins_info)
-        del jen_info['job_api']
+        if 'job_api' in self.jenkins_info:
+            del jen_info['job_api']
         self.parent_dict[self.serverID] = {
             'reservationID' : self.TLreservationID,
             'busy_status' : busy_status,
@@ -55,7 +56,6 @@ class Supervisor(object):
             'jenkins_info': jen_info,
             'reservation_data' : self.reservation_data,
             'user_info' : self.user_info
-
         }
         return self.parent_dict
 
