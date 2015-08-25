@@ -202,14 +202,14 @@ class Supervisor(object):
     def check_if_no_fails(self, output):
         try:
             if output.find('| FAIL |') == -1:
-                return True
+                return False
         except:
             try:
                 if output.find('[ ERROR ]') == -1:
-                    return True
+                    return False
             except:
                 pass
-        return False
+        return True
 
     def ending(self, jenkins_console_output=None):
         if not self.has_got_fail:
@@ -217,7 +217,8 @@ class Supervisor(object):
             else: self.test_end_status = "UNKNOWN_FAIL"
         else:
             self.test_end_status = "Failed"
-        return 0
+        # return 0
+        return self.test_end_status
 
     def remove_tag_from_file(self, directory, file_name, old_tag, new_tag = ''):
         client = paramiko.SSHClient()
@@ -298,7 +299,7 @@ class Supervisor(object):
             print message
             print subject
 
-        elif self.test_end_status== 'UNKNOWN_FAIL':
+        elif self.test_end_status == 'UNKNOWN_FAIL':
             message = "Dear {f_name} {l_name}! \n\n" \
                        "Your test on {tl_name} has failed but we couldn't catch where. " \
                        "Please check logs available at: {logs_link} \n\n" \

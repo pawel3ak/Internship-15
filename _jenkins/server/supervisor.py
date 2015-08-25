@@ -28,7 +28,7 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
     print supervisor.get_TLreservationID()
 
     print supervisor.set_parent_dict()
-    print supervisor.reservation_status()
+    # print supervisor.reservation_status()
     print supervisor.set_TLname(supervisor.get_TLname_from_ID())
     print supervisor.set_TLaddress(supervisor.get_TLaddress_from_ID())
 
@@ -52,14 +52,14 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
     print len(supervisor.parent_dict[supervisor.serverID]['test_status'])
     if supervisor.has_got_fail :
         for test in supervisor.parent_dict[supervisor.serverID]['test_status']:
-            print test
+            print "test['test_name'] = ", test['test_name']
             supervisor.remove_tag_from_file(directory=test['test_name'],
                                             file_name=test['file_name'],
                                             old_tag= 'enable'
                                             )
 
-    supervisor.ending(jenkins_console_output)
-    print supervisor.test_end_status
+    print "from ending = ", supervisor.ending(jenkins_console_output)
+    print "test end status = ", supervisor.test_end_status
     supervisor.send_information()
 
 
@@ -78,4 +78,4 @@ if __name__ == '__main__':
                     'name' : 'LTEXYZ'
                 }
         },
-        TLreservationID=67917)
+        TLreservationID=68503)
