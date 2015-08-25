@@ -43,13 +43,17 @@ class Supervisor(object):
     def get_parent_dict(self):
         return self.parent_dict
 
-    def set_parent_dict(self, busy_status = True, job_tests_parsed_status=None):
+    def set_parent_dict(self, busy_status, job_tests_parsed_status=None):
         self.parent_dict[self.serverID] = {
             'reservationID' : self.TLreservationID,
             'busy_status' : busy_status,
             'tl_name' : self.TLname,
             'duration' : self.reservation_data['duration'],
-            'test_status' : job_tests_parsed_status
+            'test_status' : job_tests_parsed_status,
+            'jenkins_info': self.jenkins_info,
+            'reservation_data' : self.reservation_data,
+            'user_info' : self.user_info
+
         }
         return self.parent_dict
 
@@ -93,7 +97,7 @@ class Supervisor(object):
         return self.TLaddress
 
     def finish_with_failure(self, test_status = None):
-        self.parent_dict[self.serverID]['busy'] = False
+        self.parent_dict[self.serverID]['busy_status'] = False
         self.send_information(test_status=test_status)
         sys.exit()
 
@@ -225,6 +229,7 @@ class Supervisor(object):
             else:
                 self.test_end_status = "UNKNOWN_FAIL"
                 self.has_got_fail = True
+                self.finish_with_failure(test_status=self.test_end_status)
         else:
             self.test_end_status = "Failed"
             self.has_got_fail = True
@@ -244,6 +249,7 @@ class Supervisor(object):
                 try:
                     file_name = re.search('({name}.*)'.format(name=file_name),files[file]).groups()[0]
                     found = True
+                    print file_name
                     break
                 except:
                     pass
@@ -286,7 +292,7 @@ class Supervisor(object):
             return 0
         elif self.test_end_status == None:
             self.test_end_status = 'UNKNOWN_FAIL'
-            self.finish_with_failure(test_status=self.test_end_status)
+            # self.finish_with_failure(test_status=self.test_end_status)
 
         message = []
         subject = ""

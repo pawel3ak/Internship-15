@@ -8,6 +8,7 @@
 """
 
 from supervisor_api import Supervisor
+import time
 
 def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None, TLreservationID = None):
     print serverID
@@ -29,11 +30,12 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
     if not supervisor.reservation_data['duration']:
         supervisor.failureStatus = 7
         supervisor.finish_with_failure()
-
+    print supervisor.TLreservationID
+    time.sleep(2)
     supervisor.get_TLreservationID()
 
-    supervisor.set_parent_dict()
-    supervisor.reservation_status()
+    supervisor.set_parent_dict(busy_status=True)
+    # supervisor.reservation_status()
     supervisor.set_TLname(supervisor.get_TLname_from_ID())
     supervisor.set_TLaddress(supervisor.get_TLaddress_from_ID())
 
@@ -44,13 +46,13 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
     print supervisor.set_user_info('Pawel','Nogiec','pawel.nogiec@nokia.com')
     ##############################################################################
 
-    supervisor.set_parent_dict()
+    supervisor.set_parent_dict(busy_status=True)
 
     supervisor.set_job_api()
     if not supervisor.get_job_status() == None:
         supervisor.create_and_build_job()
     if not supervisor.get_job_status() == "SUCCESS":
-        supervisor.send_information(test_status="UNKNOWN_FAIL")
+        supervisor.finish_with_failure(test_status="UNKNOWN_FAIL")
         return 0
     supervisor.get_jenkins_console_output()
 
