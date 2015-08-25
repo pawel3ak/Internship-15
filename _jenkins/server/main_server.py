@@ -146,7 +146,7 @@ def main_server():
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((host, port))
     sock.listen(5)
-    '''
+
     # start checking loop
     logger.info("Start new thread with checking loop")
     thread = Thread(target=main_checking_loop, args=[queue_file_name, priority_queue_file_name, SERVER_DICTIONARY_FILE_NAME,
@@ -165,7 +165,7 @@ def main_server():
         if data == "KONIEC":
             break
         response(connect, data, queue_file_name, priority_queue_file_name, server_dict)
-    '''
+
     sock.close()
     logger.info("Server stopped")
 
