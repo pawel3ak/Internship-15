@@ -34,7 +34,7 @@ EXTEND_TIME = 2
 
 
 # create logger
-logger = logging.getLogger()
+logger = logging.getLogger("Dispatcher")
 logger.setLevel(logging.DEBUG)
 # create formatter
 formatter = logging.Formatter('%(asctime)s %(levelname)8s: %(filename)20s - %(funcName)30s:     %(message)s     -   %(name)8s',

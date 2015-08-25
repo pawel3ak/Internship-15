@@ -10,7 +10,7 @@ import json
 import logging
 
 
-logger = logging.getLogger()
+logger = logging.getLogger("Dispatcher." + __name__)
 
 
 # update record in dictionary

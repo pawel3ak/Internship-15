@@ -18,7 +18,7 @@ import sdictionary
 from tl_reservation import TestLineReservation
 
 # create logger
-logger = logging.getLogger()
+logger = logging.getLogger("Dispatcher." + __name__)
 
 
 def get_catalog_list(directory):
@@ -47,12 +47,12 @@ def start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_
         logger.debug("Get reservation from queue")
         request = queue.read_next_from_queue(queue_file)
         queue.delete_reservation_from_queue(queue_file, request["serverID"], request["password"])
-    logger.debug("Start new thread supervisor.main for serverID: %d", request["serverID"])
+    logger.debug("Start new thread supervisor.main for serverID: %d", int(request["serverID"]))
     thread = Thread(target=supervisor.main, args=[request["serverID"],
                                                   request["reservation_data"],
                                                   server_dictionary,
-                                                  request["user_info"],
                                                   request["jenkins_info"],
+                                                  request["user_info"],
                                                   reservation_id])
     thread.daemon = True
     thread.start()
@@ -69,7 +69,7 @@ def end_finished_job(server_id, server_dictionary, handle_dictionary, remove_tl_
         logger.info("End reservation with ID: %d", reservation_tl_id)
         tl_reservation = TestLineReservation(reservation_tl_id)
         tl_reservation.release_reservation()
-    logger.debug("Remove the entry from the dictionaries")
+    logger.debug("Remove record from the dictionaries")
     del handle_dictionary[server_id]
     del server_dictionary[server_id]
     if not remove_tl_reservation:
@@ -113,7 +113,8 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
                 make_queue_from_test(queue_file_name, '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN', max_reservation_time)
                 logger.info("Start new job from queue")
                 start_new_job(queue_file_name, server_dictionary, handle_dictionary)
-            print "SCRIPT"
+            else:
+                logger.warning("Some weird case ;/")
             sleep(3)
         else:
             break
@@ -136,7 +137,7 @@ def main_checking_loop(queue_file_name, priority_queue_file_name, server_diction
         for record in server_dictionary:
             start_new_job(queue_file_name, server_dictionary, handle_dictionary,
                           server_dictionary[record]["reservationID"],
-                          (server_dictionary[record] + {"serverID": record}))
+                          dict(server_dictionary[record].items() + {"serverID": record}.items()))
     while True:
         logger.info("Main checking loop")
         logger.debug("Check TL busy")
