@@ -47,7 +47,7 @@ def check_queue_length(file_name):
 
 
 def get_server_id_number():
-    id_file = "temp_id"
+    id_file = "files_temp_id"
     with open(id_file, "ab+") as open_file:
         lines = open_file.readlines()
     if len(lines) == 0:

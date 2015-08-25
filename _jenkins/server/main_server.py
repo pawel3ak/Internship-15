@@ -22,9 +22,9 @@ from checking_loop import main_checking_loop
 
 HOST_IP = "127.0.0.1"
 HOST_PORT = 5005
-QUEUE_FILE_NAME = "reservation_queue"
-PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
-SERVER_DICTIONARY_FILE_NAME = "server_dictionary_file"
+QUEUE_FILE_NAME = "files/reservation_queue"
+PRIORITY_QUEUE_FILE_NAME = "files/reservation_prority_queue"
+SERVER_DICTIONARY_FILE_NAME = "files/server_dictionary_file"
 FREE_TL = 1
 MAX_TL = 3
 MIN_TIME_TO_END = 1
@@ -140,14 +140,13 @@ def main_server():
     sdictionary.create_file(SERVER_DICTIONARY_FILE_NAME)
     server_dict = sdictionary.get_dictionary_from_file(SERVER_DICTIONARY_FILE_NAME)
 
-
     # set up server
     logger.debug("Set up server")
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((host, port))
     sock.listen(5)
-
+    '''
     # start checking loop
     logger.info("Start new thread with checking loop")
     thread = Thread(target=main_checking_loop, args=[queue_file_name, priority_queue_file_name, SERVER_DICTIONARY_FILE_NAME,
@@ -155,7 +154,8 @@ def main_server():
                                                      MAX_RESERVATION_TIME, EXTEND_TIME])
     thread.daemon = True
     thread.start()
-
+    from time import sleep
+    sleep(20)
     # main server loop
     logger.info("Start server loop - waiting for request")
     while True:
@@ -165,8 +165,9 @@ def main_server():
         if data == "KONIEC":
             break
         response(connect, data, queue_file_name, priority_queue_file_name, server_dict)
-
+    '''
     sock.close()
+    logger.info("Server stopped")
 
 
 if __name__ == "__main__":
