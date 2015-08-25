@@ -25,12 +25,12 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
         supervisor.failureStatus = 7
         supervisor.finish_with_failure()
 
-    print supervisor.get_TLreservationID()
+    supervisor.get_TLreservationID()
 
-    print supervisor.set_parent_dict()
-    # print supervisor.reservation_status()
-    print supervisor.set_TLname(supervisor.get_TLname_from_ID())
-    print supervisor.set_TLaddress(supervisor.get_TLaddress_from_ID())
+    supervisor.set_parent_dict()
+    supervisor.reservation_status()
+    supervisor.set_TLname(supervisor.get_TLname_from_ID())
+    supervisor.set_TLaddress(supervisor.get_TLaddress_from_ID())
 
     #############################################################################
     #temporary hard-coded  variables:
@@ -39,27 +39,28 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
     print supervisor.set_user_info('Pawel','Nogiec','pawel.nogiec@nokia.com')
     ##############################################################################
 
-    print supervisor.set_parent_dict()
+    supervisor.set_parent_dict()
 
+    supervisor.set_job_api()
     if not supervisor.get_job_status() == None:
-        job = supervisor.create_and_build_job()
-    jenkins_console_output = supervisor.get_jenkins_console_output()
+        supervisor.create_and_build_job()
+    if not supervisor.get_job_status() == "SUCCESS":
+        supervisor.send_information(test_status="UNKNOWN_FAIL")
+        return 0
+    supervisor.get_jenkins_console_output()
 
-    job_tests_parsed_status = supervisor.get_job_tests_status(jenkins_console_output)
-    print supervisor.ending(jenkins_console_output)
-    print supervisor.set_parent_dict(busy_status=False, job_tests_parsed_status=job_tests_parsed_status)
-    print supervisor.has_got_fail
-    print len(supervisor.parent_dict[supervisor.serverID]['test_status'])
+    job_tests_parsed_status = supervisor.get_job_tests_status()
+    supervisor.ending()
+    supervisor.set_parent_dict(busy_status=False, job_tests_parsed_status=job_tests_parsed_status)
+
+
     if supervisor.has_got_fail :
         for test in supervisor.parent_dict[supervisor.serverID]['test_status']:
-            print "test['test_name'] = ", test['test_name']
             supervisor.remove_tag_from_file(directory=test['test_name'],
                                             file_name=test['file_name'],
                                             old_tag= 'enable'
                                             )
 
-    print "from ending = ", supervisor.ending(jenkins_console_output)
-    print "test end status = ", supervisor.test_end_status
     supervisor.send_information()
 
 

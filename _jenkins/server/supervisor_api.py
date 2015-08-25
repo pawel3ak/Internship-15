@@ -126,8 +126,9 @@ class Supervisor(object):
                 self.finish_with_failure()
 
 
-    def update_TLname(self,job):
+    def update_TLname(self):
         try:
+            job = self.jenkins_info['job_api'].get_job(self.jenkins_info['job_name'])
             job_config_xml = ET.fromstring(job.get_config())
             assignedNode_tag = job_config_xml.find('assignedNode')
             assignedNode_tag.text = str(self.TLname)
@@ -138,48 +139,51 @@ class Supervisor(object):
             self.finish_with_failure()
 
     def get_job_status(self):
-        if not 'job_name' in self.jenkins_info:
-            self.jenkins_info['job_name'] = 'test_on_{tl_name}'.format(tl_name=self.TLname)
         try:
-            job_api = jenkinsapi.api.Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
-            job = job_api.get_job(self.jenkins_info['job_name'])
+            job = self.jenkins_info['job_api'].get_job(self.jenkins_info['job_name'])
             return job.get_last_build().get_status()
         except:
             self.failureStatus = 3
             self.finish_with_failure()
 
-    def create_and_build_job(self):
+    def set_job_api(self):
         if not 'job_name' in self.jenkins_info:
             self.jenkins_info['job_name'] = 'test_on_{tl_name}'.format(tl_name=self.TLname)
         try:
             job_api = jenkinsapi.api.Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
-            job = job_api.get_job(self.jenkins_info['job_name'])
-            self.update_TLname(job)
-            job_api.build_job(jobname=self.jenkins_info['job_name'],
-                              params=self.jenkins_info['parameters'])
-            return job
+            self.jenkins_info['job_api'] = job_api
+            return self.jenkins_info['job_api']
+        except:
+            self.failureStatus = 3
+            self.finish_with_failure()
+
+
+    def create_and_build_job(self):
+        try:
+            self.update_TLname()
+            self.jenkins_info['job_api'].build_job(jobname=self.jenkins_info['job_name'],
+                                                   params=self.jenkins_info['parameters'])
+            return 0
         except:
             self.failureStatus = 3
             self.finish_with_failure()
 
     def get_jenkins_console_output(self):
-        if not 'job_name' in self.jenkins_info:
-            self.jenkins_info['job_name'] = 'test_on_{tl_name}'.format(tl_name=self.TLname)
         try:
-            job_api = jenkinsapi.api.Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080')
-            job = job_api.get_job(self.jenkins_info['job_name'])
-            time.sleep(10)      #let the new job build get started
+            job = self.jenkins_info['job_api'].get_job(self.jenkins_info['job_name'])
+            time.sleep(15)      #let the new job build get started
             while job.get_last_build().get_status() == None:
                 time.sleep(30)      ###############TODO longer sleep on real tests
-            return job.get_last_build().get_console()
+            self.jenkins_info['console_output'] = job.get_last_build().get_console()
+            return self.jenkins_info['console_output']
         except:
             self.failureStatus = 3
             self.finish_with_failure()
 
-    def get_job_tests_status(self, job_output):
+    def get_job_tests_status(self):
         regex = r'\=\s(.*)\s\=\W*.*FAIL'
         try:
-            match = re.findall(regex,job_output)
+            match = re.findall(regex,self.jenkins_info['console_output'])
             if len(match) != 0: self.has_got_fail = True
             tests_failed_list_with_dict=[]
             for i in range(0,len(match)):
@@ -211,13 +215,12 @@ class Supervisor(object):
                 pass
         return True
 
-    def ending(self, jenkins_console_output=None):
+    def ending(self):
         if not self.has_got_fail:
-            if self.check_if_no_fails(jenkins_console_output) == True: pass
+            if self.check_if_no_fails(self.jenkins_info['console_output']) == True: pass
             else: self.test_end_status = "UNKNOWN_FAIL"
         else:
             self.test_end_status = "Failed"
-        # return 0
         return self.test_end_status
 
     def remove_tag_from_file(self, directory, file_name, old_tag, new_tag = ''):
@@ -269,7 +272,9 @@ class Supervisor(object):
             self.test_end_status = "Failed"
             client.close()
 
-    def send_information(self):
+    def send_information(self, test_status=None):
+        if test_status:
+            self.test_end_status = test_status
         message = ""
         subject = ""
         if self.test_end_status == "reserv_pending":
@@ -284,6 +289,10 @@ class Supervisor(object):
 
 
         elif self.test_end_status == "Failed":
+            job = self.jenkins_info['job_api'].get_job(self.jenkins_info['job_name'])
+            t = job.get_last_build().get_timestamp()
+            build_time = '{}-{:02g}-{:02g}_{:02g}-{:02g}-{:02g}'.format(t.year, t.month, t.day, (t.hour-(time.altzone/3600)), t.minute, t.second)
+            logs_link = 'http://10.83.200.35/~ltebox/logs/{}_{}/log.html'.format(self.TLname, build_time)
             test_info = ''
             for test in self.parent_dict[self.serverID]['test_status']:
                 test_info += "Test = {test_name}.{file_name}\n".format(
@@ -292,25 +301,29 @@ class Supervisor(object):
             message = "Dear {f_name} {l_name}! \n\n" \
                        "Few tests has failed: \n\n" \
                        "{test_info}\n\n" \
+                       "Logs are available at: {logs_link}\n\n" \
                        "Have a nice day!".format(f_name=self.user_info['first_name'],
                                                  l_name=self.user_info['last_name'],
-                                                 test_info=test_info)
+                                                 test_info=test_info,
+                                                 logs_link=logs_link)
             subject = "Tests status update - finished with fail"
-            print message
-            print subject
+
 
         elif self.test_end_status == 'UNKNOWN_FAIL':
+            job = self.jenkins_info['job_api'].get_job(self.jenkins_info['job_name'])
+            logs_link = '{url}/job/{job_name}/{bn}/console'.format(url= 'http://plkraaa-jenkins.emea.nsn-net.net:8080',
+                                                                  job_name=self.jenkins_info['job_name'],
+                                                                  bn=job.get_last_buildnumber())
             message = "Dear {f_name} {l_name}! \n\n" \
-                       "Your test on {tl_name} has failed but we couldn't catch where. " \
+                       "Your test on {tl_name} has occured unknown fail.\n" \
                        "Please check logs available at: {logs_link} \n\n" \
                        "Have a nice day!".format(f_name=self.user_info['first_name'],
                                                  l_name=self.user_info['last_name'],
                                                  tl_name=self.TLname,
-                                                 logs_link="")
+                                                 logs_link=logs_link)
             subject = "Tests status update - finished with fail"
 
-        print message
-        print subject
+
         send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
         mail = ute_mail.mail.Mail(subject=subject,message=message, recipients=self.user_info['e-mail'], name_from="Reservation Api")
         send.connect()
