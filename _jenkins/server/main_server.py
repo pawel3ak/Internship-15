@@ -11,6 +11,7 @@ import socket
 import json
 import argparse
 import time
+import os
 import logging
 import logging.handlers
 from threading import Thread
@@ -23,9 +24,11 @@ from checking_loop import main_checking_loop
 
 HOST_IP = "127.0.0.1"
 HOST_PORT = 5005
-QUEUE_FILE_NAME = "files/reservation_queue"
-PRIORITY_QUEUE_FILE_NAME = "files/reservation_prority_queue"
-SERVER_DICTIONARY_FILE_NAME = "files/server_dictionary_file"
+FILE_DIRECTORY = "files"
+LOG_DIRECTORY = "logs"
+QUEUE_FILE_NAME = "reservation_queue"
+PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
+SERVER_DICTIONARY_FILE_NAME = "server_dictionary_file"
 FREE_TL = 1
 MAX_TL = 1
 MIN_TIME_TO_END = 1
@@ -37,10 +40,12 @@ EXTEND_TIME = 2
 logger = logging.getLogger("Dispatcher")
 logger.setLevel(logging.DEBUG)
 # create formatter
-formatter = logging.Formatter('%(asctime)s %(levelname)8s: %(filename)20s - %(funcName)30s:     %(message)s     -   %(name)8s',
+formatter = logging.Formatter('%(asctime)s %(levelname)8s: %(name)30s - %(funcName)30s:     %(message)s',
                               datefmt='%Y-%m-%d,%H:%M:%S')
 logging.Formatter.converter = time.gmtime
 # create file handler to file with logs
+if not os.path.isdir(LOG_DIRECTORY):
+    os.makedirs(LOG_DIRECTORY)
 file_handler = logging.handlers.TimedRotatingFileHandler(filename='logs/server.log',
                                                          when='midnight',
                                                          interval=1,
@@ -122,8 +127,13 @@ def main_server():
     port = args.port
     free_testline = args.freetl
     max_testline = MAX_TL
-    queue_file_name = args.file
-    priority_queue_file_name = args.priority
+    queue_file_name = FILE_DIRECTORY + "/" + args.file
+    priority_queue_file_name = FILE_DIRECTORY + "/" + args.priority
+    server_dictionary_file_name =  FILE_DIRECTORY + "/" + SERVER_DICTIONARY_FILE_NAME
+
+    # create files directory if not exist
+    if not os.path.isdir(FILE_DIRECTORY):
+        os.makedirs(FILE_DIRECTORY)
 
     # create files if not exist
     logger.debug("Create servers files")
@@ -139,8 +149,8 @@ def main_server():
     handle_dict = {}
 
     # create file for server dictionary if not exist and read if exist
-    sdictionary.create_file(SERVER_DICTIONARY_FILE_NAME)
-    server_dict = sdictionary.get_dictionary_from_file(SERVER_DICTIONARY_FILE_NAME)
+    sdictionary.create_file(server_dictionary_file_name)
+    server_dict = sdictionary.get_dictionary_from_file(server_dictionary_file_name)
 
     # set up server
     logger.debug("Set up server")
@@ -151,7 +161,7 @@ def main_server():
 
     # start checking loop
     logger.info("Start new thread with checking loop")
-    thread = Thread(target=main_checking_loop, args=[queue_file_name, priority_queue_file_name, SERVER_DICTIONARY_FILE_NAME,
+    thread = Thread(target=main_checking_loop, args=[queue_file_name, priority_queue_file_name, server_dictionary_file_name,
                                                      free_testline, max_testline, server_dict, handle_dict, MIN_TIME_TO_END,
                                                      MAX_RESERVATION_TIME, EXTEND_TIME])
     thread.daemon = True
