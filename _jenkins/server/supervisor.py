@@ -10,6 +10,11 @@
 from supervisor_api import Supervisor
 
 def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None, TLreservationID = None):
+    print serverID
+    print reservation_data
+    print parent_dict
+    print jenkins_info
+    print user_info
     supervisor = Supervisor(serverID, reservation_data, parent_dict, jenkins_info, user_info = user_info, TLreservationID = TLreservationID)
     if supervisor.TLreservationID == None:
         supervisor.TLreservationID = supervisor.create_reservation_and_run_job(
