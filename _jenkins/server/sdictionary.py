@@ -12,6 +12,7 @@ import logging
 
 logger = logging.getLogger()
 
+
 # update record in dictionary
 def update_record(dictionary, server_id, reservation_id=None, busy_status=None,
                   time_add=None, duration=None, tl_name=None, job_test_status=None):
@@ -31,7 +32,7 @@ def update_record(dictionary, server_id, reservation_id=None, busy_status=None,
 
 def get_first_not_busy(dictionary):
     for record in dictionary:
-        if dictionary[record]['busy_status'] == False:
+        if not dictionary[record]['busy_status']:
             return record
     return None
 
@@ -41,6 +42,9 @@ def get_no_busy_list(dictionary):
     for record in dictionary:
         if not dictionary[record]['busy_status']:
             record_list.append(record)
+            logger.debug("reservation %d - no busy", dictionary[record]['reservationID'])
+        else:
+            logger.debug("reservation %d - busy", dictionary[record]['reservationID'])
     return record_list
 
 
@@ -57,7 +61,7 @@ def create_file(new_file):
         open_file.close()
 
 
-def write_dictionary_to_file (file_name, dictionary):
+def write_dictionary_to_file(file_name, dictionary):
     with open(file_name, "wb") as open_file:
         json.dump(dictionary, open_file)
 
@@ -66,5 +70,6 @@ def get_dictionary_from_file(file_name):
     dictionary = {}
     with open(file_name, "rb") as open_file:
         if len(open_file.readlines()) > 0:
+            open_file.seek(0, 0)
             dictionary = json.load(open_file)
     return dictionary

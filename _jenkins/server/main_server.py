@@ -10,6 +10,7 @@
 import socket
 import json
 import argparse
+import time
 import logging
 import logging.handlers
 from threading import Thread
@@ -26,7 +27,7 @@ QUEUE_FILE_NAME = "files/reservation_queue"
 PRIORITY_QUEUE_FILE_NAME = "files/reservation_prority_queue"
 SERVER_DICTIONARY_FILE_NAME = "files/server_dictionary_file"
 FREE_TL = 1
-MAX_TL = 3
+MAX_TL = 1
 MIN_TIME_TO_END = 1
 MAX_RESERVATION_TIME = 2
 EXTEND_TIME = 2
@@ -36,8 +37,9 @@ EXTEND_TIME = 2
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 # create formatter
-formatter = logging.Formatter('%(asctime)s %(levelname)8s: %(name)8s - %(filename)18s - %(funcName)15s: %(message)s',
+formatter = logging.Formatter('%(asctime)s %(levelname)8s: %(filename)20s - %(funcName)30s:     %(message)s     -   %(name)8s',
                               datefmt='%Y-%m-%d,%H:%M:%S')
+logging.Formatter.converter = time.gmtime
 # create file handler to file with logs
 file_handler = logging.handlers.TimedRotatingFileHandler(filename='logs/server.log',
                                                          when='midnight',
