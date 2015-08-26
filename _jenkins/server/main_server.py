@@ -29,11 +29,13 @@ LOG_DIRECTORY = "logs"
 QUEUE_FILE_NAME = "reservation_queue"
 PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
 SERVER_DICTIONARY_FILE_NAME = "server_dictionary_file"
-FREE_TL = 1
-MAX_TL = 1
-MIN_TIME_TO_END = 1
-MAX_RESERVATION_TIME = 2
-EXTEND_TIME = 2
+FREE_TL = 1     # free tl number for users reservations
+MAX_TL = 1      # max tl number which server can reserve
+# time in hour
+MIN_TIME_TO_END = 1     # min time when we can make a new task on tl
+START_RESERVATION_TIME = 2  # reservation duration time
+MAX_RESERVATION_TIME = 12   # max reservation duration time with extending
+EXTEND_TIME = 2     # extend time
 
 
 # create logger
@@ -171,7 +173,7 @@ def main_server():
     logger.info("Start new thread with checking loop")
     thread = Thread(target=main_checking_loop, args=[queue_file_name, priority_queue_file_name, server_dictionary_file_name,
                                                      free_testline, max_testline, server_dict, handle_dict, MIN_TIME_TO_END,
-                                                     MAX_RESERVATION_TIME, EXTEND_TIME])
+                                                     START_RESERVATION_TIME, MAX_RESERVATION_TIME, EXTEND_TIME])
     thread.daemon = True
     thread.start()
     from time import sleep

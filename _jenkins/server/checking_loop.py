@@ -97,7 +97,7 @@ def add_new_job_to_tl(queue_file, server_id, server_dictionary, handle_dictionar
 
 
 def checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
-                               server_dictionary, handle_dictionary, max_reservation_time, loop=True):
+                               server_dictionary, handle_dictionary, start_reservation_time, loop=True):
     test_reservation = TestLineReservation()
     while True:
         # temporary prints
@@ -120,7 +120,7 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
                 start_new_job(queue_file_name, server_dictionary, handle_dictionary)
             elif queue.check_queue_length(queue_file_name) == 0:
                 logger.info("Add test to queue")
-                make_queue_from_test(queue_file_name, '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN', max_reservation_time)
+                make_queue_from_test(queue_file_name, '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN', start_reservation_time)
                 logger.info("Start new job from queue")
                 start_new_job(queue_file_name, server_dictionary, handle_dictionary)
             else:
@@ -132,7 +132,7 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
             break
 
 
-def checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, extend_time):
+def checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, max_reservation_time, extend_time):
     logger.debug("Checking if same reservation are not busy")
     no_busy_record_list = sdictionary.get_no_busy_list(server_dictionary)
     for record in no_busy_record_list:
@@ -141,7 +141,7 @@ def checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, exte
 
 def main_checking_loop(queue_file_name, priority_queue_file_name, server_dictionary_file_name,
                        number_of_free_tl, max_tl_number,server_dictionary, handle_dictionary,
-                       min_time_to_end, max_reservation_time, extend_time):
+                       min_time_to_end, start_reservation_time, max_reservation_time, extend_time):
     if server_dictionary > 0:
         logger.info("Start processes for existing reservations")
         for record in server_dictionary:
@@ -151,10 +151,10 @@ def main_checking_loop(queue_file_name, priority_queue_file_name, server_diction
     while True:
         logger.info("Main checking loop")
         logger.debug("Check TL busy")
-        checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, extend_time)
+        checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, max_reservation_time,extend_time)
         logger.debug("Check queue")
         checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
-                                   server_dictionary, handle_dictionary, max_reservation_time, False)
+                                   server_dictionary, handle_dictionary, start_reservation_time, False)
         sdictionary.write_dictionary_to_file(server_dictionary_file_name, server_dictionary)
         sleep(30)
 
