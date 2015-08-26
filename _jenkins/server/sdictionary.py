@@ -68,8 +68,11 @@ def write_dictionary_to_file(file_name, dictionary):
 
 def get_dictionary_from_file(file_name):
     dictionary = {}
+    temp_dictionary = {}
     with open(file_name, "rb") as open_file:
         if len(open_file.readlines()) > 0:
             open_file.seek(0, 0)
-            dictionary = json.load(open_file)
+            temp_dictionary = json.load(open_file)
+    for record in temp_dictionary:
+            dictionary[int(record)] = temp_dictionary[record]
     return dictionary
