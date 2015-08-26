@@ -11,12 +11,15 @@ from supervisor_api import Supervisor
 import time
 
 def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None, TLreservationID = None):
-    print serverID
-    print reservation_data
-    print parent_dict
-    print jenkins_info
-    print user_info
+    # print serverID
+    # print reservation_data
+    # print parent_dict
+    # print jenkins_info
+    # print user_info
+    # TLreservationID = 11214
+    #jenkins_info['parameters']['name'] = "LTEXYZ"
     supervisor = Supervisor(serverID, reservation_data, parent_dict, jenkins_info, user_info = user_info, TLreservationID = TLreservationID)
+
     if supervisor.TLreservationID == None:
         supervisor.TLreservationID = supervisor.create_reservation_and_run_job(
             testline_type=reservation_data['testline_type'],
@@ -26,7 +29,7 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
             # reservation_data['robotle_revision'],
             # reservation_data['state'],
             duration=reservation_data['duration'])
-
+    print supervisor.jenkins_info
     if not supervisor.reservation_data['duration']:
         supervisor.failureStatus = 7
         supervisor.finish_with_failure()
@@ -56,7 +59,10 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
         return 0
     supervisor.get_jenkins_console_output()
 
+
     job_tests_parsed_status = supervisor.get_job_tests_status()
+    supervisor.set_parent_dict(busy_status=True, job_tests_parsed_status=job_tests_parsed_status)
+
     supervisor.ending()
 
 
@@ -83,7 +89,7 @@ if __name__ == '__main__':
         jenkins_info={
             'parameters' :
                 {
-                    'name' : 'LTEXYZ-new'
+                    'name' : 'LTEXYZ'
                 }
         },
-        TLreservationID=68503)
+        TLreservationID=68880)
