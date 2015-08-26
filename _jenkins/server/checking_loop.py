@@ -61,8 +61,6 @@ def start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_
 
 
 def end_finished_job(server_id, server_dictionary, handle_dictionary, remove_tl_reservation=True):
-    print "finish"
-    '''
     logger.debug("Get tl reservation ID")
     reservation_tl_id = server_dictionary[server_id]["reservationID"]
     logger.debug("Checking is thread is end for serverID: %d", server_id)
@@ -76,7 +74,6 @@ def end_finished_job(server_id, server_dictionary, handle_dictionary, remove_tl_
     del server_dictionary[server_id]
     if not remove_tl_reservation:
         return reservation_tl_id
-    '''
     return 0
 
 
@@ -140,7 +137,7 @@ def main_checking_loop(queue_file_name, priority_queue_file_name, server_diction
         for record in server_dictionary:
             start_new_job(queue_file_name, server_dictionary, handle_dictionary,
                           server_dictionary[record]["reservationID"],
-                          dict(server_dictionary[record].items() + {"serverID": record}.items()))
+                          dict(server_dictionary[record].items() + {"serverID": int(record)}.items()))
     while True:
         logger.info("Main checking loop")
         logger.debug("Check TL busy")
