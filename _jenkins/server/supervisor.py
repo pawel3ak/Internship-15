@@ -16,7 +16,11 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
     print parent_dict
     print jenkins_info
     print user_info
+    TLreservationID = 11214
     supervisor = Supervisor(serverID, reservation_data, parent_dict, jenkins_info, user_info = user_info, TLreservationID = TLreservationID)
+    #####################################################################################################
+    #no available TL =
+    '''
     if supervisor.TLreservationID == None:
         supervisor.TLreservationID = supervisor.create_reservation_and_run_job(
             testline_type=reservation_data['testline_type'],
@@ -26,7 +30,8 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
             # reservation_data['robotle_revision'],
             # reservation_data['state'],
             duration=reservation_data['duration'])
-
+    '''
+    ################################################################################################################
     if not supervisor.reservation_data['duration']:
         supervisor.failureStatus = 7
         supervisor.finish_with_failure()
@@ -36,8 +41,8 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
 
     supervisor.set_parent_dict(busy_status=True)
     # supervisor.reservation_status()
-    supervisor.set_TLname(supervisor.get_TLname_from_ID())
-    supervisor.set_TLaddress(supervisor.get_TLaddress_from_ID())
+    # supervisor.set_TLname(supervisor.get_TLname_from_ID())
+    # supervisor.set_TLaddress(supervisor.get_TLaddress_from_ID())
 
     #############################################################################
     #temporary hard-coded  variables:

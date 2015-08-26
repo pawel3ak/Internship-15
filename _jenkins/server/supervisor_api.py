@@ -57,6 +57,7 @@ class Supervisor(object):
             'reservation_data' : self.reservation_data,
             'user_info' : self.user_info
         }
+        print self.parent_dict
         return self.parent_dict
 
     def get_jenkins_info(self):
@@ -206,7 +207,7 @@ class Supervisor(object):
                     tests_failed_list_with_dict.append({'test_name' : match[i][0],
                                        'file_name' : match[i][1]})
         except:
-            tests_failed_list_with_dict = None
+            self.finish_with_failure(test_status="UNKNOWN_FAIL")
         finally:
             return tests_failed_list_with_dict
 
