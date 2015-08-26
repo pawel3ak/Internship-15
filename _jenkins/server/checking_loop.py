@@ -18,11 +18,11 @@ import sdictionary
 from tl_reservation import TestLineReservation
 
 # create logger
-logger = logging.getLogger("Dispatcher." + __name__)
+logger = logging.getLogger("server." + __name__)
 
 
 def get_catalog_list(directory):
-    logger.debug("Get catalog list")
+    logger.debug("Get catalog list from directory: %s", directory)
     directory_list = []
     [directory_list.append(x) for x in os.listdir(directory) if os.path.isdir(os.path.join(directory, x))]
     return directory_list
@@ -49,6 +49,7 @@ def make_queue_from_test(queue_file, directory, max_reservation_time):
                    'user_info': None,
                    'jenkins_info': {'parameters': {'name': direct}}
                    }
+        logger.debug("Write new queue to file: %s", queue_file)
         queue.write_to_queue(queue_file, request)
 
 
@@ -57,7 +58,7 @@ def start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_
         logger.debug("Get reservation from queue")
         request = queue.read_next_from_queue(queue_file)
         queue.delete_reservation_from_queue(queue_file, request["serverID"], request["password"])
-    logger.debug("Start new thread supervisor.main for serverID: %d", int(request["serverID"]))
+    logger.info("Start new thread supervisor.main for serverID: %d, reservationID: %d", int(request["serverID"]), reservation_id)
     thread = Thread(target=supervisor.main, args=[request["serverID"],
                                                   request["reservation_data"],
                                                   server_dictionary,
@@ -113,22 +114,22 @@ def checking_reservation_queue(queue_file_name, priority_queue_file_name, number
         if ((test_reservation.get_available_tl_count_group_by_type())['CLOUD_F'] > number_of_free_tl) & \
                 (len(server_dictionary) < max_tl_number):
             if queue.check_queue_length(priority_queue_file_name) > 0:
-                logger.info("Start new job from priority queue")
+                logger.debug("Start new job from priority queue")
                 start_new_job(priority_queue_file_name, server_dictionary, handle_dictionary)
             elif queue.check_queue_length(queue_file_name) > 0:
-                logger.info("Start new job from queue")
+                logger.debug("Start new job from queue")
                 start_new_job(queue_file_name, server_dictionary, handle_dictionary)
             elif queue.check_queue_length(queue_file_name) == 0:
-                logger.info("Add test to queue")
+                logger.debug("Add tests to queue")
                 make_queue_from_test(queue_file_name, '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN', start_reservation_time)
-                logger.info("Start new job from queue")
+                logger.debug("Start new job from queue")
                 start_new_job(queue_file_name, server_dictionary, handle_dictionary)
             else:
                 logger.warning("Some weird case ;/")
             sleep(3)
         else:
             break
-        if loop is False:
+        if not loop:
             break
 
 
@@ -137,10 +138,11 @@ def checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, max_
     no_busy_record_list = sdictionary.get_no_busy_list(server_dictionary)
     for record in no_busy_record_list:
         end_finished_job(record, server_dictionary, handle_dictionary)
+        logger.debug("Finished job: %d", record)
 
 
 def main_checking_loop(queue_file_name, priority_queue_file_name, server_dictionary_file_name,
-                       number_of_free_tl, max_tl_number,server_dictionary, handle_dictionary,
+                       number_of_free_tl, max_tl_number, server_dictionary, handle_dictionary,
                        min_time_to_end, start_reservation_time, max_reservation_time, extend_time):
     if server_dictionary > 0:
         logger.info("Start processes for existing reservations")
@@ -151,10 +153,13 @@ def main_checking_loop(queue_file_name, priority_queue_file_name, server_diction
     while True:
         logger.info("Main checking loop")
         logger.debug("Check TL busy")
-        checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, max_reservation_time,extend_time)
+        checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, max_reservation_time, extend_time)
+        logger.debug("Write server dictionary to file: %s", server_dictionary_file_name)
+        sdictionary.write_dictionary_to_file(server_dictionary_file_name, server_dictionary)
         logger.debug("Check queue")
         checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
                                    server_dictionary, handle_dictionary, start_reservation_time, False)
+        logger.debug("Write server dictionary to file: %s", server_dictionary_file_name)
         sdictionary.write_dictionary_to_file(server_dictionary_file_name, server_dictionary)
         sleep(30)
 
