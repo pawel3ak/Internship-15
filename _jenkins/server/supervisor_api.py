@@ -57,11 +57,12 @@ class Supervisor(object):
             'reservation_data' : self.reservation_data,
             'user_info' : self.user_info
         }
-        print self.parent_dict
+
         return self.parent_dict
 
     def get_jenkins_info(self):
         return self.jenkins_info
+
 
     def get_TLreservationID(self):
         return self.TLreservationID
@@ -101,10 +102,12 @@ class Supervisor(object):
 
     def finish_with_failure(self, test_status = None):
         self.parent_dict[self.serverID]['busy_status'] = False
-        self.send_information(test_status=test_status)
+        if test_status:
+            self.test_end_status = test_status
+        self.send_information(test_status=self.test_end_status)
         sys.exit()
 
-    def create_reservation_and_run_job(self, testline_type=None, enb_build=None, ute_build=None,
+    def create_reservation(self, testline_type=None, enb_build=None, ute_build=None,
                                    sysimage_build=None, robotlte_revision=None,
                                    state=None, duration=None):
 
@@ -147,9 +150,23 @@ class Supervisor(object):
             self.finish_with_failure()
 
     def get_job_status(self):
+        job_status = None
         try:
             job = self.jenkins_info['job_api'].get_job(self.jenkins_info['job_name'])
-            return job.get_last_build().get_status()
+            job_status = job.get_last_build().get_status()
+        except:
+            self.failureStatus = 3
+            self.finish_with_failure()
+        finally:
+            if job_status == "FAILURE":
+                self.finish_with_failure(test_status="UNKNOWN_FAIL")
+            else:
+                return job.get_last_build().get_status()
+
+    def get_is_queue_or_running(self):
+        try:
+            job = self.jenkins_info['job_api'].get_job(self.jenkins_info['job_name'])
+            return job.is_queued_or_running()
         except:
             self.failureStatus = 3
             self.finish_with_failure()
@@ -179,9 +196,10 @@ class Supervisor(object):
     def get_jenkins_console_output(self):
         try:
             job = self.jenkins_info['job_api'].get_job(self.jenkins_info['job_name'])
-            time.sleep(20)      #let the new job build get started
-            while job.get_last_build().get_status() == None:
-                time.sleep(30)      ###############TODO longer sleep on real tests
+            while True:
+                if not self.get_is_queue_or_running(): break
+                else:
+                    time.sleep(2)
             self.jenkins_info['console_output'] = job.get_last_build().get_console()
             return self.jenkins_info['console_output']
         except:
@@ -212,17 +230,21 @@ class Supervisor(object):
             return tests_failed_list_with_dict
 
     def check_if_no_fails(self):
-        output = str(self.jenkins_info['console_output'])
+        output = ""
         try:
-            if not output.find('| FAIL |') == -1:
-                print "znalazlem"
-                return False
+            output = self.jenkins_info['console_output']
         except:
-            try:
-                if not output.find('[ ERROR ]') == -1:
-                    return False
-            except:
-                pass
+            self.finish_with_failure(test_status="UNKNOWN_FAIL")
+
+        if not output.find('| FAIL |') == -1:
+            return False
+        output = output.split('\n')
+        for line in output:
+            if re.findall('\[.ERROR.\].*no tests.*', line):
+                ###mozna zapisac, ze tag ciagle nie zmieniony
+                continue
+            if not line.find('[ ERROR ]') == -1:
+                return False
         return True
 
     def ending(self):
@@ -325,9 +347,7 @@ class Supervisor(object):
                            "Your test have failed: \n\n" \
                            "{test_info}\n\n" \
                            "Logs are available at: {logs_link}\n\n" \
-                           "Have a nice day!".format(f_name=self.user_info['first_name'],
-                                                     l_name=self.user_info['last_name'],
-                                                     test_info=test_info,
+                           "Have a nice day!".format(test_info=test_info,
                                                      logs_link=logs_link)
                 message.append({'message' : _message,
                                 'feature' : test['test_name']})
@@ -347,7 +367,7 @@ class Supervisor(object):
                                                  tl_name=self.TLname,
                                                  logs_link=logs_link)
             message.append({'message' : _message})
-            subject = "Tests status update - finished with fail"
+            subject = "Tests status update - finished with unknown fail"
 
 
 

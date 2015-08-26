@@ -11,17 +11,10 @@ from supervisor_api import Supervisor
 import time
 
 def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None, TLreservationID = None):
-    # print serverID
-    # print reservation_data
-    # print parent_dict
-    # print jenkins_info
-    # print user_info
-    # TLreservationID = 11214
-    #jenkins_info['parameters']['name'] = "LTEXYZ"
     supervisor = Supervisor(serverID, reservation_data, parent_dict, jenkins_info, user_info = user_info, TLreservationID = TLreservationID)
 
     if supervisor.TLreservationID == None:
-        supervisor.TLreservationID = supervisor.create_reservation_and_run_job(
+        supervisor.TLreservationID = supervisor.create_reservation(
             testline_type=reservation_data['testline_type'],
             # reservation_data['enb_build'],
             # reservation_data['ute_build'],
@@ -29,7 +22,7 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
             # reservation_data['robotle_revision'],
             # reservation_data['state'],
             duration=reservation_data['duration'])
-    print supervisor.jenkins_info
+
     if not supervisor.reservation_data['duration']:
         supervisor.failureStatus = 7
         supervisor.finish_with_failure()
@@ -38,7 +31,7 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
     supervisor.get_TLreservationID()
 
     supervisor.set_parent_dict(busy_status=True)
-    # supervisor.reservation_status()
+    supervisor.reservation_status()
     supervisor.set_TLname(supervisor.get_TLname_from_ID())
     supervisor.set_TLaddress(supervisor.get_TLaddress_from_ID())
 
@@ -52,20 +45,18 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
     supervisor.set_parent_dict(busy_status=True)
 
     supervisor.set_job_api()
-    if not supervisor.get_job_status() == None:
+    if not supervisor.get_is_queue_or_running():
         supervisor.create_and_build_job()
-    if not supervisor.get_job_status() == "SUCCESS":
-        supervisor.finish_with_failure(test_status="UNKNOWN_FAIL")
-        return 0
-    supervisor.get_jenkins_console_output()
 
+    supervisor.get_jenkins_console_output()
+    supervisor.get_job_status()
 
     job_tests_parsed_status = supervisor.get_job_tests_status()
     supervisor.set_parent_dict(busy_status=True, job_tests_parsed_status=job_tests_parsed_status)
 
-    supervisor.ending()
-
-
+    print supervisor.ending()
+    print job_tests_parsed_status
+    print supervisor.parent_dict[supervisor.serverID]['test_status']
 
     if supervisor.has_got_fail :
         for test in supervisor.parent_dict[supervisor.serverID]['test_status']:
