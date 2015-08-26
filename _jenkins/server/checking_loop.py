@@ -11,7 +11,7 @@ from time import sleep
 from threading import Thread
 import os
 import logging
-
+import pexpect
 import reservation_queue as queue
 import supervisor
 import sdictionary
@@ -29,6 +29,16 @@ def get_catalog_list(directory):
 
 
 def make_queue_from_test(queue_file, directory, max_reservation_time):
+    logger.debug("Repository update")
+    updating_bash = pexpect.spawn("/bin/bash")
+    updating_bash.sendline("cd ~/auto/ruff_scripts")
+    updating_bash.sendline("git pull")
+    try:
+        i = updating_bash.expect(["Already up-to-date", "remote"])
+        if i == 1:
+            updating_bash.expect("auto/ruff_scripts$", timeout=60)
+    except pexpect.TIMEOUT:
+        logger.error("Repository update - fail - timeout")
     logger.debug("Make new queue")
     directory_list = get_catalog_list(directory)
     for direct in directory_list:

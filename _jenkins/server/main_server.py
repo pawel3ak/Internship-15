@@ -52,8 +52,16 @@ file_handler = logging.handlers.TimedRotatingFileHandler(filename='logs/server.l
                                                          backupCount=30)
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(formatter)
+
+file_handler2 = logging.handlers.TimedRotatingFileHandler(filename='logs/server_info.log',
+                                                         when='midnight',
+                                                         interval=1,
+                                                         backupCount=30)
+file_handler2.setLevel(logging.INFO)
+file_handler2.setFormatter(formatter)
 # add handler to the logger
 logger.addHandler(file_handler)
+logger.addHandler(file_handler2)
 
 
 def response(connect, message, queue_file_name, priority_queue_file_name, server_dictionary):
