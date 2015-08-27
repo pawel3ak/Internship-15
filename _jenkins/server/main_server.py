@@ -57,9 +57,9 @@ file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(formatter)
 
 file_handler2 = logging.handlers.TimedRotatingFileHandler(filename='logs/server_info.log',
-                                                         when='midnight',
-                                                         interval=1,
-                                                         backupCount=30)
+                                                          when='midnight',
+                                                          interval=1,
+                                                          backupCount=30)
 file_handler2.setLevel(logging.INFO)
 file_handler2.setFormatter(formatter)
 # add handler to the logger
@@ -150,7 +150,7 @@ def main_server():
     max_testline = MAX_TL
     queue_file_name = FILE_DIRECTORY + "/" + args.file
     priority_queue_file_name = FILE_DIRECTORY + "/" + args.priority
-    server_dictionary_file_name =  FILE_DIRECTORY + "/" + SERVER_DICTIONARY_FILE_NAME
+    server_dictionary_file_name = FILE_DIRECTORY + "/" + SERVER_DICTIONARY_FILE_NAME
 
     # create files and directories if not exist
     logger.debug("Checking if necessary directories and files exist")

@@ -58,7 +58,7 @@ def start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_
         logger.debug("Get reservation from queue")
         request = queue.read_next_from_queue(queue_file)
         queue.delete_reservation_from_queue(queue_file, request["serverID"], request["password"])
-    logger.info("Start new thread supervisor.main for serverID: %d, reservationID: %d", int(request["serverID"]), reservation_id)
+    logger.info("Start new thread supervisor.main for serverID: %d", int(request["serverID"]))
     thread = Thread(target=supervisor.main, args=[request["serverID"],
                                                   request["reservation_data"],
                                                   server_dictionary,
@@ -141,15 +141,28 @@ def checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, max_
         logger.debug("Finished job: %d", record)
 
 
+def delete_done_reservation_from_dictionary(dictionary):
+    temp = []
+    for record in dictionary:
+        test_reservation = TestLineReservation(dictionary[record]["reservationID"])
+        if test_reservation.get_reservation_details()["status"] > 3:
+            temp.append(record)
+    for record in temp:
+        del dictionary[record]
+
+
 def main_checking_loop(queue_file_name, priority_queue_file_name, server_dictionary_file_name,
                        number_of_free_tl, max_tl_number, server_dictionary, handle_dictionary,
                        min_time_to_end, start_reservation_time, max_reservation_time, extend_time):
-    if server_dictionary > 0:
+    if len(server_dictionary) > 0:
         logger.info("Start processes for existing reservations")
+        delete_done_reservation_from_dictionary(server_dictionary)
         for record in server_dictionary:
             start_new_job(queue_file_name, server_dictionary, handle_dictionary,
                           server_dictionary[record]["reservationID"],
                           dict(server_dictionary[record].items() + {"serverID": int(record)}.items()))
+        logger.debug("Write server dictionary to file: %s", server_dictionary_file_name)
+        sdictionary.write_dictionary_to_file(server_dictionary_file_name, server_dictionary)
     while True:
         logger.info("Main checking loop")
         logger.debug("Check TL busy")
