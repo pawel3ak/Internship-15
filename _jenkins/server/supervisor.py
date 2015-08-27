@@ -58,7 +58,7 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
     print job_tests_parsed_status
 
     if supervisor.has_got_fail :
-        supervisor.remove_tag_from_file(old_tag='tescik')
+        supervisor.remove_tag_from_file(old_tag='enable')
 
     supervisor.send_information()
 
@@ -89,12 +89,12 @@ if __name__ == '__main__':
         i+=1
         print '\'{}\' : {},'.format(dir, lista[dir])
     '''
-    dir = 'LTEXYZ'
-    # i = 0
+    dir = 'LTEXYZ-new'
+    i = 0
     # k = 0
-    # for dir in dir_list:
-    if True:
-        thread1 = Thread(target=main, args=[0,
+    for dir in dir_list:
+    # if True:
+        thread1 = Thread(target=main, args=[i,
             {
                 'testline_type' : 'CLOUD_F',
                 'duration' : 600
@@ -108,7 +108,7 @@ if __name__ == '__main__':
             },
             None,
             68880])
-        # i += 1
+        i += 1
         thread1.start()
 
         # thread2 = Thread(target=main, args=[i,
