@@ -31,7 +31,7 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
     supervisor.get_TLreservationID()
 
     supervisor.set_parent_dict(busy_status=True)
-    supervisor.reservation_status()
+    # supervisor.reservation_status()
     supervisor.set_TLname(supervisor.get_TLname_from_ID())
     supervisor.set_TLaddress(supervisor.get_TLaddress_from_ID())
 
@@ -49,21 +49,16 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
         supervisor.create_and_build_job()
 
     supervisor.get_jenkins_console_output()
-    supervisor.get_job_status()
+    print supervisor.get_job_status()
 
     job_tests_parsed_status = supervisor.get_job_tests_status()
     supervisor.set_parent_dict(busy_status=True, job_tests_parsed_status=job_tests_parsed_status)
 
     print supervisor.ending()
     print job_tests_parsed_status
-    print supervisor.parent_dict[supervisor.serverID]['test_status']
 
     if supervisor.has_got_fail :
-        for test in supervisor.parent_dict[supervisor.serverID]['test_status']:
-            supervisor.remove_tag_from_file(directory=test['test_name'],
-                                            file_name=test['file_name'],
-                                            old_tag= 'enable'
-                                            )
+        supervisor.remove_tag_from_file(old_tag='tescik')
 
     supervisor.send_information()
 
@@ -71,16 +66,84 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
     return 0
 
 if __name__ == '__main__':
-    main(serverID=69,
-         reservation_data={
-             'testline_type' : 'CLOUD_F',
-             'duration' : 600
-         },
-        parent_dict={},
-        jenkins_info={
-            'parameters' :
-                {
-                    'name' : 'LTEXYZ'
-                }
-        },
-        TLreservationID=68880)
+    import os
+    from threading import Thread
+    dir_list = []
+    path = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/'
+    [dir_list.append(dir) for dir in os.listdir(path) if os.path.isdir(os.path.join(path,dir))]
+
+    """ ['LTE1819', 'LTE2351', 'LTE738', 'LTE1841', 'LTE2465', 'CRT', 'LTE1899', 'LTE2209',
+    'LBT1558', 'LTE1905', 'LTE1879', 'LTEXYZ-new', 'LTE2275', 'LTE1638', 'LTEXYZ',
+    'LBT2762_LBT2763', 'LTE1321', 'LTE1509', 'LTE2384', 'LTE2324', 'LTE1536', 'LTE648',
+    'LTE2149', 'LTE1130', 'LTE1731', 'LTE1406', 'SHB', 'LTE1749', 'LTE1569', 'LTE1469',
+    'LTE2161', 'LTE2014', 'LBT2989', 'LTE825', 'LBT2180', 'LTE2302']"""
+
+    '''
+    lista = {}
+    i=0
+    for dir in dir_list:
+        if i%2 == 0:
+            lista[dir] = ['damian.papiez@nokia.com']
+        else:
+            lista[dir] = ['pawel.nogiec@nokia.com']
+        i+=1
+        print '\'{}\' : {},'.format(dir, lista[dir])
+    '''
+    dir = 'LTEXYZ'
+    # i = 0
+    # k = 0
+    # for dir in dir_list:
+    if True:
+        thread1 = Thread(target=main, args=[0,
+            {
+                'testline_type' : 'CLOUD_F',
+                'duration' : 600
+            },
+            {},
+            {
+                'parameters' :
+                    {
+                        'name' : dir
+                    }
+            },
+            None,
+            68880])
+        # i += 1
+        thread1.start()
+
+        # thread2 = Thread(target=main, args=[i,
+        #     {
+        #         'testline_type' : 'CLOUD_F',
+        #         'duration' : 600
+        #     },
+        #     {},
+        #     {
+        #         'parameters' :
+        #             {
+        #                 'name' : dir
+        #             }
+        #     },
+        #     None,
+        #     68880])
+        # thread2.start()
+
+        thread1.join(timeout=None)
+        # thread2.join(timeout=None)
+        # i += 1
+
+    '''
+        main(serverID=69,
+            reservation_data={
+                'testline_type' : 'CLOUD_F',
+                'duration' : 600
+            },
+            parent_dict={},
+            jenkins_info={
+                'parameters' :
+                    {
+                        'name' : dir
+                    }
+            },
+            TLreservationID=68880)
+
+    '''

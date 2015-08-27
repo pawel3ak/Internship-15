@@ -159,7 +159,9 @@ class Supervisor(object):
             self.finish_with_failure()
         finally:
             if job_status == "FAILURE":
-                self.finish_with_failure(test_status="UNKNOWN_FAIL")
+                self.has_got_fail = False
+                self.ending()
+                # self.finish_with_failure(test_status="UNKNOWN_FAIL")
             else:
                 return job.get_last_build().get_status()
 
@@ -260,31 +262,55 @@ class Supervisor(object):
             self.has_got_fail = True
         return self.test_end_status
 
-    def remove_tag_from_file(self, directory, file_name, old_tag, new_tag = ''):
+    def remove_tag_from_file(self, old_tag = 'enable', new_tag = ''):
         client = paramiko.SSHClient()
         client.load_system_host_keys()
         client.set_missing_host_key_policy(paramiko.WarningPolicy)
         client.connect(self.get_TLaddress(), username='ute', password='ute')
         sftp = client.open_sftp()
-        path = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}/tests/'.format(directory)
-        try:
-            files = sftp.listdir(path=path)
-            found = False
-            for file in range(0,len(files)):
-                try:
-                    file_name = re.search('({name}.*)'.format(name=file_name),files[file]).groups()[0]
-                    found = True
-                    print file_name
-                    break
-                except:
-                    pass
-            if not found:
-                self.failureStatus = 4
-                self.finish_with_failure()
+        additional_directory_list =[]
+        files_names_list =[]
+        path = None
+        file_name = None
+        for test in self.parent_dict[self.serverID]['test_status']:
+            try:
+                more_informations = re.search('({}.*)\.({}.*)'.format(test['test_name'],test['test_name']),
+                                                test['file_name']).groups()
+                additional_directory_list.append(more_informations[0])
+                files_names_list.append(more_informations[1])
+            except:
+                files_names_list.append(test['file_name'])
+                additional_directory_list.append('')
 
+        for i in range(0,len(files_names_list)):
+            if additional_directory_list[i] == '':
+                path = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}/tests/'.format(
+                    self.parent_dict[self.serverID]['test_status'][i]['test_name'])
+
+            else:
+                path = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}/tests/{}'.format(
+                    self.parent_dict[self.serverID]['test_status'][i]['test_name'],
+                    additional_directory_list[i])
+            try:
+                files = sftp.listdir(path=path)
+                found = False
+                for file in files:
+                    try:
+                        file_name = re.search('({name}.*)'.format(name=files_names_list[i]),file).groups()[0]
+                        found = True
+                        self.parent_dict[self.serverID]['test_status'][i]['file_name'] = file_name
+                        #print file_name
+                        break
+                    except:
+                        pass
+                if not found:
+                    self.failureStatus = 4
+                    # self.finish_with_failure(test_status="FAILED2")
+            except:
+                pass
+        try:
             file = sftp.open(os.path.join(path,file_name), 'r')
             lines_in_file = file.readlines()
-
             found = False
             for line in range(0, len(lines_in_file)):
                 try:
@@ -298,14 +324,14 @@ class Supervisor(object):
                     pass
             if not found:
                 self.failureStatus = 5
-                self.finish_with_failure()
+                # self.finish_with_failure()
             file.close()
             file = sftp.open(os.path.join(path,file_name), 'w')
             file.writelines(lines_in_file)
             file.close()
         except:
             self.failureStatus = 6
-            self.finish_with_failure()
+            # self.finish_with_failure()
         finally:
             self.test_end_status = "Failed"
             client.close()
@@ -338,19 +364,21 @@ class Supervisor(object):
             t = job.get_last_build().get_timestamp()
             build_time = '{}-{:02g}-{:02g}_{:02g}-{:02g}-{:02g}'.format(t.year, t.month, t.day, (t.hour-(time.altzone/3600)), t.minute, t.second)
             logs_link = 'http://10.83.200.35/~ltebox/logs/{}_{}/log.html'.format(self.TLname, build_time)
+            test_info = ''
+            print "test_status = ", self.parent_dict[self.serverID]['test_status']
 
             for test in self.parent_dict[self.serverID]['test_status']:
-                test_info = "Test = {test_name}.{file_name}\n".format(
+                test_info += "Test = {test_name}.{file_name}\n".format(
                     test_name=test['test_name'],
                     file_name=test['file_name'])
-                _message = "Dear tester! \n\n" \
-                           "Your test have failed: \n\n" \
-                           "{test_info}\n\n" \
-                           "Logs are available at: {logs_link}\n\n" \
-                           "Have a nice day!".format(test_info=test_info,
-                                                     logs_link=logs_link)
-                message.append({'message' : _message,
-                                'feature' : test['test_name']})
+            _message = "Dear tester! \n\n" \
+                        "Your test have failed: \n\n" \
+                        "{test_info}\n\n" \
+                        "Logs are available at: {logs_link}\n\n" \
+                        "Have a nice day!".format(test_info=test_info,
+                                                  logs_link=logs_link)
+            message.append({'message' : _message,
+                            'feature' : self.parent_dict[self.serverID]['test_status'][0]['test_name']})
             subject = "Tests status update - finished with fail"
 
 
