@@ -16,6 +16,7 @@ import logging
 import logging.handlers
 from threading import Thread
 from multiprocessing import Manager
+from time import sleep
 import tl_reservation
 import sdictionary
 import reservation_queue as queue
@@ -39,7 +40,7 @@ EXTEND_TIME = 2     # extend time
 
 
 # create logger
-logger = logging.getLogger("Dispatcher")
+logger = logging.getLogger("server")
 logger.setLevel(logging.DEBUG)
 # create formatter
 formatter = logging.Formatter('%(asctime)s %(levelname)8s: %(name)30s - %(funcName)30s:     %(message)s',
@@ -73,10 +74,10 @@ def response(connect, message, queue_file_name, priority_queue_file_name, server
         _get_available_tl_count(connect)
     elif message == "request/get_info":
         _get_tests_info(connect, server_dictionary, _specific=True)
-
     elif message == "request/get_all":
         _get_tests_info(connect, server_dictionary)
     else:
+        logger.debug("Wrong command from client - send response and close connection")
         connect.send("Wrong command")
         connect.close()
 
@@ -85,41 +86,51 @@ def _get_tests_info(connect, parent_dict, _specific=None):
     connect.send("OK")
     string_to_send = str(parent_dict)
     if _specific:
+        logger.debug("Get data from client")
         data = connect.recv(1024).strip()
         try:
             string_to_send = str(parent_dict[int(data)])
         except:
             string_to_send = "No information about requested serverID"
+            logger.debug("Wrong server ID from client")
+    logger.debug("Send response and close connection")
     connect.send(string_to_send)
     connect.close()
 
 
 def _get_available_tl_count(connect):
     testline_handle = tl_reservation.TestLineReservation()
+    logger.debug("Send response and close connection")
     connect.send(str((testline_handle.get_available_tl_count_group_by_type())['CLOUD_F']))
     connect.close()
 
 
 def new_request(connect, queue_file_name, priority_queue_file_name, server_dictionary):
     connect.send("OK")
+    logger.debug("Get data from client")
     data = connect.recv(1024).strip()
     request = json.loads(data)
     request['serverID'] = queue.get_server_id_number()
     request['password'] = queue.generate_password()
     if request['priority'] == 0:
         request.pop('priority')
+        logger.debug("Save client request to queue")
         queue.write_to_queue(queue_file_name, request)
     elif request['priority'] == 1:
         request.pop('priority')
+        logger.debug("Save client request to priority queue")
         queue.write_to_queue(priority_queue_file_name, request)
     '''
     if (queue.check_queue_length(queue_file_name) == 1) or (queue.check_queue_length(priority_queue_file_name) == 1):
         checking_reservation_queue(queue_file_name, priority_queue_file_name, server_dictionary, False)
     '''
+    logger.debug("Close connection")
     connect.close()
 
 
 def main_server():
+    logger.info("Start server configuration")
+    logger.debug("Parsing arguments")
     parser = argparse.ArgumentParser(argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-a', '--host', default=HOST_IP,
                         help='set IP addres for server')
@@ -141,14 +152,27 @@ def main_server():
     priority_queue_file_name = FILE_DIRECTORY + "/" + args.priority
     server_dictionary_file_name =  FILE_DIRECTORY + "/" + SERVER_DICTIONARY_FILE_NAME
 
-    # create files directory if not exist
+    # create files and directories if not exist
+    logger.debug("Checking if necessary directories and files exist")
+    # files directory
     if not os.path.isdir(FILE_DIRECTORY):
+        logger.debug("Create %s directory", FILE_DIRECTORY)
         os.makedirs(FILE_DIRECTORY)
-
-    # create files if not exist
-    logger.debug("Create servers files")
-    queue.create_file(queue_file_name)
-    queue.create_file(priority_queue_file_name)
+    # queue file
+    if not os.path.exists(queue_file_name):
+        logger.debug("Crate file: %s", queue_file_name)
+        queue.create_file(queue_file_name)
+    # priority queue file
+    if not os.path.exists(priority_queue_file_name):
+        logger.debug("Crate file: %s", priority_queue_file_name)
+        queue.create_file(priority_queue_file_name)
+    # server dictionary
+    if not os.path.exists(server_dictionary_file_name):
+        logger.debug("Crate file: %s", server_dictionary_file_name)
+        sdictionary.create_file(server_dictionary_file_name)
+    else:
+        logger.debug("Load server dictionary from file: %s", server_dictionary_file_name)
+        server_dict = sdictionary.get_dictionary_from_file(server_dictionary_file_name)
 
     # create server and process dictionary
     logger.debug("Create servers dictionaries")
@@ -158,12 +182,8 @@ def main_server():
     handle_dict = man.dict()
     handle_dict = {}
 
-    # create file for server dictionary if not exist and read if exist
-    sdictionary.create_file(server_dictionary_file_name)
-    server_dict = sdictionary.get_dictionary_from_file(server_dictionary_file_name)
-
     # set up server
-    logger.debug("Set up server")
+    logger.debug("Set up server config")
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((host, port))
@@ -176,14 +196,14 @@ def main_server():
                                                      START_RESERVATION_TIME, MAX_RESERVATION_TIME, EXTEND_TIME])
     thread.daemon = True
     thread.start()
-    from time import sleep
+
     sleep(20)
     # main server loop
     logger.info("Start server loop - waiting for request")
     while True:
         connect, address = sock.accept()
         data = connect.recv(1024).strip()
-        logger.debug("New request")
+        logger.debug("New request: %s", data)
         if data == "KONIEC":
             break
         response(connect, data, queue_file_name, priority_queue_file_name, server_dict)

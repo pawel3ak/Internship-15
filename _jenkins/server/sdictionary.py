@@ -10,7 +10,7 @@ import json
 import logging
 
 
-logger = logging.getLogger("Dispatcher." + __name__)
+logger = logging.getLogger("server." + __name__)
 
 
 # update record in dictionary
@@ -53,7 +53,11 @@ def get_busy_list(dictionary):
     for record in dictionary:
         if dictionary[record]['busy_status']:
             record_list.append(record)
+            logger.debug("reservation %d - busy", dictionary[record]['reservationID'])
+        else:
+            logger.debug("reservation %d - no busy", dictionary[record]['reservationID'])
     return record_list
+
 
 
 def create_file(new_file):
