@@ -265,7 +265,7 @@ class Supervisor(object):
     def remove_tag_from_file(self, old_tag = 'enable', new_tag = ''):
         client = paramiko.SSHClient()
         client.load_system_host_keys()
-        client.set_missing_host_key_policy(paramiko.WarningPolicy)
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         client.connect(self.get_TLaddress(), username='ute', password='ute')
         sftp = client.open_sftp()
         additional_directory_list =[]
