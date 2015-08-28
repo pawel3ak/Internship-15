@@ -30,7 +30,7 @@ LOG_DIRECTORY = "logs"
 QUEUE_FILE_NAME = "reservation_queue"
 PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
 SERVER_DICTIONARY_FILE_NAME = "server_dictionary_file"
-FREE_TL = 1     # free tl number for users reservations
+FREE_TL = -1     # free tl number for users reservations
 MAX_TL = 1      # max tl number which server can reserve
 # time in hour
 MIN_TIME_TO_END = 1     # min time when we can make a new task on tl
@@ -152,6 +152,14 @@ def main_server():
     priority_queue_file_name = FILE_DIRECTORY + "/" + args.priority
     server_dictionary_file_name = FILE_DIRECTORY + "/" + SERVER_DICTIONARY_FILE_NAME
 
+    # create server and process dictionary
+    logger.debug("Create servers dictionaries")
+    man = Manager()
+    server_dict = man.dict()
+    server_dict = {}
+    handle_dict = man.dict()
+    handle_dict = {}
+
     # create files and directories if not exist
     logger.debug("Checking if necessary directories and files exist")
     # files directory
@@ -173,14 +181,6 @@ def main_server():
     else:
         logger.debug("Load server dictionary from file: %s", server_dictionary_file_name)
         server_dict = sdictionary.get_dictionary_from_file(server_dictionary_file_name)
-
-    # create server and process dictionary
-    logger.debug("Create servers dictionaries")
-    man = Manager()
-    server_dict = man.dict()
-    server_dict = {}
-    handle_dict = man.dict()
-    handle_dict = {}
 
     # set up server
     logger.debug("Set up server config")

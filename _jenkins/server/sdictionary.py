@@ -78,5 +78,5 @@ def get_dictionary_from_file(file_name):
             open_file.seek(0, 0)
             temp_dictionary = json.load(open_file)
     for record in temp_dictionary:
-            dictionary[int(record)] = temp_dictionary[record]
+        dictionary[int(record)] = temp_dictionary[record]
     return dictionary

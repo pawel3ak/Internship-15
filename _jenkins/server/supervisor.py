@@ -89,11 +89,11 @@ if __name__ == '__main__':
         i+=1
         print '\'{}\' : {},'.format(dir, lista[dir])
     '''
-    dir = 'LTEXYZ-new'
+    dir = 'LTE2351'
     i = 0
     # k = 0
-    for dir in dir_list:
-    # if True:
+    # for dir in dir_list:
+    if True:
         thread1 = Thread(target=main, args=[i,
             {
                 'testline_type' : 'CLOUD_F',
