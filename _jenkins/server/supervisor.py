@@ -7,7 +7,8 @@
 :contact: pawel.nogiec@nokia.com
 """
 
-from supervisor_api import Supervisor
+from supervisor_api import Supervisor, logger
+from messages_logger import EXCEPTIONS_INFO
 import time
 
 def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None, TLreservationID = None):
@@ -23,15 +24,12 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
             # reservation_data['state'],
             duration=reservation_data['duration'])
 
-    if not supervisor.reservation_data['duration']:
-        supervisor.failureStatus = 7
-        supervisor.finish_with_failure()
     print supervisor.TLreservationID
     time.sleep(2)
     supervisor.get_TLreservationID()
 
     supervisor.set_parent_dict(busy_status=True)
-    # supervisor.reservation_status()
+    supervisor.reservation_status()
     supervisor.set_TLname(supervisor.get_TLname_from_ID())
     supervisor.set_TLaddress(supervisor.get_TLaddress_from_ID())
 
@@ -58,13 +56,14 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
     print job_tests_parsed_status
 
     if supervisor.has_got_fail :
-        supervisor.remove_tag_from_file(old_tag='enable')
+        supervisor.remove_tag_from_file()
 
     supervisor.send_information()
 
     supervisor.set_parent_dict(busy_status=False, job_tests_parsed_status=job_tests_parsed_status)
     return 0
 
+'''
 if __name__ == '__main__':
     import os
     from threading import Thread
@@ -78,22 +77,11 @@ if __name__ == '__main__':
     'LTE2149', 'LTE1130', 'LTE1731', 'LTE1406', 'SHB', 'LTE1749', 'LTE1569', 'LTE1469',
     'LTE2161', 'LTE2014', 'LBT2989', 'LTE825', 'LBT2180', 'LTE2302']"""
 
-    '''
-    lista = {}
-    i=0
-    for dir in dir_list:
-        if i%2 == 0:
-            lista[dir] = ['damian.papiez@nokia.com']
-        else:
-            lista[dir] = ['pawel.nogiec@nokia.com']
-        i+=1
-        print '\'{}\' : {},'.format(dir, lista[dir])
-    '''
-    dir = 'LTEXYZ-new'
+
+
+
     i = 0
-    # k = 0
     for dir in dir_list:
-    # if True:
         thread1 = Thread(target=main, args=[i,
             {
                 'testline_type' : 'CLOUD_F',
@@ -110,40 +98,7 @@ if __name__ == '__main__':
             68880])
         i += 1
         thread1.start()
+        thread1.join()
 
-        # thread2 = Thread(target=main, args=[i,
-        #     {
-        #         'testline_type' : 'CLOUD_F',
-        #         'duration' : 600
-        #     },
-        #     {},
-        #     {
-        #         'parameters' :
-        #             {
-        #                 'name' : dir
-        #             }
-        #     },
-        #     None,
-        #     68880])
-        # thread2.start()
 
-        thread1.join(timeout=None)
-        # thread2.join(timeout=None)
-        # i += 1
-
-    '''
-        main(serverID=69,
-            reservation_data={
-                'testline_type' : 'CLOUD_F',
-                'duration' : 600
-            },
-            parent_dict={},
-            jenkins_info={
-                'parameters' :
-                    {
-                        'name' : dir
-                    }
-            },
-            TLreservationID=68880)
-
-    '''
+'''
