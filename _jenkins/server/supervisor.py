@@ -8,12 +8,11 @@
 """
 
 from supervisor_api import Supervisor, logger
-from messages_logger import EXCEPTIONS_INFO
 import time
 
 def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None, TLreservationID = None):
     supervisor = Supervisor(serverID, reservation_data, parent_dict, jenkins_info, user_info = user_info, TLreservationID = TLreservationID)
-
+    supervisor.set_parent_dict(busy_status=True)
     if supervisor.TLreservationID == None:
         supervisor.TLreservationID = supervisor.create_reservation(
             testline_type=reservation_data['testline_type'],

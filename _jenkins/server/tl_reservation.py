@@ -36,14 +36,14 @@ class TestLineReservation(CloudReservationApi):
     def create_reservation(self, testline_type=None, enb_build=None, ute_build=None,
                            sysimage_build=None, robotlte_revision=None, state=None, duration=None):
         if self.reservation_data['id'] is not None:
-            print 'Reservation is already created'
+            # print 'Reservation is already created'
             return -102
         try:
             self.__set_id(super(TestLineReservation, self).create_reservation(testline_type, enb_build, ute_build,
                                                                               sysimage_build, robotlte_revision, state, duration))
             return self.get_id()
         except ApiMaxReservationCountExceededException:
-            print 'User max reservation count exceeded'
+            # print 'User max reservation count exceeded'
             return -103  # User max reservation count exceeded
 
     def get_reservation_status(self):
@@ -74,11 +74,18 @@ class TestLineReservation(CloudReservationApi):
 if __name__ == '__main__':
     print 'abc'
     #9:47 (11:47)
-    reservation = TestLineReservation(67221)
+    # for i in range(68600,69200):
+    #69459.69460, 69482
+    reservation = TestLineReservation(68765)
     # print reservation.get_available_tl_count_group_by_type()
     # reservation = TestLineReservation(66567)
     # reservation = TestLineReservation(66626)
-    # print reservation.create_reservation(testline_type="CLOUD_F", duration=600)
+    # id = reservation.create_reservation(testline_type="CLOUD_F", duration=600)
+    # if id == -103:
+    #     print "max user"
+    # if not isinstance(id, int):
+    #     print "max user"
+    #     if reservation.get_reservation_details()['user'] == 'app_lmts':
     print reservation.get_address()
     print reservation.get_reservation_status()
     print reservation.get_reservation_details()

@@ -131,11 +131,11 @@ class Supervisor(object):
         if self.TLreservationID == -103:
             self.failureStatus = 1
             logger.warning('{}'.format(EXCEPTIONS_INFO[self.failureStatus]))
-            self.finish_with_failure()
+            self.finish_with_failure(test_status="PASS")
         elif self.TLreservationID == -102:
             self.failureStatus = 2
             logger.warning('{}'.format(EXCEPTIONS_INFO[self.failureStatus]))
-            self.finish_with_failure()
+            self.finish_with_failure(test_status="PASS")
         else:
             return self.TLreservationID
 
