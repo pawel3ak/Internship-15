@@ -58,7 +58,7 @@ def start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_
         logger.debug("Get reservation from queue")
         request = queue.read_next_from_queue(queue_file)
         queue.delete_reservation_from_queue(queue_file, request["serverID"], request["password"])
-    logger.info("Start new thread supervisor.main for serverID: %d", int(request["serverID"]))
+    logger.info("Start new thread supervisor.main for serverID: {} reservationID: {}".format(request["serverID"], reservation_id))
     thread = Thread(target=supervisor.main, args=[request["serverID"],
                                                   request["reservation_data"],
                                                   server_dictionary,
@@ -76,8 +76,8 @@ def end_finished_job(server_id, server_dictionary, handle_dictionary, remove_tl_
     reservation_tl_id = server_dictionary[server_id]["reservationID"]
     logger.debug("Checking is thread is end for serverID: %d", server_id)
     handle_dictionary[server_id].join()
-    if remove_tl_reservation:
-        logger.info("End reservation with ID: %d", reservation_tl_id)
+    if remove_tl_reservation & (reservation_tl_id is not None):
+        logger.info("End reservation with ID: {}".format(reservation_tl_id))
         tl_reservation = TestLineReservation(reservation_tl_id)
         tl_reservation.release_reservation()
     logger.debug("Remove record from the dictionaries")

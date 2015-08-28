@@ -42,9 +42,9 @@ def get_no_busy_list(dictionary):
     for record in dictionary:
         if not dictionary[record]['busy_status']:
             record_list.append(record)
-            logger.debug("reservation %d - no busy", dictionary[record]['reservationID'])
+            logger.debug("reservation {} - no busy".format(dictionary[record]['reservationID']))
         else:
-            logger.debug("reservation %d - busy", dictionary[record]['reservationID'])
+            logger.debug("reservation {} - busy".format(dictionary[record]['reservationID']))
     return record_list
 
 
@@ -53,9 +53,9 @@ def get_busy_list(dictionary):
     for record in dictionary:
         if dictionary[record]['busy_status']:
             record_list.append(record)
-            logger.debug("reservation %d - busy", dictionary[record]['reservationID'])
+            logger.debug("reservation {} - busy".format(dictionary[record]['reservationID']))
         else:
-            logger.debug("reservation %d - no busy", dictionary[record]['reservationID'])
+            logger.debug("reservation {} - no busy".format(dictionary[record]['reservationID']))
     return record_list
 
 
@@ -78,5 +78,6 @@ def get_dictionary_from_file(file_name):
             open_file.seek(0, 0)
             temp_dictionary = json.load(open_file)
     for record in temp_dictionary:
-        dictionary[int(record)] = temp_dictionary[record]
+        if temp_dictionary[record]['reservationID'] is not None:
+            dictionary[int(record)] = temp_dictionary[record]
     return dictionary
