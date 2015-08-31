@@ -75,7 +75,7 @@ if __name__ == '__main__':
     print 'abc'
     #9:47 (11:47)
     # for i in range(68600,69200):
-    reservation = TestLineReservation(68765)
+    reservation = TestLineReservation(70210)
     # print reservation.get_available_tl_count_group_by_type()
     # reservation = TestLineReservation(66567)
     # reservation = TestLineReservation(66626)
@@ -85,10 +85,10 @@ if __name__ == '__main__':
     # if not isinstance(id, int):
     #     print "max user"
     #     if reservation.get_reservation_details()['user'] == 'app_lmts':
-    print reservation.get_address()
-    print reservation.get_reservation_status()
-    print reservation.get_reservation_details()
-    # print reservation.release_reservation()
     # print reservation.get_address()
-    # print reservation.get_reservation_status()
+    print reservation.get_reservation_status()
+    # print reservation.get_reservation_details()
+    print reservation.release_reservation()
+    # print reservation.get_address()
+    print reservation.get_reservation_status()
     # print reservation.get_reservation_details()

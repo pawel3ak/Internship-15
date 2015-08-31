@@ -473,5 +473,5 @@ class Supervisor(object):
             send.connect()
             send.send(mail)
 
-    def git_launch(self, file_info=None, pull_only=False):
-        git_launch(TL_address=self.TLaddress, file_info=file_info, pull_only=pull_only)
+    def git_launch(self, file_info=None, pull_only=None):
+        return git_launch(TL_address=self.TLaddress, file_info=file_info, pull_only=pull_only)

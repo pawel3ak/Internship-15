@@ -54,13 +54,27 @@ def main():
                         help='set IP addres for server')
     parser.add_argument('-p', '--port', type=int, default=HOST_PORT,
                         help='set port number for server')
+    parser.add_argument('--info', default='',
+                        help='check informations about given ID')
+    args = parser.parse_args()
+    host = args.host
+    port = args.port
+    info = args.info
+
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect((HOST_IP, HOST_PORT))
-    if len(sys.argv) == 1:
-        get_all(sock)
-    elif len(sys.argv) == 3:
-        if sys.argv[1] == "info":
-            get_info(sock,sys.argv[2])
+    sock.connect((host, port))
+    if info != '':
+        if info == 'all':
+            get_all(sock)
+        else:
+            try:
+                info = int(info)
+                get_info(sock,info)
+            except:
+                pass
+    # elif len(sys.argv) == 3:
+    #     if sys.argv[1] == "info":
+    #         get_info(sock,sys.argv[2])
 
 if __name__ == '__main__':
     main()

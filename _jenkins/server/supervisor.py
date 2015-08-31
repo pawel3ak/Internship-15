@@ -28,7 +28,7 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
     supervisor.get_TLreservationID()
 
     supervisor.set_parent_dict(busy_status=True)
-    supervisor.reservation_status()
+    # supervisor.reservation_status()
     supervisor.set_TLname(supervisor.get_TLname_from_ID())
     supervisor.set_TLaddress(supervisor.get_TLaddress_from_ID())
 
@@ -41,10 +41,10 @@ def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None
 
     supervisor.set_parent_dict(busy_status=True)
 
-    supervisor.git_launch(pull_only=True)
+    print supervisor.git_launch(pull_only=True)
 
 
-    supervisor.git_launch()
+
     supervisor.set_job_api()
     if not supervisor.get_is_queue_or_running():
         supervisor.create_and_build_job()
