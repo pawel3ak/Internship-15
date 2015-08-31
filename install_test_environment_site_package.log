@@ -1,0 +1,228 @@
+running develop
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_wmp_legacy/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-wmp-legacy>=1.9 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_dev_wro1/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-dev-wro1>=1.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_testline_configuration/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-testline-configuration>=0.3.1 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_pdu/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-pdu>=1.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_leo_opt_sw/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-leo-opt-sw>=1.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_wmp_alarm_checker/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-wmp-alarm-checker>=1.0.17 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_dcm_pybot_rp/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-dcm-pybot-rp>=1.1 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_dcm_mmt_heartbeat/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-dcm-mmt-heartbeat>=1.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_dcm_aatrace/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-dcm-aatrace>=1.1 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_dcm_ttitrace/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-dcm-ttitrace>=1.2 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_dcm_sw_manager/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-dcm-sw-manager>=1.4 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_dcm_dct_config/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-dcm-dct-config>=1.1 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_dcm_dct/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-dcm-dct>=1.1 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_tti_trace_analyzer/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-tti-trace-analyzer>=1.2 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_dcm_ttitrace_parser/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-dcm-ttitrace-parser>=1.2 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_async/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-async>=1.1.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_aatrace/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-aatrace>=1.1.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_kpi_pm_report_analyzer/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-kpi-pm-report-analyzer>=1.1.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ta_pdml/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ta-pdml>=1.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ute_sdata/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ute-sdata>=1.7 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ute_epcsim/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ute-epcsim>=0.1 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ruff/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ruff>=0.9.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/memorystats/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: memorystats>=1.0.1 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+[33mhttp://pypi.ute.inside.nsn.com:25102/paramiko/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: paramiko in /home/ute/virtualenvs/ute/lib/python2.7/site-packages (from memorystats>=1.0.1)
+[33mhttp://pypi.ute.inside.nsn.com:25102/configobj/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: configobj>=4.7.2 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages (from memorystats>=1.0.1)
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/matplotlib/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: matplotlib in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/robotframework/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: robotframework>=2.8.5 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/robotframework-ftplibrary/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: robotframework-ftplibrary>=1.2 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/robotframework-archivelibrary/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: robotframework-archivelibrary in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+[33mhttp://pypi.ute.inside.nsn.com:25102/robotframework/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: robotframework in /home/ute/virtualenvs/ute/lib/python2.7/site-packages (from robotframework-archivelibrary)
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/robotframework-requests/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: robotframework-requests in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+[33mhttp://pypi.ute.inside.nsn.com:25102/robotframework/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: robotframework in /home/ute/virtualenvs/ute/lib/python2.7/site-packages (from robotframework-requests)
+[33mhttp://pypi.ute.inside.nsn.com:25102/requests/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: requests in /home/ute/virtualenvs/ute/lib/python2.7/site-packages (from robotframework-requests)
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0mDownloading/unpacking ute-test-framework from svn+https://ca_ute_test:utetest@svne1.access.nsn.com/isource/svnroot/utelibs/ute_test_framework/trunk/
+  Checking out https://ca_ute_test:utetest@svne1.access.nsn.com/isource/svnroot/utelibs/ute_test_framework/trunk/ to /tmp/ute/build/88f67b7614e7817635cb7cb63d95d3b6/ute-test-framework
+  Running setup.py (path:/tmp/ute/build/88f67b7614e7817635cb7cb63d95d3b6/ute-test-framework/setup.py) egg_info for package ute-test-framework
+    
+Installing collected packages: ute-test-framework
+  Found existing installation: ute-test-framework 1.91
+    Uninstalling ute-test-framework:
+      Successfully uninstalled ute-test-framework
+  Running setup.py install for ute-test-framework
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_tshark/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-tshark>=1.1.2 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_infomodel/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-infomodel>=1.27 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_wtssim/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-wtssim>=1.5.7 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_reporting_portal/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-reporting-portal>=4.9.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_fault/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-fault>=1.5.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_code_test/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-code-test>=1.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_btssm/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-btssm>=1.13.1 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_syslog/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-syslog>=2.0.11 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_fsmaccess/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-fsmaccess>=1.6.2 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_pdu/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-pdu>=1.1.1 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_testline_configuration/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-testline-configuration>=1.3.1 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_common_util/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-common-util>=1.1.1 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_common_bts/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-common-bts>=1.3.2 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_common_converter/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-common-converter>=1.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_common_store/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-common-store>=1.2.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_common_validator/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-common-validator>=1.1 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_common_config/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-common-config>=1.1.1 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_script/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-script>=1.0.2 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/ute_core/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: ute-core>=1.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/requests/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: requests>=2.2.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    DEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+    http://pypi.ute.inside.nsn.com:25102/mock/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+    Requirement already up-to-date: mock>=1.0.1 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+    Cleaning up...
+    
+Successfully installed ute-test-framework
+Cleaning up...
+[33mDEPRECATION: --no-install, --no-download, --build, and --no-clean are deprecated.  See https://github.com/pypa/pip/issues/906.
+[0m[33mhttp://pypi.ute.inside.nsn.com:25102/ute_installer/ uses an insecure transport scheme (http). Consider using https if pypi.ute.inside.nsn.com:25102 has it available
+[0mRequirement already up-to-date: ute-installer>=1.0 in /home/ute/virtualenvs/ute/lib/python2.7/site-packages
+Cleaning up...
+running egg_info
+writing robotlte.egg-info/PKG-INFO
+writing top-level names to robotlte.egg-info/top_level.txt
+writing dependency_links to robotlte.egg-info/dependency_links.txt
