@@ -30,8 +30,8 @@ LOG_DIRECTORY = "logs"
 QUEUE_FILE_NAME = "reservation_queue"
 PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
 SERVER_DICTIONARY_FILE_NAME = "server_dictionary_file"
-FREE_TL = -1     # free tl number for users reservations
-MAX_TL = 1      # max tl number which server can reserve
+FREE_TL = 0     # free tl number for users reservations
+MAX_TL = 3      # max tl number which server can reserve
 # time in hour
 MIN_TIME_TO_END = 1     # min time when we can make a new task on tl
 START_RESERVATION_TIME = 2  # reservation duration time
