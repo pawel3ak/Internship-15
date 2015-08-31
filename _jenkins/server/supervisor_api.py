@@ -19,7 +19,7 @@ import paramiko
 import sys
 from mailing_list import mail_dict
 import logging
-from messages_logger import EXCEPTIONS_INFO
+from messages_logger import LOGGER_INFO
 from server_git_api import git_launch
 # create logger
 logger = logging.getLogger("server." + __name__)
@@ -29,8 +29,8 @@ class Supervisor(object):
     def __init__(self, serverID, reservation_data, parent_dict, jenkins_info, user_info=None, TLreservationID=None):
         self.serverID = serverID
         if not 'duration' in reservation_data:
-            self.failureStatus = 13
-            logger.error('{}'.format(EXCEPTIONS_INFO[self.failureStatus]))
+            self.failureStatus = 113
+            logger.error('{}'.format(LOGGER_INFO[self.failureStatus]))
             self.finish_with_failure()
         self.reservation_data = reservation_data
         self.parent_dict = parent_dict
@@ -42,6 +42,11 @@ class Supervisor(object):
         self.failureStatus = None
         self.has_got_fail = False
         self.test_end_status = None
+        logger.debug("Created new Supervisor object with args: "
+                     "serverID = {}, reservation_data = {}, parent_dict = {}, jenkins_info = {}, user_info = {},"
+                     " TLreservationID = {}".format(self.serverID, self.reservation_data, self.parent_dict,
+                                                    self.jenkins_info, self.user_info, self.TLreservationID))
+
 
     def get_serverID(self):
         return self.serverID
@@ -68,7 +73,7 @@ class Supervisor(object):
             'reservation_data' : self.reservation_data,
             'user_info' : self.user_info
         }
-        logger.info("Saving parent dictionary")
+        logger.debug("Parent dictionary = {}".format(self.parent_dict))
         return self.parent_dict
 
     def get_jenkins_info(self):
@@ -87,7 +92,8 @@ class Supervisor(object):
             'last_name' : last_name,
             'e-mail' :e_mail
         }
-        logger.info("Saving user informations : {} {}, email: {}".format(first_name,last_name,e_mail))
+        logger.debug("Saving user informations : {} {}, email: {}".format(first_name,last_name,e_mail))
+
         return self.user_info
 
     def get_TLname(self):
@@ -130,14 +136,15 @@ class Supervisor(object):
                                                            robotlte_revision=robotlte_revision,
                                                            state=state, duration=duration)
         if self.TLreservationID == -103:
-            self.failureStatus = 1
-            logger.warning('{}'.format(EXCEPTIONS_INFO[self.failureStatus]))
+            self.failureStatus = 101
+            logger.warning('{}'.format(LOGGER_INFO[self.failureStatus]))
             self.finish_with_failure(test_status="PASS")
         elif self.TLreservationID == -102:
-            self.failureStatus = 2
-            logger.warning('{}'.format(EXCEPTIONS_INFO[self.failureStatus]))
+            self.failureStatus = 102
+            logger.warning('{}'.format(LOGGER_INFO[self.failureStatus]))
             self.finish_with_failure(test_status="PASS")
         else:
+            logger.info("Reservation created. ID: {}".format(self.TLreservationID))
             return self.TLreservationID
 
     def reservation_status(self):
@@ -150,13 +157,15 @@ class Supervisor(object):
         while True:
             if reservation.get_reservation_status() == reservation_status_dict[1] or\
                             reservation.get_reservation_status() == reservation_status_dict[2]:
-                time.sleep(60)
+                logger.debug("Waiting for TL (reservation ID: {}) to be ready for use. TL status: {}".format(self.TLreservationID, reservation.get_reservation_status()))
+                time.sleep(120)
             elif reservation.get_reservation_status() == reservation_status_dict[3]:
+                logger.info("{} ready".format(self.get_TLname_from_ID()))
                 return 0
             elif reservation.get_reservation_status() == reservation_status_dict[4] or\
                             reservation.get_reservation_status() == reservation_status_dict[5]:
-                self.failureStatus = 3      #reservation failure
-                logger.warning('{} {}'.format(self.TLreservationID, EXCEPTIONS_INFO[self.failureStatus]))
+                self.failureStatus = 103      #reservation failure
+                logger.warning('{} {}'.format(self.TLreservationID, LOGGER_INFO[self.failureStatus]))
                 self.finish_with_failure()
 
 
@@ -167,10 +176,11 @@ class Supervisor(object):
             assignedNode_tag = job_config_xml.find('assignedNode')
             assignedNode_tag.text = str(self.TLname)
             job.update_config(ET.tostring(job_config_xml))
+            logger.debug("Updated TL name: {} in job {}".format(self.TLname, self.jenkins_info['job_name']))
             return 0
         except:
-            self.failureStatus = 4
-            logger.warning('{} : {}'.format(self.TLname, EXCEPTIONS_INFO[self.failureStatus]))
+            self.failureStatus = 104
+            logger.warning('{} : {}'.format(self.TLname, LOGGER_INFO[self.failureStatus]))
             self.finish_with_failure()
 
     def get_job_status(self):
@@ -179,10 +189,11 @@ class Supervisor(object):
             job = self.jenkins_info['job_api'].get_job(self.jenkins_info['job_name'])
             job_status = job.get_last_build().get_status()
         except:
-            self.failureStatus = 5
-            logger.error('{} : {}'.format(self.jenkins_info['job_name'],EXCEPTIONS_INFO[self.failureStatus]))
+            self.failureStatus = 105
+            logger.error('{} : {}'.format(self.jenkins_info['job_name'],LOGGER_INFO[self.failureStatus]))
             self.finish_with_failure()
         finally:
+            logger.debug("Job {} status = {}".format(self.jenkins_info['job_name'], job_status))
             if job_status == "FAILURE":
                 self.has_got_fail = False
                 self.ending()
@@ -194,8 +205,8 @@ class Supervisor(object):
             job = self.jenkins_info['job_api'].get_job(self.jenkins_info['job_name'])
             return job.is_queued_or_running()
         except:
-            self.failureStatus = 5
-            logger.error('{} : {}'.format(self.jenkins_info['job_name'],EXCEPTIONS_INFO[self.failureStatus]))
+            self.failureStatus = 105
+            logger.error('{} : {}'.format(self.jenkins_info['job_name'],LOGGER_INFO[self.failureStatus]))
             self.finish_with_failure()
 
     def set_job_api(self):
@@ -204,10 +215,11 @@ class Supervisor(object):
         try:
             job_api = jenkinsapi.api.Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
             self.jenkins_info['job_api'] = job_api
+            logger.debug("job_api has been set")
             return self.jenkins_info['job_api']
         except:
-            self.failureStatus = 6
-            logger.critical('{}'.format(EXCEPTIONS_INFO[self.failureStatus]))
+            self.failureStatus = 106
+            logger.critical('{}'.format(LOGGER_INFO[self.failureStatus]))
             self.finish_with_failure()
 
     def create_and_build_job(self):
@@ -215,10 +227,11 @@ class Supervisor(object):
             self.update_TLname()
             self.jenkins_info['job_api'].build_job(jobname=self.jenkins_info['job_name'],
                                                    params=self.jenkins_info['parameters'])
+            logger.info("Job {} was built".format(self.jenkins_info['job_name']))
             return 0
         except:
-            self.failureStatus = 7
-            logger.error('{}'.format(EXCEPTIONS_INFO[self.failureStatus]))
+            self.failureStatus = 107
+            logger.error('{}'.format(LOGGER_INFO[self.failureStatus]))
             self.finish_with_failure()
 
     def get_jenkins_console_output(self):
@@ -229,10 +242,11 @@ class Supervisor(object):
                 else:
                     time.sleep(2)   ####TODO longer time on real tests
             self.jenkins_info['console_output'] = job.get_last_build().get_console()
+            logger.debug("Console output retrieved from {}".format(self.jenkins_info['job_name']))
             return self.jenkins_info['console_output']
         except:
-            self.failureStatus = 8
-            logger.error('{}'.format(EXCEPTIONS_INFO[self.failureStatus]))
+            self.failureStatus = 108
+            logger.error('{}'.format(LOGGER_INFO[self.failureStatus]))
             self.finish_with_failure()
 
     def get_job_tests_status(self):
@@ -253,10 +267,9 @@ class Supervisor(object):
                     match[i] = re.search('(\w*)\.(.*)', match[i]).groups()
                     tests_failed_list_with_dict.append({'test_name' : match[i][0],
                                        'file_name' : match[i][1]})
+            logger.info("Regex found fails in output of {}".format(self.jenkins_info['job_name']))
         except:
-            # self.failureStatus = 9
-            # logger.error('{}'.format(EXCEPTIONS_INFO[self.failureStatus]))
-            # self.finish_with_failure(test_status="UNKNOWN_FAIL")
+            logger.debug("Regex did not find fails in output of {}".format(self.jenkins_info['job_name']))
             pass
         finally:
             return tests_failed_list_with_dict
@@ -266,11 +279,12 @@ class Supervisor(object):
         try:
             output = self.jenkins_info['console_output']
         except:
-            self.failureStatus = 8
-            logger.error('{}'.format(EXCEPTIONS_INFO[self.failureStatus]))
+            self.failureStatus = 108
+            logger.error('{}'.format(LOGGER_INFO[self.failureStatus]))
             self.finish_with_failure(test_status="UNKNOWN_FAIL")
 
         if not output.find('| FAIL |') == -1:
+            logger.debug("Found 'FAIL' in output of {}".format(self.jenkins_info['job_name']))
             return False
         output = output.split('\n')
         for line in output:
@@ -278,6 +292,7 @@ class Supervisor(object):
                 ###mozna zapisac, ze tag ciagle nie zmieniony
                 continue
             if not line.find('[ ERROR ]') == -1:
+                logger.debug("Found 'ERROR' in output of {}".format(self.jenkins_info['job_name']))
                 return False
         return True
 
@@ -285,15 +300,17 @@ class Supervisor(object):
         if not self.has_got_fail:
             if self.check_if_no_fails() == True:
                 self.test_end_status = "PASS"
+                logger.info("Test {} was successful".format(self.jenkins_info['job_name']))
             else:
                 self.test_end_status = "UNKNOWN_FAIL"
                 self.has_got_fail = True
-                self.failureStatus = 9
-                logger.error('{}'.format(EXCEPTIONS_INFO[self.failureStatus]))
+                self.failureStatus = 109
+                logger.error('{}'.format(LOGGER_INFO[self.failureStatus]))
                 self.finish_with_failure(test_status=self.test_end_status)
         else:
             self.test_end_status = "Failed"
             self.has_got_fail = True
+            logger.info("Test {} has got some failures".format(self.jenkins_info['job_name']))
         return self.test_end_status
 
     def remove_tag_from_file(self, old_tag = 'enable', new_tag = ''):
@@ -333,12 +350,13 @@ class Supervisor(object):
                         file_name = re.search('({name}.*)'.format(name=files_names_list[i]),file).groups()[0]
                         found = True
                         self.parent_dict[self.serverID]['test_status'][i]['file_name'] = file_name
+                        logger.debug("Found filename: {}".format(file_name))
                         break
                     except:
                         pass
                 if not found:
-                    self.failureStatus = 10
-                    logger.warning('{}'.format(EXCEPTIONS_INFO[self.failureStatus]))
+                    self.failureStatus = 110
+                    logger.warning('{}'.format(LOGGER_INFO[self.failureStatus]))
             except:
                 pass
         try:
@@ -351,25 +369,26 @@ class Supervisor(object):
                     try:
                         lines_in_file[line] = re.sub(old_tag, new_tag, lines_in_file[line])
                         found = True
+                        logger.debug("Changed tag in file: {} from {} to {}".format(file_name, old_tag, new_tag))
                     except:
                         pass
                 except:
                     pass
             if not found:
-                self.failureStatus = 11
-                logger.warning('{} : {}'.format(EXCEPTIONS_INFO[self.failureStatus], old_tag))
+                self.failureStatus = 111
+                logger.warning('{} : {}'.format(LOGGER_INFO[self.failureStatus], old_tag))
             result = self.git_launch(file_info=[path, file_name])
             if not result == True:
-                self.failureStatus = 14
-                logger.warning('{} : {}'.format(EXCEPTIONS_INFO[self.failureStatus], result))
-
+                self.failureStatus = 114
+                logger.warning('{} : {}'.format(LOGGER_INFO[self.failureStatus], result))
+            logger.info("Git push successful on {}".format(self.TLname))
             file.close()
             file = sftp.open(os.path.join(path,file_name), 'w')
             file.writelines(lines_in_file)
             file.close()
         except:
-            self.failureStatus = 12
-            logger.warning('{}'.format(EXCEPTIONS_INFO[self.failureStatus]))
+            self.failureStatus = 112
+            logger.warning('{}'.format(LOGGER_INFO[self.failureStatus]))
         finally:
             self.test_end_status = "Failed"
             client.close()
