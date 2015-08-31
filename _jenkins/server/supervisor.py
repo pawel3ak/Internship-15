@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 """
 :created on: '11/08/15'
 
@@ -7,221 +7,101 @@
 :contact: pawel.nogiec@nokia.com
 """
 
-import tl_reservation as tlr
+from supervisor_api import Supervisor, logger
 import time
-import jenkinsapi
-import xml.etree.ElementTree as ET
-import re
-import ute_mail.sender
-import ute_mail.mail
+
+def main(serverID, reservation_data, parent_dict, jenkins_info, user_info = None, TLreservationID = None):
+    supervisor = Supervisor(serverID, reservation_data, parent_dict, jenkins_info, user_info = user_info, TLreservationID = TLreservationID)
+    supervisor.set_parent_dict(busy_status=True)
+    if supervisor.TLreservationID == None:
+        supervisor.TLreservationID = supervisor.create_reservation(
+            testline_type=reservation_data['testline_type'],
+            # reservation_data['enb_build'],
+            # reservation_data['ute_build'],
+            # reservation_data['sysimage_build'],
+            # reservation_data['robotle_revision'],
+            # reservation_data['state'],
+            duration=reservation_data['duration'])
+
+    print supervisor.TLreservationID
+    time.sleep(2)
+    supervisor.get_TLreservationID()
+
+    supervisor.set_parent_dict(busy_status=True)
+    supervisor.reservation_status()
+    supervisor.set_TLname(supervisor.get_TLname_from_ID())
+    supervisor.set_TLaddress(supervisor.get_TLaddress_from_ID())
+
+    #############################################################################
+    #temporary hard-coded  variables:
+    print supervisor.set_TLname('tl99_test')
+    print supervisor.set_TLaddress('wmp-tl99.lab0.krk-lab.nsn-rdnet.net')
+    print supervisor.set_user_info('Pawel','Nogiec','pawel.nogiec@nokia.com')
+    ##############################################################################
+
+    supervisor.set_parent_dict(busy_status=True)
+
+    supervisor.git_launch(pull_only=True)
 
 
-def create_reservation_and_run_job(testline_type=None, enb_build=None, ute_build=None,
-                                   sysimage_build=None, robotlte_revision=None,
-                                   state=None, duration=None):
+    supervisor.git_launch()
+    supervisor.set_job_api()
+    if not supervisor.get_is_queue_or_running():
+        supervisor.create_and_build_job()
 
-    reservation = tlr.TestLineReservation()
-    return reservation.create_reservation(testline_type=testline_type, enb_build=enb_build,
-                                                   ute_build=ute_build, sysimage_build=sysimage_build,
-                                                   robotlte_revision=robotlte_revision,
-                                                   state=state, duration=duration)
+    supervisor.get_jenkins_console_output()
+    print supervisor.get_job_status()
 
-def reservation_status(id):
-    reservation = tlr.TestLineReservation(id)
-    reservation_status_dict = {1: 'Pending for testline',
-                               2: 'Testline assigned',
-                               3: 'Confirmed',
-                               4: 'Finished',
-                               5: 'Canceled'}
-    while True:
-        if reservation.get_reservation_status() == reservation_status_dict[1] or\
-                        reservation.get_reservation_status() == reservation_status_dict[2]:
-            time.sleep(60)
-        elif reservation.get_reservation_status() == reservation_status_dict[3]:
-            return 0
-        elif reservation.get_reservation_status() == reservation_status_dict[4] or\
-                        reservation.get_reservation_status() == reservation_status_dict[5]:
-            return -1
+    job_tests_parsed_status = supervisor.get_job_tests_status()
+    supervisor.set_parent_dict(busy_status=True, job_tests_parsed_status=job_tests_parsed_status)
 
+    print supervisor.ending()
+    print job_tests_parsed_status
 
-def _get_tl_name(id):
-    reservation = tlr.TestLineReservation(id)
-    return reservation.get_reservation_details()['testline']['name']
+    if supervisor.has_got_fail :
+        supervisor.remove_tag_from_file()
 
+    supervisor.send_information()
 
-def send_information(id,tl_name,user_info, test_passed = None, tests_status = None):
-    if test_passed == None:
-        _message = "Hello {f_name} {l_name}! \n\n" \
-                   "Your reservation is pending.\n" \
-                   "Reservation ID = {rID}\n" \
-                   "Testline name = {tl_name}\n\n" \
-                   "Have a nice day!".format(f_name=user_info['first_name'],
-                                             _name=user_info['last_name'],
-                                             rID=id, tl_name=tl_name)
-        _subject = "Reservation status update"
-
-    elif test_passed == True:
-        _message = "Hello {f_name} {l_name}! \n\n" \
-                  "All your tests were successful\n\n" \
-                  "Have a nice day!".format(f_name=user_info['first_name'],
-                                            l_name=user_info['last_name'])
-        _subject = "Tests status update - finished"
-
-    elif test_passed == False:
-        test_info = ''
-        for test_status_number in range(0, len(tests_status)):
-            test_info += "Test = {test_name}.{file_name}\n".format(
-                test_name=tests_status[test_status_number]['test_name'],
-                file_name=tests_status[test_status_number]['file_name'])
-        _message = "Hello {f_name} {l_name}! \n\n" \
-                  "Few tests didn't pass: \n\n" \
-                  "{test_info}\n\n" \
-                  "Have a nice day!".format(f_name=user_info['first_name'],
-                                            l_name=user_info['last_name'],
-                                            test_info=test_info)
-        _subject = "Tests status update - finished"
-
-    send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
-    mail = ute_mail.mail.Mail(subject=_subject,message=_message, recipients=user_info['e-mail'], name_from="Reservation Api")
-    send.connect()
-    send.send(mail)
-
-
-# def _update_tl_name(job, tl_name):
-#     job_config_xml = ET.fromstring(job.get_config())
-#     assignedNode_tag = job_config_xml.find('assignedNode')
-#     assignedNode_tag.text = str(tl_name)
-#     job.update_config(ET.tostring(job_config_xml))
-
-
-def _create_and_build_job(jenkins_info, tl_name):
-    _job_name = 'test_on_{tl_name}'.format(tl_name=tl_name)
-    job_parameters = jenkins_info['parameters']
-    job_api = jenkinsapi.api.Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
-    job = job_api.get_job(_job_name)
-    # _update_tl_name(job, tl_name)
-    job_api.build_job(jobname=_job_name, params=job_parameters)
-    return job
-
-
-def _get_jenkins_console_output(job):
-    time.sleep(10)       #let the new job build get started
-    while job.get_last_build().get_status() == None:
-        time.sleep(30)      ###############TODO longer sleep on real tests
-    return job.get_last_build().get_console()
-
-
-def _update_parent_dict(serverID, parent_dict, id, busy_status, tl_name, duration, job_test_status=None):
-    parent_dict[serverID]={
-        'reservationID' : id,
-        'busy_status' : busy_status,
-        'tl_name' : tl_name,
-        'duration' : duration,
-        'test_status' : job_test_status}
-
-
-def _get_job_test_status(job_output):
-    has_got_fail = False
-    regex = r'[=]\s(.*)\s[=]\W*.*FAIL'
-    try:
-        match = re.findall(regex,job_output)
-        if len(match) != 0: has_got_fail = True
-        tests_dict=[]
-        for i in range(0,len(match)):
-            match[i] = re.sub(" +", "_", match[i])
-            if match[i][-3:] == '...': match[i] = match[i][:-3]
-            if match[i][-1:] == '_': match[i] = match[i][:-1]
-            try:
-                match[i] = re.search('CPLN\.(\w*)\.Tests\.(.*)', match[i]).groups()
-                tests_dict.append({'test_name' : match[i][0],
-                              'file_name' : match[i][1]})
-            except:
-                match[i] = re.search('CPLN\.(\w*)\.(.*)', match[i]).groups()
-                tests_dict.append({'test_name' : match[i][0],
-                                   'file_name' : match[i][1]})
-    except:
-        tests_dict = None
-
-    return tests_dict, has_got_fail
-
-
-def _check_for_fails(output):
-    return output.find('| FAIL |')
-
-
-def _end(id, has_got_fail, tl_name, user_info, job_test_status, jenkins_console_output=None):
-    if has_got_fail == False:
-        if _check_for_fails(jenkins_console_output) == -1: test_passed = True
-        else: test_passed = "UNKNOWN_FAIL"
-    else:
-        test_passed = False
-
-    send_information(id, tl_name, user_info, test_passed, job_test_status)
+    supervisor.set_parent_dict(busy_status=False, job_tests_parsed_status=job_tests_parsed_status)
     return 0
 
+'''
+if __name__ == '__main__':
+    import os
+    from threading import Thread
+    dir_list = []
+    path = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/'
+    [dir_list.append(dir) for dir in os.listdir(path) if os.path.isdir(os.path.join(path,dir))]
 
-def main(serverID, reservation_data, parent_dict, user_info, jenkins_info):
-    reservationID = create_reservation_and_run_job(testline_type=reservation_data['testline_type'],
-                                                   # reservation_data['enb_build'],
-                                                   # reservation_data['ute_build'],
-                                                   # reservation_data['sysimage_build'],
-                                                   # reservation_data['robotle_revision'],
-                                                   # reservation_data['state'],
-                                                   duration=reservation_data['duration'])
-    print reservationID
-    _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
-                        tl_name='', duration=reservation_data['duration'])
-    if not reservation_status(reservationID) == 0:
-        parent_dict[serverID]['busy'] = False
-        return -1
-    tl_name = _get_tl_name(reservationID)
+    """ ['LTE1819', 'LTE2351', 'LTE738', 'LTE1841', 'LTE2465', 'CRT', 'LTE1899', 'LTE2209',
+    'LBT1558', 'LTE1905', 'LTE1879', 'LTEXYZ-new', 'LTE2275', 'LTE1638', 'LTEXYZ',
+    'LBT2762_LBT2763', 'LTE1321', 'LTE1509', 'LTE2384', 'LTE2324', 'LTE1536', 'LTE648',
+    'LTE2149', 'LTE1130', 'LTE1731', 'LTE1406', 'SHB', 'LTE1749', 'LTE1569', 'LTE1469',
+    'LTE2161', 'LTE2014', 'LBT2989', 'LTE825', 'LBT2180', 'LTE2302']"""
 
-    ############################################################################
-    #temporary hard-coded  variables:
-    tl_name = 'tl99_test'
-    user_info = {'first_name' : 'Pawel',
-                'last_name' : 'Nogiec',
-                'e-mail' : 'pawel.nogiec@nokia.com'}
-    #############################################################################
-    _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
-                        tl_name=tl_name, duration=reservation_data['duration'])
 
-    job = _create_and_build_job(jenkins_info, tl_name)
-    jenkins_console_output = _get_jenkins_console_output(job)
-    job_test_status_dict, has_got_fail = _get_job_test_status(job_output=jenkins_console_output)
-    _end(id=reservationID, has_got_fail=has_got_fail, tl_name=tl_name,
-         job_test_status=job_test_status_dict, user_info=user_info)
-    return 0
 
-if __name__=='__main__':
-    serverID=123
-    parent_dict = {serverID : {}}
-    reservationID = 66655
-    reservation_data = {'duration' : 120}
-    jenkins_info = {'parameters' : {'name' : ''}}
 
-    _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
-                        tl_name='', duration=reservation_data['duration'])
-    if not reservation_status(reservationID) == 0:
-        parent_dict[serverID]['busy'] = False
-        # return -1
-        print "fail"
-    tl_name = _get_tl_name(reservationID)
+    i = 0
+    for dir in dir_list:
+        thread1 = Thread(target=main, args=[i,
+            {
+                'testline_type' : 'CLOUD_F',
+                'duration' : 600
+            },
+            {},
+            {
+                'parameters' :
+                    {
+                        'name' : dir
+                    }
+            },
+            None,
+            68880])
+        i += 1
+        thread1.start()
+        thread1.join()
 
-    ############################################################################
-    #temporary hard-coded  variables:
-    tl_name = 'tl99_test'
-    user_info = {'first_name' : 'Pawel',
-                'last_name' : 'Nogiec',
-                'e-mail' : 'pawel.nogiec@nokia.com'}
-    #############################################################################
-    _update_parent_dict(serverID=serverID, parent_dict=parent_dict, id=reservationID, busy_status=True,
-                        tl_name=tl_name, duration=reservation_data['duration'])
 
-    job = _create_and_build_job(jenkins_info, tl_name)
-    jenkins_console_output = _get_jenkins_console_output(job)
-    job_test_status_dict, has_got_fail = _get_job_test_status(job_output=jenkins_console_output)
-    _end(id=reservationID, has_got_fail=has_got_fail, tl_name=tl_name,
-         job_test_status=job_test_status_dict, user_info=user_info)
-    # return 0
-    print "ok"
+'''

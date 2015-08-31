@@ -1,10 +1,10 @@
 __author__ = 'kgadek'
 import re
 import yaml
+import sys
 
 #files names
-raw_time_file="_json_rpc_tests--127.0.0.1.34255.raw.time"
-raw_file="_json_rpc_tests--127.0.0.1.34255.raw"
+
 
 #yaml class not to set alphabetic dict
 class MyDict(dict):
@@ -39,7 +39,7 @@ def create_yml_files(f1,logs,num_lines):
         count+=1
         outfile.close()
 
-def get_raw_files():
+def get_raw_files(raw_time_file,raw_file):
     f1=open(str(raw_time_file),"r")
     f2=open(str(raw_file),"r")
     num_lines = sum(1 for line in f1)
@@ -50,6 +50,8 @@ def get_raw_files():
 
 
 if __name__ == "__main__":
-    get_raw_files()
+    raw_time_file=sys.argv[1]
+    raw_file=sys.argv[2]
+    get_raw_files(raw_time_file,raw_file)
 
 

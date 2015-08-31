@@ -8,6 +8,10 @@
 """
 
 import json
+import logging
+
+# create logger
+logger = logging.getLogger("server." + __name__)
 
 
 def create_file(new_file):
@@ -31,9 +35,10 @@ def delete_reservation_from_queue(file_name, queue_number, password):
         lines = queue_file.readlines()
     for line in lines:
         if (json.loads(line)["serverID"] == queue_number) & (json.loads(line)["password"] != password):
-            print 'Wrong password'
+            logger.warning("Wrong password")
             return -101
     with open(file_name, "wb") as queue_file:
+        logger.debug("Delete from queue serverID: %d", queue_number)
         for line in lines:
             if json.loads(line)["serverID"] != queue_number:
                 queue_file.write(line)
@@ -47,7 +52,8 @@ def check_queue_length(file_name):
 
 
 def get_server_id_number():
-    id_file = "temp_id"
+    id_file = "files/temp_id"
+    # check if id_file exists
     with open(id_file, "ab+") as open_file:
         lines = open_file.readlines()
     if len(lines) == 0:
