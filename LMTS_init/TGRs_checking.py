@@ -2,10 +2,13 @@ __author__ = 'tarsa'
 
 import re
 
-TGR_IP = []
+TGR_IPs = []
 
 def is_tgrs_reachable():
-    pass
+    for IP in TGR_IPs:
+        print(pexpect.run("ping {tgr_ip}".format(tgr_ip=)))
+        if re.search("", ping_cmd_output)
+
 
 def parse_TGR_IPs_list_lmts_ini_file(path_to_lmts_ini_file="/usr/lmts/etc/lmts.ini",
                                      first_line = "[tgr_\d]",
@@ -36,7 +39,7 @@ def parse_TGR_IPs_list_lmts_ini_file(path_to_lmts_ini_file="/usr/lmts/etc/lmts.i
             current_line = line
             if re.match(first_line, previous_line):
                 _tgr_IP = re.search(second_line, current_line).group(0)
-                TGR_IP.append(_tgr_IP)
+                TGR_IPs.append(_tgr_IP)
 	    previous_line = current_line
 
 
