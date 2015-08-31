@@ -12,4 +12,5 @@ EXCEPTIONS_INFO = {
     11: "Finding tag in file error",
     12: "Opening file to change tag failed (probably wrong file name)",
     13: "No duration in reseration_data",
+    14: "Git error"
 }

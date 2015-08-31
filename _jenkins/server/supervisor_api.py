@@ -20,6 +20,7 @@ import sys
 from mailing_list import mail_dict
 import logging
 from messages_logger import EXCEPTIONS_INFO
+from server_git_api import git_launch
 # create logger
 logger = logging.getLogger("server." + __name__)
 
@@ -341,7 +342,7 @@ class Supervisor(object):
             except:
                 pass
         try:
-            file = sftp.open(os.path.join(path,file_name), 'r')
+            file = sftp.open(os.path.join(path, file_name), 'r')
             lines_in_file = file.readlines()
             found = False
             for line in range(0, len(lines_in_file)):
@@ -357,6 +358,11 @@ class Supervisor(object):
             if not found:
                 self.failureStatus = 11
                 logger.warning('{} : {}'.format(EXCEPTIONS_INFO[self.failureStatus], old_tag))
+            result = self.git_launch(file_info=[path, file_name])
+            if not result == True:
+                self.failureStatus = 14
+                logger.warning('{} : {}'.format(EXCEPTIONS_INFO[self.failureStatus], result))
+
             file.close()
             file = sftp.open(os.path.join(path,file_name), 'w')
             file.writelines(lines_in_file)
@@ -448,3 +454,5 @@ class Supervisor(object):
             send.connect()
             send.send(mail)
 
+    def git_launch(self, file_info=None, pull_only=False):
+        git_launch(TL_address=self.TLaddress, file_info=file_info, pull_only=pull_only)
