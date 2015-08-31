@@ -75,7 +75,6 @@ if __name__ == '__main__':
     print 'abc'
     #9:47 (11:47)
     # for i in range(68600,69200):
-    #69459.69460, 69482
     reservation = TestLineReservation(68765)
     # print reservation.get_available_tl_count_group_by_type()
     # reservation = TestLineReservation(66567)
