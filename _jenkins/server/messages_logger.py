@@ -1,5 +1,4 @@
 LOGGER_INFO = {
-
     101: "User maximum reservation count exceeded",
     102: "Reservation already created",
     103: "Reservation failure (Cancelled or Finished)",
