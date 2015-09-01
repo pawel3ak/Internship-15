@@ -31,8 +31,8 @@ LOG_DIRECTORY = "logs"
 QUEUE_FILE_NAME = "reservation_queue"
 PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
 SERVER_DICTIONARY_FILE_NAME = "server_dictionary_file"
-FREE_TL = 0     # free tl number for users reservations
-MAX_TL = 3      # max tl number which server can reserve
+FREE_TL = 1     # free tl number for users reservations
+MAX_TL = 1      # max tl number which server can reserve
 # time in hour
 MIN_TIME_TO_END = 1     # min time when we can make a new task on tl
 START_RESERVATION_TIME = 2  # reservation duration time
@@ -51,7 +51,7 @@ logging.Formatter.converter = time.gmtime
 if not os.path.isdir(LOG_DIRECTORY):
     os.makedirs(LOG_DIRECTORY)
 
-#handler for DEBUG lvl
+# handler for DEBUG lvl
 file_handler = logging.handlers.TimedRotatingFileHandler(filename='logs/server.log',
                                                          when='midnight',
                                                          interval=1,
@@ -60,7 +60,7 @@ file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(formatter)
 file_handler.addFilter(MyFilter(logging.DEBUG))
 
-#handler for INFO lvl
+# handler for INFO lvl
 file_handler2 = logging.handlers.TimedRotatingFileHandler(filename='logs/server_info.log',
                                                           when='midnight',
                                                           interval=1,
@@ -69,39 +69,18 @@ file_handler2.setLevel(logging.INFO)
 file_handler2.setFormatter(formatter)
 file_handler2.addFilter(MyFilter(logging.INFO))
 
-#handler for WARNING lvl
+# handler for WARNING, ERROR, CRITICAL lvl
 file_handler3 = logging.handlers.TimedRotatingFileHandler(filename='logs/server_warn.log',
                                                           when='midnight',
                                                           interval=1,
                                                           backupCount=30)
 file_handler3.setLevel(logging.WARNING)
 file_handler3.setFormatter(formatter)
-file_handler3.addFilter(MyFilter(logging.WARNING))
 
-#handler for ERROR lvl
-file_handler4 = logging.handlers.TimedRotatingFileHandler(filename='logs/server_error.log',
-                                                          when='midnight',
-                                                          interval=1,
-                                                          backupCount=30)
-file_handler4.setLevel(logging.ERROR)
-file_handler4.setFormatter(formatter)
-file_handler4.addFilter(MyFilter(logging.ERROR))
-
-#handler for CRITICAL lvl
-file_handler5 = logging.handlers.TimedRotatingFileHandler(filename='logs/server_critical.log',
-                                                          when='midnight',
-                                                          interval=1,
-                                                          backupCount=30)
-file_handler5.setLevel(logging.CRITICAL)
-file_handler5.setFormatter(formatter)
-file_handler5.addFilter(MyFilter(logging.CRITICAL))
-
-# add handler to the logger
+# add handlers to the logger
 logger.addHandler(file_handler)
 logger.addHandler(file_handler2)
 logger.addHandler(file_handler3)
-logger.addHandler(file_handler4)
-logger.addHandler(file_handler5)
 
 
 def response(connect, message, queue_file_name, priority_queue_file_name, server_dictionary):

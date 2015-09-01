@@ -171,7 +171,7 @@ def main_checking_loop(queue_file_name, priority_queue_file_name, server_diction
         sdictionary.write_dictionary_to_file(server_dictionary_file_name, server_dictionary)
         logger.debug("Check queue")
         checking_reservation_queue(queue_file_name, priority_queue_file_name, number_of_free_tl, max_tl_number,
-                                   server_dictionary, handle_dictionary, start_reservation_time, False)
+                                   server_dictionary, handle_dictionary, start_reservation_time)
         logger.debug("Write server dictionary to file: %s", server_dictionary_file_name)
         sdictionary.write_dictionary_to_file(server_dictionary_file_name, server_dictionary)
         sleep(30)
