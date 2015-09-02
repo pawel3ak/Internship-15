@@ -111,8 +111,8 @@ def main_server():
     port = args.port
     free_testline = args.freetl
     max_testline = MAX_TL
-    queue_file_name = FILE_DIRECTORY + "/" + args.file
-    server_dictionary_file_name = FILE_DIRECTORY + "/" + SERVER_DICTIONARY_FILE_NAME
+    queue_file_name = os.path.join(FILE_DIRECTORY, args.file)
+    server_dictionary_file_name = os.path.join(FILE_DIRECTORY, SERVER_DICTIONARY_FILE_NAME)
 
     # create server and process dictionary
     logger.debug("Create servers dictionaries")
