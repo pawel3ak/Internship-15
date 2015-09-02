@@ -33,7 +33,7 @@ class Supervisor(object):
             logger.error('{}'.format(LOGGER_INFO[self.failureStatus]))
             self.finish_with_failure()
         self.reservation_data = reservation_data
-        self.parent_dict = parent_dict
+        self.parent_dictionary = parent_dict
         self.jenkins_info = jenkins_info
         self.TLreservationID = TLreservationID
         self.user_info = user_info
@@ -44,7 +44,7 @@ class Supervisor(object):
         self.test_end_status = None
         logger.debug("Created new Supervisor object with args: "
                      "serverID = {}, reservation_data = {}, parent_dict = {}, jenkins_info = {}, user_info = {},"
-                     " TLreservationID = {}".format(self.serverID, self.reservation_data, self.parent_dict,
+                     " TLreservationID = {}".format(self.serverID, self.reservation_data, self.parent_dictionary,
                                                     self.jenkins_info, self.user_info, self.TLreservationID))
 
 
@@ -55,26 +55,26 @@ class Supervisor(object):
         return self.reservation_data
 
     def get_parent_dict(self):
-        return self.parent_dict
+        return self.parent_dictionary
 
-    def set_parent_dict(self, busy_status, job_tests_parsed_status=None):
+    def set_parent_dictionary(self, busy_status=True):
         jenkins_info = self.jenkins_info.copy()
         if 'job_api' in jenkins_info:
             del jenkins_info['job_api']
         if 'console_output' in jenkins_info:
             del jenkins_info['console_output']
-        self.parent_dict[self.serverID] = {
+        self.parent_dictionary[self.serverID] = {
             'reservationID' : self.TLreservationID,
             'busy_status' : busy_status,
             'tl_name' : self.TLname,
             'duration' : self.reservation_data['duration'],
-            'test_status' : job_tests_parsed_status,
+            'test_status' : self.job_tests_failed_list,
             'jenkins_info': jenkins_info,
             'reservation_data' : self.reservation_data,
             'user_info' : self.user_info
         }
-        logger.debug("Parent dictionary = {}".format(self.parent_dict))
-        return self.parent_dict
+        logger.debug("Parent dictionary = {}".format(self.parent_dictionary))
+        return self.parent_dictionary
 
     def get_jenkins_info(self):
         return self.jenkins_info
@@ -119,7 +119,7 @@ class Supervisor(object):
         return self.TLaddress
 
     def finish_with_failure(self, test_status = None):
-        self.parent_dict[self.serverID]['busy_status'] = False
+        self.parent_dictionary[self.serverID]['busy_status'] = False
         if test_status:
             self.test_end_status = test_status
         self.send_information(test_status=self.test_end_status)
@@ -164,12 +164,12 @@ class Supervisor(object):
                 return 0
             elif reservation.get_reservation_status() == reservation_status_dict[4] or\
                             reservation.get_reservation_status() == reservation_status_dict[5]:
-                self.failureStatus = 103      #reservation failure
+                self.failureStatus = 103
                 logger.warning('{} {}'.format(self.TLreservationID, LOGGER_INFO[self.failureStatus]))
                 self.finish_with_failure()
 
 
-    def update_TLname(self):
+    def set_job_TLname(self):
         try:
             job = self.jenkins_info['job_api'].get_job(self.jenkins_info['job_name'])
             job_config_xml = ET.fromstring(job.get_config())
@@ -200,7 +200,7 @@ class Supervisor(object):
             else:
                 return job.get_last_build().get_status()
 
-    def get_is_queue_or_running(self):
+    def get_is_queue_or_running(self):      ##tu pewnie bedziesz chcial zmienic nazwe, ale nie mialem pomyslu na jaka, bo funkcja z jenkinsapi nazywa sie "is_queue_or_running"
         try:
             job = self.jenkins_info['job_api'].get_job(self.jenkins_info['job_name'])
             return job.is_queued_or_running()
@@ -224,7 +224,7 @@ class Supervisor(object):
 
     def create_and_build_job(self):
         try:
-            self.update_TLname()
+            self.set_job_TLname()
             self.jenkins_info['job_api'].build_job(jobname=self.jenkins_info['job_name'],
                                                    params=self.jenkins_info['parameters'])
             logger.info("Job {} was built".format(self.jenkins_info['job_name']))
@@ -249,47 +249,41 @@ class Supervisor(object):
             logger.error('{}'.format(LOGGER_INFO[self.failureStatus]))
             self.finish_with_failure()
 
-    def get_job_tests_status(self):
+    def set_job_tests_failed_list(self):
         regex = r'\=\s(.*)\s\=\W*.*FAIL'
-        tests_failed_list_with_dict=[]
+        job_tests_failed_list=[]
         try:
-            match = re.findall(regex,self.jenkins_info['console_output'])
-            if len(match) != 0: self.has_got_fail = True
-            for i in range(0,len(match)):
-                match[i] = re.sub(" +", "_", match[i])
-                if match[i][-3:] == '...': match[i] = match[i][:-3]
-                if match[i][-1:] == '_': match[i] = match[i][:-1]
+            matches = re.findall(regex,self.jenkins_info['console_output'])
+            if len(matches) != 0: self.has_got_fail = True
+            for match in matches:
+                match = re.sub(" +", "_", match)  #changing " " to "_" - pybot thinks it's the same, i don't
+                if match[-3:] == '...': match = match[:-3]  #cutting last "..."
+                if match[-1:] == '_': match = match[:-1]    #cutting last "_"
                 try:
-                    match[i] = re.search('(\w*)\.Tests\.(.*)', match[i]).groups()
-                    tests_failed_list_with_dict.append({'test_name' : match[i][0],
-                                  'file_name' : match[i][1]})
+                    match = re.search('(\w*)\.Tests\.(.*)', match).groups()
+                    job_tests_failed_list.append({'test_name' : match[0],
+                                  'file_name' : match[1]})
                 except:
-                    match[i] = re.search('(\w*)\.(.*)', match[i]).groups()
-                    tests_failed_list_with_dict.append({'test_name' : match[i][0],
-                                       'file_name' : match[i][1]})
+                    match = re.search('(\w*)\.(.*)', match).groups()
+                    job_tests_failed_list.append({'test_name' : match[0],
+                                       'file_name' : match[1]})
             logger.info("Regex found fails in output of {}".format(self.jenkins_info['job_name']))
         except:
             logger.debug("Regex did not find fails in output of {}".format(self.jenkins_info['job_name']))
             pass
         finally:
-            return tests_failed_list_with_dict
+            self.job_tests_failed_list = job_tests_failed_list
+            return self.job_tests_failed_list
 
-    def check_if_no_fails(self):
-        output = ""
-        try:
-            output = self.jenkins_info['console_output']
-        except:
-            self.failureStatus = 108
-            logger.error('{}'.format(LOGGER_INFO[self.failureStatus]))
-            self.finish_with_failure(test_status="UNKNOWN_FAIL")
-
+    def check_for_fails(self):
+        output = str(self.jenkins_info['console_output'])
         if not output.find('| FAIL |') == -1:
             logger.debug("Found 'FAIL' in output of {}".format(self.jenkins_info['job_name']))
             return False
         output = output.split('\n')
         for line in output:
             if re.findall('\[.ERROR.\].*no tests.*', line):
-                ###mozna zapisac, ze tag ciagle nie zmieniony
+                ###mozna zapisac, ze tag ciagle nie zmieniony i wysylac ponownie mail do testerow
                 continue
             if not line.find('[ ERROR ]') == -1:
                 logger.debug("Found 'ERROR' in output of {}".format(self.jenkins_info['job_name']))
@@ -298,7 +292,7 @@ class Supervisor(object):
 
     def ending(self):
         if not self.has_got_fail:
-            if self.check_if_no_fails() == True:
+            if self.check_for_fails() == True:
                 self.test_end_status = "PASS"
                 logger.info("Test {} was successful".format(self.jenkins_info['job_name']))
             else:
@@ -313,43 +307,46 @@ class Supervisor(object):
             logger.info("Test {} has got some failures".format(self.jenkins_info['job_name']))
         return self.test_end_status
 
-    def remove_tag_from_file(self, old_tag = 'enable', new_tag = ''):
-        client = paramiko.SSHClient()
-        client.load_system_host_keys()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(self.get_TLaddress(), username='ute', password='ute')
-        sftp = client.open_sftp()
-        additional_directory_list =[]
-        files_names_list =[]
-        path = None
-        file_name = None
-        for test in self.parent_dict[self.serverID]['test_status']:
+    def _get_SSHClient_connection(self):
+        SSHClient = paramiko.SSHClient()
+        SSHClient .load_system_host_keys()
+        SSHClient .set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        SSHClient .connect(self.get_TLaddress(), username='ute', password='ute')
+        # sftp_connection = client.open_sftp()
+        return SSHClient
+
+    def _check_if_more_directories(self):
+        additional_directory_list = []
+        files_names_list = []
+        for test in self.parent_dictionary[self.serverID]['test_status']:
             try:
-                more_informations = re.search('({}.*)\.({}.*)'.format(test['test_name'],test['test_name']),
+                match = re.search('({}.*)\.({}.*)'.format(test['test_name'],test['test_name']),
                                                 test['file_name']).groups()
-                additional_directory_list.append(more_informations[0])
-                files_names_list.append(more_informations[1])
+                additional_directory_list.append(match[0])
+                files_names_list.append(match[1])
             except:
                 files_names_list.append(test['file_name'])
                 additional_directory_list.append('')
 
-        for i in range(0,len(files_names_list)):
+    def _try_to_match_file_name(self, additional_directory_list, files_names_list):
+        for i in range(len(files_names_list)):
             if additional_directory_list[i] == '':
                 path = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}/tests/'.format(
-                    self.parent_dict[self.serverID]['test_status'][i]['test_name'])
-
+                    self.parent_dictionary[self.serverID]['test_status'][i]['test_name'])
             else:
                 path = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}/tests/{}'.format(
-                    self.parent_dict[self.serverID]['test_status'][i]['test_name'],
+                    self.parent_dictionary[self.serverID]['test_status'][i]['test_name'],
                     additional_directory_list[i])
             try:
-                files = sftp.listdir(path=path)
+                SSHClient = self._get_SSHClient_connection()
+                files = SSHClient.open_sftp().listdir(path=path)
+                SSHClient.close()
                 found = False
                 for file in files:
                     try:
                         file_name = re.search('({name}.*)'.format(name=files_names_list[i]),file).groups()[0]
                         found = True
-                        self.parent_dict[self.serverID]['test_status'][i]['file_name'] = file_name
+                        self.parent_dictionary[self.serverID]['test_status'][i]['file_name'] = file_name
                         logger.debug("Found filename: {}".format(file_name))
                         break
                     except:
@@ -359,9 +356,17 @@ class Supervisor(object):
                     logger.warning('{}'.format(LOGGER_INFO[self.failureStatus]))
             except:
                 pass
+
+    def remove_tag_from_file(self, old_tag = 'enable', new_tag = ''):
+        additional_directory_list, files_names_list = self._check_if_more_directories()
+        path, file_name = self._try_to_match_file_name(additional_directory_list, files_names_list)
+
         try:
-            file = sftp.open(os.path.join(path, file_name), 'r')
+            SSHClient = self._get_SSHClient_connection()
+            file = SSHClient.open_sftp().open(os.path.join(path, file_name), 'r')
             lines_in_file = file.readlines()
+            file.close()
+            SSHClient.close()
             found = False
             for line in range(0, len(lines_in_file)):
                 try:
@@ -377,21 +382,19 @@ class Supervisor(object):
             if not found:
                 self.failureStatus = 111
                 logger.warning('{} : {}'.format(LOGGER_INFO[self.failureStatus], old_tag))
-            result = self.git_launch(file_info=[path, file_name])
-            if not result == True:
+            git_result = self.git_launch(file_info=[path, file_name])
+            if not git_result == True:
                 self.failureStatus = 114
-                logger.warning('{} : {}'.format(LOGGER_INFO[self.failureStatus], result))
+                logger.warning('{} : {}'.format(LOGGER_INFO[self.failureStatus], git_result))
             logger.info("Git push successful on {}".format(self.TLname))
-            file.close()
-            file = sftp.open(os.path.join(path,file_name), 'w')
+            SSHClient = self._get_SSHClient_connection()
+            file = SSHClient.open_sftp().open(os.path.join(path,file_name), 'w')
             file.writelines(lines_in_file)
             file.close()
+            SSHClient.close()
         except:
             self.failureStatus = 112
             logger.warning('{}'.format(LOGGER_INFO[self.failureStatus]))
-        finally:
-            self.test_end_status = "Failed"
-            client.close()
 
     def send_information(self, test_status=None):
         if test_status:
@@ -401,7 +404,7 @@ class Supervisor(object):
         elif self.test_end_status == None:
             self.test_end_status = 'UNKNOWN_FAIL'
 
-        message = []
+        messages = []
         subject = ""
         if self.test_end_status == "reserv_pending":
             _message = "Dear {f_name} {l_name}! \n\n" \
@@ -411,7 +414,7 @@ class Supervisor(object):
                        "Have a nice day!".format(f_name=self.user_info['first_name'],
                                                  l_name=self.user_info['last_name'],
                                                  rID=self.TLreservationID, tl_name=self.TLname)
-            message.append({'message' : _message})
+            messages.append({'message' : _message})
             subject = "Reservation status update"
 
 
@@ -421,9 +424,9 @@ class Supervisor(object):
             build_time = '{}-{:02g}-{:02g}_{:02g}-{:02g}-{:02g}'.format(t.year, t.month, t.day, (t.hour-(time.altzone/3600)), t.minute, t.second)
             logs_link = 'http://10.83.200.35/~ltebox/logs/{}_{}/log.html'.format(self.TLname, build_time)
             test_info = ''
-            print "test_status = ", self.parent_dict[self.serverID]['test_status']
+            print "test_status = ", self.parent_dictionary[self.serverID]['test_status']
 
-            for test in self.parent_dict[self.serverID]['test_status']:
+            for test in self.parent_dictionary[self.serverID]['test_status']:
                 test_info += "Test = {test_name}.{file_name}\n".format(
                     test_name=test['test_name'],
                     file_name=test['file_name'])
@@ -433,8 +436,8 @@ class Supervisor(object):
                         "Logs are available at: {logs_link}\n\n" \
                         "Have a nice day!".format(test_info=test_info,
                                                   logs_link=logs_link)
-            message.append({'message' : _message,
-                            'feature' : self.parent_dict[self.serverID]['test_status'][0]['test_name']})
+            messages.append({'message' : _message,
+                            'feature' : self.parent_dictionary[self.serverID]['test_status'][0]['test_name']})
             subject = "Tests status update - finished with fail"
 
 
@@ -450,25 +453,25 @@ class Supervisor(object):
                                                  l_name=self.user_info['last_name'],
                                                  tl_name=self.TLname,
                                                  logs_link=logs_link)
-            message.append({'message' : _message})
+            messages.append({'message' : _message})
             subject = "Tests status update - finished with unknown fail"
 
 
 
 
-        if 'feature' in message[0]:
-            for message_number in range(0, len(message)):
-                mail = ute_mail.mail.Mail(subject=subject,message=message[message_number]['message'],
-                                          recipients=mail_dict[message[message_number]['feature']],
+        if 'feature' in messages[0]:
+            for message in messages:
+                mail = ute_mail.mail.Mail(subject=subject,message=message['message'],
+                                          recipients=mail_dict[message['feature']],
                                           name_from="Reservation Api")
-                print mail_dict[message[message_number]['feature']]
+                print mail_dict[message['feature']]
                 send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
                 send.connect()
                 send.send(mail)
         else:
-            mail = ute_mail.mail.Mail(subject=subject,message=message[0]['message'],
-                                          recipients='pawel.nogiec@nokia.com',
-                                          name_from="Reservation Api")
+            mail = ute_mail.mail.Mail(subject=subject,message=messages[0]['message'],
+                                          recipients='pawel.nogiec@nokia.com',  #Bartek Kukla (?) mail here
+                                          name_from="Reservation Api")          #We need to figure out better name
             send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
             send.connect()
             send.send(mail)

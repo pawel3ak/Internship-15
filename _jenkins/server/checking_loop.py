@@ -59,7 +59,7 @@ def start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_
         request = queue.read_next_from_queue(queue_file)
         queue.delete_reservation_from_queue(queue_file, request["serverID"], request["password"])
     logger.info("Start new thread supervisor.main for serverID: {} reservationID: {}".format(request["serverID"], reservation_id))
-    thread = Thread(target=supervisor.main, args=[request["serverID"],
+    thread = Thread(target=supervisor.supervisor, args=[request["serverID"],
                                                   request["reservation_data"],
                                                   server_dictionary,
                                                   request["jenkins_info"],
