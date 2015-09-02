@@ -9,7 +9,7 @@
 
 from supervisor_api import Supervisor
 
-def supervisor(serverID, reservation_data, parent_dict, jenkins_info, user_info = None, TLreservationID = None):
+def supervise(serverID, reservation_data, parent_dict, jenkins_info, user_info = None, TLreservationID = None):
     supervisor_api = Supervisor(serverID, reservation_data, parent_dict, jenkins_info, user_info = user_info, TLreservationID = TLreservationID)
     supervisor_api.set_parent_dictionary(busy_status=True)
     if supervisor_api.TLreservationID == None:
