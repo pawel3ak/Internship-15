@@ -17,7 +17,7 @@ from threading import Thread
 from multiprocessing import Manager
 from time import sleep
 import tl_reservation
-import sdictionary
+import serv_dictionary
 import reservation_queue as queue
 from checking_loop import main_checking_loop
 from utilities.logger_config import config_logger
@@ -39,7 +39,6 @@ EXTEND_TIME = 2     # extend time
 
 # create logger
 logger = logging.getLogger("server")
-logger.setLevel(logging.DEBUG)
 config_logger(logger)
 
 
@@ -95,7 +94,6 @@ def new_request(connect, queue_file_name):
 
 
 def main_server():
-    print "hehe"
     logger.info("Start server configuration")
     logger.debug("Parsing arguments")
     parser = argparse.ArgumentParser(argparse.ArgumentDefaultsHelpFormatter)
@@ -136,10 +134,10 @@ def main_server():
         queue.create_file(queue_file_name)
     if not os.path.exists(server_dictionary_file_name):
         logger.debug("Crate file: %s", server_dictionary_file_name)
-        sdictionary.create_file(server_dictionary_file_name)
+        serv_dictionary.create_file(server_dictionary_file_name)
     else:
         logger.debug("Load server dictionary from file: %s", server_dictionary_file_name)
-        server_dict = sdictionary.get_dictionary_from_file(server_dictionary_file_name)
+        server_dict = serv_dictionary.get_dictionary_from_file(server_dictionary_file_name)
 
     # set up server
     logger.debug("Set up server config")

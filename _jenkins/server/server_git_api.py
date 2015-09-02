@@ -96,4 +96,5 @@ def ssh_for_git(TL_address):
     # client.connect(TL_address, username='ute', password='ute')
     # return client
 
-git_launch('wmp-tl99.lab0.krk-lab.nsn-rdnet.net', file_info=None, pull_only=True)
+if __name__ is "__main__":
+    git_launch('wmp-tl99.lab0.krk-lab.nsn-rdnet.net', file_info=None, pull_only=True)

@@ -14,7 +14,7 @@ import logging
 import pexpect
 import reservation_queue as queue
 import supervisor
-import sdictionary
+import serv_dictionary
 from tl_reservation import TestLineReservation
 
 # create logger
@@ -73,7 +73,7 @@ def start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_
     handle_dictionary[request["serverID"]] = thread
 
 
-def end_finished_job(server_id, server_dictionary, handle_dictionary, remove_tl_reservation=True):
+def finish_not_busy_reservation(server_id, server_dictionary, handle_dictionary, remove_tl_reservation=True):
     logger.debug("Get tl reservation ID")
     reservation_tl_id = server_dictionary[server_id]["reservationID"]
     logger.debug("Checking if thread is end for serverID: %d", server_id)
@@ -93,7 +93,7 @@ def end_finished_job(server_id, server_dictionary, handle_dictionary, remove_tl_
 def bind_new_job_to_tl(queue_file, server_id, server_dictionary, handle_dictionary):
     # end old job and get reservation ID number
     logger.debug("Get reservation ID and end finished job")
-    reservation_id = end_finished_job(server_id, server_dictionary, handle_dictionary, False)
+    reservation_id = finish_not_busy_reservation(server_id, server_dictionary, handle_dictionary, False)
     # add new job
     logger.debug("Start new job on existing reservation ID: %d", reservation_id)
     start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_id)
@@ -135,20 +135,18 @@ def checking_reservation_queue(queue_file_name, number_of_free_tl, max_tl_number
 
 def checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, max_reservation_time, extend_time):
     logger.debug("Checking if same reservation are not busy")
-    no_busy_record_list = sdictionary.get_no_busy_list(server_dictionary)
-    for record in no_busy_record_list:
-        end_finished_job(record, server_dictionary, handle_dictionary)
+    not_busy_record_list = serv_dictionary.get_not_busy_reservation_list(server_dictionary)
+    for record in not_busy_record_list:
+        finish_not_busy_reservation(record, server_dictionary, handle_dictionary)
         logger.debug("Finished job: %d", record)
 
 
 def delete_done_reservation_from_dictionary(dictionary):
     temp = []
-    for record in dictionary:
-        test_reservation = TestLineReservation(dictionary[record]["reservationID"])
+    for key in dictionary.keys():
+        test_reservation = TestLineReservation(dictionary[key]["reservationID"])
         if test_reservation.get_reservation_details()["status"] > 3:
-            temp.append(record)
-    for record in temp:
-        del dictionary[record]
+            del dictionary[key]
 
 
 def main_checking_loop(queue_file_name, server_dictionary_file_name,
@@ -162,18 +160,18 @@ def main_checking_loop(queue_file_name, server_dictionary_file_name,
                           server_dictionary[record]["reservationID"],
                           dict(server_dictionary[record].items() + {"serverID": int(record)}.items()))
         logger.debug("Write server dictionary to file: %s", server_dictionary_file_name)
-        sdictionary.write_dictionary_to_file(server_dictionary_file_name, server_dictionary)
+        serv_dictionary.write_dictionary_to_file(server_dictionary_file_name, server_dictionary)
     while True:
         logger.info("Main checking loop")
         logger.debug("Check TL busy")
         checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, max_reservation_time, extend_time)
         logger.debug("Write server dictionary to file: %s", server_dictionary_file_name)
-        sdictionary.write_dictionary_to_file(server_dictionary_file_name, server_dictionary)
+        serv_dictionary.write_dictionary_to_file(server_dictionary_file_name, server_dictionary)
         logger.debug("Check queue")
         checking_reservation_queue(queue_file_name, number_of_free_tl, max_tl_number,
                                    server_dictionary, handle_dictionary, start_reservation_time)
         logger.debug("Write server dictionary to file: %s", server_dictionary_file_name)
-        sdictionary.write_dictionary_to_file(server_dictionary_file_name, server_dictionary)
+        serv_dictionary.write_dictionary_to_file(server_dictionary_file_name, server_dictionary)
         sleep(30)
 
 

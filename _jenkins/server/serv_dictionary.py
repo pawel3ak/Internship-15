@@ -37,7 +37,7 @@ def get_first_not_busy(dictionary):
     return None
 
 
-def get_no_busy_list(dictionary):
+def get_not_busy_reservation_list(dictionary):
     record_list = []
     for record in dictionary:
         if not dictionary[record]['busy_status']:
