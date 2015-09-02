@@ -42,6 +42,7 @@ class Supervisor(object):
         self.failureStatus = None
         self.has_got_fail = False
         self.test_end_status = None
+        self.job_tests_failed_list = None
         logger.debug("Created new Supervisor object with args: "
                      "serverID = {}, reservation_data = {}, parent_dict = {}, jenkins_info = {}, user_info = {},"
                      " TLreservationID = {}".format(self.serverID, self.reservation_data, self.parent_dictionary,
