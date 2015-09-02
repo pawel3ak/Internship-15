@@ -10,7 +10,6 @@
 import socket
 import json
 import argparse
-import time
 import os
 import logging
 import logging.handlers
@@ -21,15 +20,13 @@ import tl_reservation
 import sdictionary
 import reservation_queue as queue
 from checking_loop import main_checking_loop
-from filter_logs import MyFilter
+from utilities.logger_config import config_logger
 
 
 HOST_IP = "127.0.0.1"
 HOST_PORT = 5005
 FILE_DIRECTORY = "files"
-LOG_DIRECTORY = "logs"
 QUEUE_FILE_NAME = "reservation_queue"
-PRIORITY_QUEUE_FILE_NAME = "reservation_prority_queue"
 SERVER_DICTIONARY_FILE_NAME = "server_dictionary_file"
 FREE_TL = 1     # free tl number for users reservations
 MAX_TL = 1      # max tl number which server can reserve
@@ -43,49 +40,12 @@ EXTEND_TIME = 2     # extend time
 # create logger
 logger = logging.getLogger("server")
 logger.setLevel(logging.DEBUG)
-# create formatter
-formatter = logging.Formatter('%(asctime)s %(levelname)8s: %(name)30s - %(funcName)30s:     %(message)s',
-                              datefmt='%Y-%m-%d,%H:%M:%S')
-logging.Formatter.converter = time.gmtime
-# create file handler to file with logs
-if not os.path.isdir(LOG_DIRECTORY):
-    os.makedirs(LOG_DIRECTORY)
-
-# handler for DEBUG lvl
-file_handler = logging.handlers.TimedRotatingFileHandler(filename='logs/server.log',
-                                                         when='midnight',
-                                                         interval=1,
-                                                         backupCount=30)
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(formatter)
-file_handler.addFilter(MyFilter(logging.DEBUG))
-
-# handler for INFO lvl
-file_handler2 = logging.handlers.TimedRotatingFileHandler(filename='logs/server_info.log',
-                                                          when='midnight',
-                                                          interval=1,
-                                                          backupCount=30)
-file_handler2.setLevel(logging.INFO)
-file_handler2.setFormatter(formatter)
-file_handler2.addFilter(MyFilter(logging.INFO))
-
-# handler for WARNING, ERROR, CRITICAL lvl
-file_handler3 = logging.handlers.TimedRotatingFileHandler(filename='logs/server_warn.log',
-                                                          when='midnight',
-                                                          interval=1,
-                                                          backupCount=30)
-file_handler3.setLevel(logging.WARNING)
-file_handler3.setFormatter(formatter)
-
-# add handlers to the logger
-logger.addHandler(file_handler)
-logger.addHandler(file_handler2)
-logger.addHandler(file_handler3)
+config_logger(logger)
 
 
-def response(connect, message, queue_file_name, priority_queue_file_name, server_dictionary):
+def response(connect, message, queue_file_name, server_dictionary):
     if message == "request/create_reservation":
-        new_request(connect, queue_file_name, priority_queue_file_name, server_dictionary)
+        new_request(connect, queue_file_name)
     elif message == "request/available_tl_count":
         _get_available_tl_count(connect)
     elif message == "request/get_info":
@@ -121,30 +81,21 @@ def _get_available_tl_count(connect):
     connect.close()
 
 
-def new_request(connect, queue_file_name, priority_queue_file_name, server_dictionary):
+def new_request(connect, queue_file_name):
     connect.send("OK")
     logger.debug("Get data from client")
     data = connect.recv(1024).strip()
     request = json.loads(data)
     request['serverID'] = queue.get_server_id_number()
     request['password'] = queue.generate_password()
-    if request['priority'] == 0:
-        request.pop('priority')
-        logger.debug("Save client request to queue")
-        queue.write_to_queue(queue_file_name, request)
-    elif request['priority'] == 1:
-        request.pop('priority')
-        logger.debug("Save client request to priority queue")
-        queue.write_to_queue(priority_queue_file_name, request)
-    '''
-    if (queue.check_queue_length(queue_file_name) == 1) or (queue.check_queue_length(priority_queue_file_name) == 1):
-        checking_reservation_queue(queue_file_name, priority_queue_file_name, server_dictionary, False)
-    '''
+    logger.debug("Save client request to queue")
+    queue.write_to_queue(queue_file_name, request)
     logger.debug("Close connection")
     connect.close()
 
 
 def main_server():
+    print "hehe"
     logger.info("Start server configuration")
     logger.debug("Parsing arguments")
     parser = argparse.ArgumentParser(argparse.ArgumentDefaultsHelpFormatter)
@@ -156,8 +107,6 @@ def main_server():
                         help='set how many free telstline will be available for users')
     parser.add_argument('-f', '--file', default=QUEUE_FILE_NAME,
                         help='set file for reservation queue')
-    parser.add_argument('-r', '--priority', default=PRIORITY_QUEUE_FILE_NAME,
-                        help='set file for reservation priority queue')
 
     args = parser.parse_args()
     host = args.host
@@ -165,7 +114,6 @@ def main_server():
     free_testline = args.freetl
     max_testline = MAX_TL
     queue_file_name = FILE_DIRECTORY + "/" + args.file
-    priority_queue_file_name = FILE_DIRECTORY + "/" + args.priority
     server_dictionary_file_name = FILE_DIRECTORY + "/" + SERVER_DICTIONARY_FILE_NAME
 
     # create server and process dictionary
@@ -186,11 +134,6 @@ def main_server():
     if not os.path.exists(queue_file_name):
         logger.debug("Crate file: %s", queue_file_name)
         queue.create_file(queue_file_name)
-    # priority queue file
-    if not os.path.exists(priority_queue_file_name):
-        logger.debug("Crate file: %s", priority_queue_file_name)
-        queue.create_file(priority_queue_file_name)
-    # server dictionary
     if not os.path.exists(server_dictionary_file_name):
         logger.debug("Crate file: %s", server_dictionary_file_name)
         sdictionary.create_file(server_dictionary_file_name)
@@ -207,12 +150,11 @@ def main_server():
 
     # start checking loop
     logger.info("Start new thread with checking loop")
-    thread = Thread(target=main_checking_loop, args=[queue_file_name, priority_queue_file_name, server_dictionary_file_name,
+    thread = Thread(target=main_checking_loop, args=[queue_file_name, server_dictionary_file_name,
                                                      free_testline, max_testline, server_dict, handle_dict, MIN_TIME_TO_END,
                                                      START_RESERVATION_TIME, MAX_RESERVATION_TIME, EXTEND_TIME])
     thread.daemon = True
     thread.start()
-
     sleep(20)
     # main server loop
     logger.info("Start server loop - waiting for request")
@@ -222,7 +164,7 @@ def main_server():
         logger.debug("New request: %s", data)
         if data == "KONIEC":
             break
-        response(connect, data, queue_file_name, priority_queue_file_name, server_dict)
+        response(connect, data, queue_file_name, server_dict)
 
     sock.close()
     logger.info("Server stopped")
