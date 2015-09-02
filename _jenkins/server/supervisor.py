@@ -23,8 +23,8 @@ def supervisor(serverID, reservation_data, parent_dict, jenkins_info, user_info 
             duration=reservation_data['duration'])
 
     supervisor_api.set_parent_dictionary(busy_status=True)
-    supervisor_api.reservation_status()
-    supervisor_api.set_TLname(supervisor_api.get_TLname_from_ID())
+    supervisor_api.check_and_wait_for_TL_being_prepared_to_use()
+    supervisor_api.set_TLname_from_TLreservationID()
     supervisor_api.set_TLaddress(supervisor_api.get_TLaddress_from_ID())
 
     #############################################################################
@@ -41,7 +41,7 @@ def supervisor(serverID, reservation_data, parent_dict, jenkins_info, user_info 
 
 
     supervisor_api.set_job_api()
-    if not supervisor_api.get_is_queue_or_running():
+    if not supervisor_api.is_queued_or_running():
         supervisor_api.create_and_build_job()
 
     supervisor_api.get_jenkins_console_output()
@@ -50,12 +50,12 @@ def supervisor(serverID, reservation_data, parent_dict, jenkins_info, user_info 
     supervisor_api.set_job_tests_failed_list()
     supervisor_api.set_parent_dictionary()
 
-    print supervisor_api.ending()
+    print supervisor_api.check_output_for_other_fails_or_errors_and_get_test_end_status()
 
-    if supervisor_api.has_got_fail :
-        supervisor_api.remove_tag_from_file()
+    if supervisor_api.are_any_failed_tests :
+        supervisor_api.remove_tag_from_robots_tests()
 
-    supervisor_api.send_information()
+    supervisor_api.send_information_about_executed_job()
 
     supervisor_api.set_parent_dictionary(busy_status=False)
     return 0

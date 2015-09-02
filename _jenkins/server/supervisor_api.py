@@ -33,14 +33,14 @@ class Supervisor(object):
             logger.error('{}'.format(LOGGER_INFO[self.failureStatus]))
             self.finish_with_failure()
         self.reservation_data = reservation_data
-        self.parent_dictionary = parent_dict
+        self.parent_dictionary = parent_dict    #dictionary used to communicate with parent process
         self.jenkins_info = jenkins_info
         self.TLreservationID = TLreservationID
         self.user_info = user_info
         self.TLname = None
         self.TLaddress = None
         self.failureStatus = None
-        self.has_got_fail = False
+        self.are_any_failed_tests = False
         self.test_end_status = None
         self.job_tests_failed_list = None
         logger.debug("Created new Supervisor object with args: "
@@ -55,10 +55,14 @@ class Supervisor(object):
     def get_reservation_data(self):
         return self.reservation_data
 
-    def get_parent_dict(self):
+    def get_parent_dictionary(self):
         return self.parent_dictionary
 
     def set_parent_dictionary(self, busy_status=True):
+        '''
+        :param busy_status: tells whether supervisor has finished work or not
+        :return self.parent_dictionary: full information about reservation that is managed by this supervisor
+        '''
         jenkins_info = self.jenkins_info.copy()
         if 'job_api' in jenkins_info:
             del jenkins_info['job_api']
@@ -100,9 +104,10 @@ class Supervisor(object):
     def get_TLname(self):
         return self.TLname
 
-    def get_TLname_from_ID(self):
+    def set_TLname_from_TLreservationID(self):
         reservation = tlr.TestLineReservation(self.TLreservationID)
-        return reservation.get_reservation_details()['testline']['name']
+        self.TLname = reservation.get_reservation_details()['testline']['name']
+        return self.TLname
 
     def set_TLname(self,name):
         self.TLname = name
@@ -123,7 +128,7 @@ class Supervisor(object):
         self.parent_dictionary[self.serverID]['busy_status'] = False
         if test_status:
             self.test_end_status = test_status
-        self.send_information(test_status=self.test_end_status)
+        self.send_information_about_executed_job(test_status=self.test_end_status)
         sys.exit()
 
     def create_reservation(self, testline_type=None, enb_build=None, ute_build=None,
@@ -148,23 +153,23 @@ class Supervisor(object):
             logger.info("Reservation created. ID: {}".format(self.TLreservationID))
             return self.TLreservationID
 
-    def reservation_status(self):
+    def check_and_wait_for_TL_being_prepared_to_use(self):
         reservation = tlr.TestLineReservation(self.TLreservationID)
-        reservation_status_dict = {1: 'Pending for testline',
+        _reservation_status_dict = {1: 'Pending for testline',
                                    2: 'Testline assigned',
                                    3: 'Confirmed',
                                    4: 'Finished',
                                    5: 'Canceled'}
         while True:
-            if reservation.get_reservation_status() == reservation_status_dict[1] or\
-                            reservation.get_reservation_status() == reservation_status_dict[2]:
+            if reservation.get_reservation_status() == _reservation_status_dict[1] or\
+                            reservation.get_reservation_status() == _reservation_status_dict[2]:
                 logger.debug("Waiting for TL (reservation ID: {}) to be ready for use. TL status: {}".format(self.TLreservationID, reservation.get_reservation_status()))
                 time.sleep(120)
-            elif reservation.get_reservation_status() == reservation_status_dict[3]:
-                logger.info("{} ready".format(self.get_TLname_from_ID()))
+            elif reservation.get_reservation_status() == _reservation_status_dict[3]:
+                logger.info("{} ready".format(self.set_TLname_from_TLreservationID()))
                 return 0
-            elif reservation.get_reservation_status() == reservation_status_dict[4] or\
-                            reservation.get_reservation_status() == reservation_status_dict[5]:
+            elif reservation.get_reservation_status() == _reservation_status_dict[4] or\
+                            reservation.get_reservation_status() == _reservation_status_dict[5]:
                 self.failureStatus = 103
                 logger.warning('{} {}'.format(self.TLreservationID, LOGGER_INFO[self.failureStatus]))
                 self.finish_with_failure()
@@ -196,12 +201,12 @@ class Supervisor(object):
         finally:
             logger.debug("Job {} status = {}".format(self.jenkins_info['job_name'], job_status))
             if job_status == "FAILURE":
-                self.has_got_fail = False
-                self.ending()
+                self.are_any_failed_tests = False
+                self.check_output_for_other_fails_or_errors_and_get_test_end_status()
             else:
                 return job.get_last_build().get_status()
 
-    def get_is_queue_or_running(self):      ##tu pewnie bedziesz chcial zmienic nazwe, ale nie mialem pomyslu na jaka, bo funkcja z jenkinsapi nazywa sie "is_queue_or_running"
+    def is_queued_or_running(self):
         try:
             job = self.jenkins_info['job_api'].get_job(self.jenkins_info['job_name'])
             return job.is_queued_or_running()
@@ -239,7 +244,7 @@ class Supervisor(object):
         try:
             job = self.jenkins_info['job_api'].get_job(self.jenkins_info['job_name'])
             while True:
-                if not self.get_is_queue_or_running(): break
+                if not self.is_queued_or_running(): break
                 else:
                     time.sleep(2)   ####TODO longer time on real tests
             self.jenkins_info['console_output'] = job.get_last_build().get_console()
@@ -255,7 +260,7 @@ class Supervisor(object):
         job_tests_failed_list=[]
         try:
             matches = re.findall(regex,self.jenkins_info['console_output'])
-            if len(matches) != 0: self.has_got_fail = True
+            if len(matches) != 0: self.are_any_failed_tests = True
             for match in matches:
                 match = re.sub(" +", "_", match)  #changing " " to "_" - pybot thinks it's the same, i don't
                 if match[-3:] == '...': match = match[:-3]  #cutting last "..."
@@ -291,20 +296,20 @@ class Supervisor(object):
                 return False
         return True
 
-    def ending(self):
-        if not self.has_got_fail:
+    def check_output_for_other_fails_or_errors_and_get_test_end_status(self):
+        if not self.are_any_failed_tests:
             if self.check_for_fails() == True:
                 self.test_end_status = "PASS"
                 logger.info("Test {} was successful".format(self.jenkins_info['job_name']))
             else:
                 self.test_end_status = "UNKNOWN_FAIL"
-                self.has_got_fail = True
+                self.are_any_failed_tests = True
                 self.failureStatus = 109
                 logger.error('{}'.format(LOGGER_INFO[self.failureStatus]))
                 self.finish_with_failure(test_status=self.test_end_status)
         else:
             self.test_end_status = "Failed"
-            self.has_got_fail = True
+            self.are_any_failed_tests = True
             logger.info("Test {} has got some failures".format(self.jenkins_info['job_name']))
         return self.test_end_status
 
@@ -358,7 +363,7 @@ class Supervisor(object):
             except:
                 pass
 
-    def remove_tag_from_file(self, old_tag = 'enable', new_tag = ''):
+    def remove_tag_from_robots_tests(self, old_tag = 'enable', new_tag = ''):
         additional_directory_list, files_names_list = self._check_if_more_directories()
         path, file_name = self._try_to_match_file_name(additional_directory_list, files_names_list)
 
@@ -397,7 +402,7 @@ class Supervisor(object):
             self.failureStatus = 112
             logger.warning('{}'.format(LOGGER_INFO[self.failureStatus]))
 
-    def send_information(self, test_status=None):
+    def send_information_about_executed_job(self, test_status=None):
         if test_status:
             self.test_end_status = test_status
         if self.test_end_status == "PASS":
