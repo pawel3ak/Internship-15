@@ -7,20 +7,23 @@
 :contact: pawel.nogiec@nokia.com
 """
 
-import tl_reservation as tlr
 import time
-import jenkinsapi
 import xml.etree.ElementTree as ET
 import re
+import os
+import sys
+import logging
+
+import jenkinsapi
 import ute_mail.sender
 import ute_mail.mail
-import os
 import paramiko
-import sys
+
+import tl_reservation as tlr
 from mailing_list import mail_dict
-import logging
-from messages_logger import LOGGER_INFO
+from utilities.logger_messages import LOGGER_INFO
 from server_git_api import git_launch
+
 # create logger
 logger = logging.getLogger("server." + __name__)
 
