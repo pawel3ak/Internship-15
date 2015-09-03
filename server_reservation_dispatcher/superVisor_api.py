@@ -38,10 +38,11 @@ class Supervisor(object):
         self.user_info = user_info          #dict:{first_name : "", last_name : "", mail :""}
         self.TLname = TLname
         self.TLaddress = self.get_TLaddress()
+        self.suitname = jenkins_job_info['parameters']['name']
         self.failureStatus = None
         self.are_any_failed_tests = False
         self.test_end_status = None
-        self.job_tests_failed_list = None
+        self.job_filenames_failed_tests = None
         logger.debug("Created new Supervisor object with args: "
                      "jenkins_info = {}, user_info = {}, TLreservationID = {}".format(self.jenkins_info,
                                                                                       self.user_info,
@@ -176,37 +177,40 @@ class Supervisor(object):
             logger.error('{}'.format(LOGGER_INFO[self.failureStatus]))
             self.finish_with_failure()
 
-    def set_job_tests_failed_list(self):
+    def parse_output_and_set_job_failed_tests(self):
+        job_filenames_failed_tests=[]
         regex = r'\=\s(.*)\s\=\W*.*FAIL'
-        job_tests_failed_list=[]
         try:
-            matches = re.findall(regex,self.jenkins_info['console_output'])
-            if len(matches) != 0: self.are_any_failed_tests = True
+            matches = re.findall(regex, self.jenkins_info['console_output'])
             for match in matches:
                 match = re.sub(" +", "_", match)  #changing " " to "_" - pybot thinks it's the same, i don't
                 if match[-3:] == '...': match = match[:-3]  #cutting last "..."
-                if match[-1:] == '_': match = match[:-1]    #cutting last "_"
+                elif match[-1:] == '_': match = match[:-1]    #cutting last "_"
                 try:
-                    match = re.search('(\w*)\.Tests\.(.*)', match).groups()
-                    job_tests_failed_list.append({'test_name' : match[0],
-                                  'file_name' : match[1]})
+                    match = re.search('\w*\.Tests\.{}.*\.(.*)'.format(self.suitname), match).group(1)
+                    job_filenames_failed_tests.append(match)
                 except:
-                    match = re.search('(\w*)\.(.*)', match).groups()
-                    job_tests_failed_list.append({'test_name' : match[0],
-                                       'file_name' : match[1]})
-            logger.info("Regex found fails in output of {}".format(self.jenkins_info['job_name']))
+                    try:
+                        match = re.search('\w*\.Tests\.(.*)', match).group(1)
+                        job_filenames_failed_tests.append(match)
+                    except:
+                        match = re.search('\w*\.(.*)', match).group(1)
+                        job_filenames_failed_tests.append(match)
         except:
             logger.debug("Regex did not find fails in output of {}".format(self.jenkins_info['job_name']))
-            pass
         finally:
-            self.job_tests_failed_list = job_tests_failed_list
-            return self.job_tests_failed_list
+            if job_filenames_failed_tests:
+                logger.info("Regex found fails in output of {}".format(self.jenkins_info['job_name']))
+            self.job_filenames_failed_tests = job_filenames_failed_tests
+            return self.job_filenames_failed_tests
+
+
 
     def check_for_fails(self):
-        output = str(self.jenkins_info['console_output'])
+        output = self.jenkins_info['console_output']
         if not output.find('| FAIL |') == -1:
             logger.debug("Found 'FAIL' in output of {}".format(self.jenkins_info['job_name']))
-            return False
+            return True
         output = output.split('\n')
         for line in output:
             if re.findall('\[.ERROR.\].*no tests.*', line):
@@ -214,122 +218,102 @@ class Supervisor(object):
                 continue
             if not line.find('[ ERROR ]') == -1:
                 logger.debug("Found 'ERROR' in output of {}".format(self.jenkins_info['job_name']))
-                return False
-        return True
+                return True
+        return False
 
     def check_output_for_other_fails_or_errors_and_get_test_end_status(self):
         if not self.are_any_failed_tests:
-            if self.check_for_fails() == True:
-                self.test_end_status = "PASS"
+            if self.check_for_fails() == False:
+                self.test_end_status = "SUCCESSFUL"
                 logger.info("Test {} was successful".format(self.jenkins_info['job_name']))
             else:
-                self.test_end_status = "UNKNOWN_FAIL"
+                self.test_end_status = "UNKNOWN_ERROR/FAIL"
                 self.are_any_failed_tests = True
                 self.failureStatus = 109
                 logger.error('{}'.format(LOGGER_INFO[self.failureStatus]))
-                self.finish_with_failure(test_status=self.test_end_status)
+                self.finish_with_failure()
         else:
-            self.test_end_status = "Failed"
+            self.test_end_status = "GOT_FAILS"
             self.are_any_failed_tests = True
             logger.info("Test {} has got some failures".format(self.jenkins_info['job_name']))
         return self.test_end_status
 
     def get_SSHClient_connection(self):
         SSHClient = paramiko.SSHClient()
-        SSHClient .load_system_host_keys()
-        SSHClient .set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        SSHClient .connect(self.get_TLaddress(), username='ute', password='ute')
+        SSHClient.load_system_host_keys()
+        SSHClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        SSHClient.connect(self.TLaddress, username='ute', password='ute')
         return SSHClient
 
-    def _check_if_more_directories(self):           #is private?
-        additional_directory_list = []
-        files_names_list = []
-        for test in self.parent_dictionary[self.serverID]['test_status']:
-            try:
-                match = re.search('({}.*)\.({}.*)'.format(test['test_name'],test['test_name']),
-                                                test['file_name']).groups()
-                additional_directory_list.append(match[0])
-                files_names_list.append(match[1])
-            except:
-                files_names_list.append(test['file_name'])
-                additional_directory_list.append('')
-            finally:
-                return additional_directory_list, files_names_list
 
-    def _try_to_match_file_name(self, additional_directory_list, files_names_list):         #is private?
-        paths_list = []
-        matched_file_names_list = []
-        for i in range(len(files_names_list)):
-            if additional_directory_list[i] == '':
-                path = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}/tests/'.format(
-                    self.parent_dictionary[self.serverID]['test_status'][i]['test_name'])
-                paths_list.append(path)
-            else:
-                path = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}/tests/{}'.format(
-                    self.parent_dictionary[self.serverID]['test_status'][i]['test_name'],
-                    additional_directory_list[i])
-                paths_list.append(path)
-            try:
-                SSHClient = self.get_SSHClient_connection()
-                files = SSHClient.open_sftp().listdir(path=path)
-                SSHClient.close()
-                found = False
-                for file in files:
-                    try:
-                        file_name = re.search('({name}.*)'.format(name=files_names_list[i]),file).groups()[0]
-                        found = True
-                        matched_file_names_list.append(file_name)
-                        self.parent_dictionary[self.serverID]['test_status'][i]['file_name'] = file_name
-                        logger.debug("Found filename: {}".format(file_name))
-                        break
-                    except:
-                        matched_file_names_list.append('')
-                        # pass
-                if not found:
-                    self.failureStatus = 110
-                    logger.warning('{}'.format(LOGGER_INFO[self.failureStatus]))
-            except:
-                pass
-        return paths_list, matched_file_names_list
+    def check_if_more_directories(self):
+        tmp_filenames_and_paths = []
+        for root, dirs, files in os.walk('/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}'.format(self.suitname)):
+            for file in files:
+                if file.endswith('.robot') or file.endswith('.txt'):
+                    tmp_filenames_and_paths.append({'path' : root, 'filename' : file})
+        return tmp_filenames_and_paths
+
+
+    def try_to_match_file_name(self, tmp_filenames_and_paths):
+        filenames_and_paths = []
+        for filename_from_output in self.job_filenames_failed_tests:
+            _found = False
+            for tmp_filename_and_path in tmp_filenames_and_paths:
+                try:
+                    re.search('({}.*)'.format(filename_from_output),tmp_filename_and_path['filename']).group(1)
+                    filenames_and_paths.append({'path' : tmp_filename_and_path['path'], 'filename' : tmp_filename_and_path['filename']})
+                    logger.debug("Found filename: {}".format(tmp_filename_and_path['filename']))
+                    _found = True
+                    break
+                except:
+                    pass
+            if not _found:
+                self.failureStatus = 110
+                logger.warning('{} {}'.format(LOGGER_INFO[self.failureStatus],filename_from_output))
+
+        return filenames_and_paths
+
 
     def remove_tag_from_robots_tests(self, old_tag = 'enable', new_tag = ''):
-        additional_directory_list, files_names_list = self._check_if_more_directories()
-        paths_list, matched_file_names_list = self._try_to_match_file_name(additional_directory_list, files_names_list)
-        for i in range(len(matched_file_names_list)):
+        tmp_filenames_and_paths = self.check_if_more_directories()
+        filenames_and_paths = self.try_to_match_file_name(tmp_filenames_and_paths)
+
+        for filename_and_path in filenames_and_paths:
             try:
                 SSHClient = self.get_SSHClient_connection()
-                file = SSHClient.open_sftp().open(os.path.join(paths_list[i], matched_file_names_list[i]), 'r')
+                file = SSHClient.open_sftp().open(os.path.join(filename_and_path['path'], filename_and_path['name']), 'r+')
                 lines_in_file = file.readlines()
-                file.close()
-                SSHClient.close()
-                found = False
-                for line in range(0, len(lines_in_file)):
+                file.seek(0)
+                file.truncate()
+                _found = False
+                for line in lines_in_file:
                     try:
-                        tag_line = re.search('\[Tags](.*)', lines_in_file[line]).groups()[0]
+                        re.search('\[Tags](.*)', line).group(1)
                         try:
-                            lines_in_file[line] = re.sub(old_tag, new_tag, lines_in_file[line])
-                            found = True
-                            logger.debug("Changed tag in file: {} from {} to {}".format(matched_file_names_list[i], old_tag, new_tag))
+                            file.write(re.sub(old_tag, new_tag, line))
+                            _found = True
+                            logger.debug("Changed tag in file: {} from {} to {}".format(os.path.join(filename_and_path['path'], filename_and_path['name']), old_tag, new_tag))
                         except:
-                            pass
+                            file.write(line)
                     except:
                         pass
-                if not found:
+                if not _found:
                     self.failureStatus = 111
+                    self.test_end_status = "NO_TAG"
                     logger.warning('{} : {}'.format(LOGGER_INFO[self.failureStatus], old_tag))
             #   git_result = self.git_launch(file_info=[path, file_name])
             #   if not git_result == True:
             #         self.failureStatus = 114
             #         logger.warning('{} : {}'.format(LOGGER_INFO[self.failureStatus], git_result))
             #   logger.info("Git push successful on {}".format(self.TLname))
-                SSHClient = self.get_SSHClient_connection()
-                file = SSHClient.open_sftp().open(os.path.join(paths_list[i],matched_file_names_list[i]), 'w')
-                file.writelines(lines_in_file)
-                file.close()
-                SSHClient.close()
+
             except:
                 self.failureStatus = 112
+                self.test_end_status = "SSH_Connection_Failure"
                 logger.warning('{}'.format(LOGGER_INFO[self.failureStatus]))
+            finally:
+                SSHClient.close()
 
     def send_information_about_executed_job(self, test_status=None):
         if test_status:
