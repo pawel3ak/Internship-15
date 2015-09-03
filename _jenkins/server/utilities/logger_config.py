@@ -7,11 +7,11 @@
 """
 import logging
 import logging.handlers
-import ConfigParser
 import time
 import os
 
 LOG_DIRECTORY = "logs"
+
 
 def add_handler(logger, formatter, logging_level= logging.INFO, filename_log= 'server.log'):
     file_handler = logging.handlers.TimedRotatingFileHandler(filename=os.path.join(LOG_DIRECTORY, filename_log),

@@ -49,17 +49,6 @@ def get_not_busy_reservation_list(dictionary):
     return record_list
 
 
-def get_busy_reservation_list(dictionary):
-    record_list = []
-    for record in dictionary:
-        if dictionary[record]['busy_status']:
-            record_list.append(record)
-            logger.debug("reservation {} - busy".format(dictionary[record]['reservationID']))
-        else:
-            logger.debug("reservation {} - no busy".format(dictionary[record]['reservationID']))
-    return record_list
-
-
 def write_dictionary_to_file(file_name, dictionary):
     with open(file_name, "wb") as open_file:
         json.dump(dictionary, open_file)

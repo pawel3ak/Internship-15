@@ -27,6 +27,7 @@ def get_list_of_folders_in_dir(directory):
     [directory_list.append(x) for x in os.listdir(directory) if os.path.isdir(os.path.join(directory, x))]
     return directory_list
 
+
 def update_repository():
     logger.debug("Repository update")
     updating_bash = pexpect.spawn("/bin/bash")
@@ -91,7 +92,7 @@ def finish_not_busy_reservation(server_id, server_dictionary, handle_dictionary,
 
 
 def bind_new_job_to_tl(queue_file, server_id, server_dictionary, handle_dictionary):
-    # end old job and get reservation ID number
+    # check if job is finished, remove from dictionaries and get reservation ID number
     logger.debug("Get reservation ID and end finished job")
     reservation_id = finish_not_busy_reservation(server_id, server_dictionary, handle_dictionary, False)
     # add new job
@@ -100,7 +101,7 @@ def bind_new_job_to_tl(queue_file, server_id, server_dictionary, handle_dictiona
 
 
 def checking_reservation_queue(queue_file_name, number_of_free_tl, max_tl_number, server_dictionary,
-                               handle_dictionary, start_reservation_time, cloud_name= 'CLOUD_F' , loop=True):
+                               handle_dictionary, start_reservation_time, cloud_name='CLOUD_F', loop=True):
     test_reservation = TestLineReservation()
     while True:
         # temporary prints
@@ -145,7 +146,7 @@ def delete_done_reservation_from_dictionary(dictionary):
     temp = []
     for key in dictionary.keys():
         test_reservation = TestLineReservation(dictionary[key]["reservationID"])
-        if test_reservation.get_reservation_details()["status"] > 3:    #reservation status is either canceled or finished
+        if test_reservation.get_reservation_details()["status"] > 3:    # reservation status is either canceled or finished
             del dictionary[key]
 
 

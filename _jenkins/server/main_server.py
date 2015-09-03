@@ -39,6 +39,7 @@ EXTEND_TIME = 2     # extend time
 
 # create logger
 logger = logging.getLogger("server")
+logger.setLevel(logging.DEBUG)
 config_logger(logger)
 
 def get_requests_to_server(server_socket, queue_file_name, server_dict):
@@ -152,11 +153,11 @@ def main_server():
 
     # create server and process dictionary
     logger.debug("Create servers dictionaries")
-    man = Manager()
-    server_dict = man.dict()
-    # server_dict = {}
-    handle_dict = man.dict()
-    # handle_dict = {}
+    #man = Manager()
+    #server_dict = man.dict()
+    server_dict = {}
+    #handle_dict = man.dict()
+    handle_dict = {}
 
     # create files and directories if not exist
     create_server_files(queue_file_name, server_dictionary_file_name)
