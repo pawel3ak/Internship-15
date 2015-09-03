@@ -54,18 +54,13 @@ def get_server_id_number():
     # check if id_file exists
     with open(id_file, "ab+") as opened_file:
         lines = opened_file.readlines()
-    if len(lines) == 0:
-        write_to_queue_file(id_file, 1)
-        return 1
-    elif len(lines) == 1:
-        id_number = read_next_reservation_record_from_queue(id_file) + 1
-        with open(id_file, "wb+") as opened_file:
-            json.dump(id_number, opened_file)
-        return id_number
-    else:
-        id_number = 1
-        with open(id_file, "wb+") as opened_file:
-            json.dump(id_number, opened_file)
+        if len(lines) == 1:
+            id_number = json.loads(lines[0]) + 1
+        else:
+            id_number = 1
+        opened_file.seek(0)
+        opened_file.truncate()
+        json.dump(id_number, opened_file)
         return id_number
 
 
