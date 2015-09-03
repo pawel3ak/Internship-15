@@ -8,6 +8,7 @@
 
 import json
 import logging
+import os
 
 
 logger = logging.getLogger("server." + __name__)
@@ -48,7 +49,7 @@ def get_not_busy_reservation_list(dictionary):
     return record_list
 
 
-def get_busy_list(dictionary):
+def get_busy_reservation_list(dictionary):
     record_list = []
     for record in dictionary:
         if dictionary[record]['busy_status']:
@@ -57,12 +58,6 @@ def get_busy_list(dictionary):
         else:
             logger.debug("reservation {} - no busy".format(dictionary[record]['reservationID']))
     return record_list
-
-
-
-def create_file(new_file):
-    with open(new_file, "ab+") as open_file:
-        open_file.close()
 
 
 def write_dictionary_to_file(file_name, dictionary):

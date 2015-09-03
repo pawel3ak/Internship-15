@@ -52,14 +52,14 @@ def make_tests_queue_from_dir(queue_file, directory, max_reservation_time):
                    'jenkins_info': {'parameters': {'name': dir}}
                    }
         logger.debug("Write new queue to file: %s", queue_file)
-        queue.write_to_queue(queue_file, request)
+        queue.write_to_queue_file(queue_file, request)
 
 
 def start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_id=None, request=None):
     if request is None:
         logger.debug("Get reservation from queue")
-        request = queue.read_next_from_queue(queue_file)
-        queue.delete_reservation_from_queue(queue_file, request["serverID"], request["password"])
+        request = queue.read_next_reservation_record_from_queue(queue_file)
+        queue.delete_reservation_record_from_queue_file(queue_file, request["serverID"], request["password"])
     logger.info("Start new thread supervisor.main for serverID: {} reservationID: {}".format(request["serverID"], reservation_id))
     thread = Thread(target=supervisor.supervise, args=[request["serverID"],
                                                   request["reservation_data"],
@@ -145,7 +145,7 @@ def delete_done_reservation_from_dictionary(dictionary):
     temp = []
     for key in dictionary.keys():
         test_reservation = TestLineReservation(dictionary[key]["reservationID"])
-        if test_reservation.get_reservation_details()["status"] > 3:
+        if test_reservation.get_reservation_details()["status"] > 3:    #reservation status is either canceled or finished
             del dictionary[key]
 
 

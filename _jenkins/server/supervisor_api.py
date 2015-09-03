@@ -316,15 +316,14 @@ class Supervisor(object):
             logger.info("Test {} has got some failures".format(self.jenkins_info['job_name']))
         return self.test_end_status
 
-    def _get_SSHClient_connection(self):
+    def get_SSHClient_connection(self):
         SSHClient = paramiko.SSHClient()
         SSHClient .load_system_host_keys()
         SSHClient .set_missing_host_key_policy(paramiko.AutoAddPolicy())
         SSHClient .connect(self.get_TLaddress(), username='ute', password='ute')
-        # sftp_connection = client.open_sftp()
         return SSHClient
 
-    def _check_if_more_directories(self):
+    def _check_if_more_directories(self):           #is private?
         additional_directory_list = []
         files_names_list = []
         for test in self.parent_dictionary[self.serverID]['test_status']:
@@ -337,7 +336,7 @@ class Supervisor(object):
                 files_names_list.append(test['file_name'])
                 additional_directory_list.append('')
 
-    def _try_to_match_file_name(self, additional_directory_list, files_names_list):
+    def _try_to_match_file_name(self, additional_directory_list, files_names_list):         #is private?
         for i in range(len(files_names_list)):
             if additional_directory_list[i] == '':
                 path = '/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}/tests/'.format(
@@ -347,7 +346,7 @@ class Supervisor(object):
                     self.parent_dictionary[self.serverID]['test_status'][i]['test_name'],
                     additional_directory_list[i])
             try:
-                SSHClient = self._get_SSHClient_connection()
+                SSHClient = self.get_SSHClient_connection()
                 files = SSHClient.open_sftp().listdir(path=path)
                 SSHClient.close()
                 found = False
@@ -371,7 +370,7 @@ class Supervisor(object):
         path, file_name = self._try_to_match_file_name(additional_directory_list, files_names_list)
 
         try:
-            SSHClient = self._get_SSHClient_connection()
+            SSHClient = self.get_SSHClient_connection()
             file = SSHClient.open_sftp().open(os.path.join(path, file_name), 'r')
             lines_in_file = file.readlines()
             file.close()
@@ -396,7 +395,7 @@ class Supervisor(object):
                 self.failureStatus = 114
                 logger.warning('{} : {}'.format(LOGGER_INFO[self.failureStatus], git_result))
             logger.info("Git push successful on {}".format(self.TLname))
-            SSHClient = self._get_SSHClient_connection()
+            SSHClient = self.get_SSHClient_connection()
             file = SSHClient.open_sftp().open(os.path.join(path,file_name), 'w')
             file.writelines(lines_in_file)
             file.close()
