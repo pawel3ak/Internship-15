@@ -12,5 +12,7 @@ LOGGER_INFO = {
     111: "Finding tag in file error",
     112: "Opening file to change tag failed (probably wrong file name)",
     113: "No duration in reseration_data",
-    114: "Git error"
+    114: "Git error",
+    128: "SSH Connection Failure",
+
 }

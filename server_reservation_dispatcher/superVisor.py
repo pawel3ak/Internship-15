@@ -8,15 +8,50 @@
 """
 
 
-from superVisor_api import Supervisor
+from superVisor_api import SuperVisor
+
+def supervise(TLname, jenkins_job_info, user_info = None):
+    superVisor_api = SuperVisor(TLname, jenkins_job_info, user_info)
+    superVisor_api.make_file_with_specific_info()
+    superVisor_api.set_jenkins_connection()
+    print superVisor_api.get_jenkins_connection()
+    print superVisor_api.get_jobname()
+    superVisor_api.set_job_handler()
+    if superVisor_api._is_queued_or_running():
+        superVisor_api.set_job_status()
+        superVisor_api.check_job_status()
 
 
-#
-# __job_status = self.get_job_status()
-# if __job_status == "FAILURE":
-#     self.set_are_any_failed_tests(False)
-#     self.check_output_for_other_fails_or_errors_and_get_test_end_status()
-# elif __job_status == "UNKNOWN":
-#     self.set_failure_status(127)
-#     self.set_test_end_status("JenkinsError")
-#     self.finish_with_failure()
+    superVisor_api.set_node_for_job()
+    # superVisor_api.build_job()
+    superVisor_api._is_queued_or_running()
+    superVisor_api.set_job_status()
+    superVisor_api.check_job_status()
+    superVisor_api.set_jenkins_console_output()
+    superVisor_api.parse_output_and_set_job_failed_tests()
+    print superVisor_api.get_are_any_failed_tests()
+    superVisor_api.check_output_for_other_fails_or_errors_and_set_test_end_status()
+    print superVisor_api.get_test_end_status()
+    superVisor_api.remove_tag_from_robots_tests()
+    superVisor_api.send_information_about_executed_job()
+    superVisor_api.delete_file_with_specific_info()
+
+    # print superVisor_api.get_jenkins_info()
+    # print superVisor_api.get_user_info()
+    # print superVisor_api.get_TLname()
+    # print superVisor_api.get_suitname()
+    # print superVisor_api.get_TLaddress()
+    # print superVisor_api.get_failure_status()
+    # print superVisor_api.get_are_any_failed_tests()
+    # print superVisor_api.get_test_end_status()
+    # print superVisor_api.get_filenames_of_failed_tests()
+
+
+if __name__ == '__main__':
+    jenkins_job_info = {
+        'parameters' : {
+            'name' : 'LTEXYZ'
+        }
+    }
+    supervise('tl99_test', jenkins_job_info)
+

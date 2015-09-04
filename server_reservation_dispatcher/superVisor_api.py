@@ -34,8 +34,8 @@ from utilities.logger_config import config_logger
 config_logger(logger)
 ########################################################################################
 
-class Supervisor(object):
-    def __init__(self,TLname, jenkins_job_info, user_info=None):
+class SuperVisor(object):
+    def __init__(self,TLname, jenkins_job_info, user_info):
         self.__jenkins_info = jenkins_job_info    #dict:{jobname : "", parameters : {param1 : "", ...}}
         self.__user_info = user_info          #dict:{first_name : "", last_name : "", mail :""}
         self.__TLname = TLname
@@ -118,7 +118,7 @@ class Supervisor(object):
 
 
     def set_default_jobname(self):
-        self.__jenkins_info['jobname'] = 'job_on_{}'.format(self.get_TLname())
+        self.__jenkins_info['jobname'] = 'test_on_{}'.format(self.get_TLname())
 
 
     def get_jobname(self):
@@ -129,6 +129,8 @@ class Supervisor(object):
 
 
     def set_jenkins_connection(self):
+        if not self.get_jobname():
+            self.set_default_jobname()
         try:
             self.__jenkins_info['connection'] = Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
             logger.debug("jenkins connection has been set")
@@ -143,8 +145,14 @@ class Supervisor(object):
         return self.__jenkins_info['connection']
 
 
-    def set_job_handler(self, job_handler):
-        self.__jenkins_info['job_handler'] = job_handler
+    def set_job_handler(self):
+        try:
+            self.__jenkins_info['job_handler'] = self.get_jenkins_connection().get_job(self.get_jobname())
+        except:
+            self.set_failure_status(125)
+            self.set_test_end_status("JenkinsError")
+            logger.critical('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+            self.finish_with_failure()
 
 
     def get_job_handler(self):
@@ -159,6 +167,10 @@ class Supervisor(object):
         return self.__jenkins_info['output']
 
 
+    def get_job_status(self):
+        return self.__jenkins_info['job_status']
+
+
     #########################################################################################
     #functions
     #########################################################################################
@@ -171,8 +183,8 @@ class Supervisor(object):
             'job_params': self.get_job_parameters()
         }
         path_with_filename = os.path.join('.','files','SuperVisor',self.get_suitname())
-        with open(path_with_filename, 'wb'):
-            json.dump(info_to_save, path_with_filename)
+        with open(path_with_filename, 'wb') as file_with_specific_info:
+            json.dump(info_to_save, file_with_specific_info)
 
 
     def delete_file_with_specific_info(self):
@@ -191,16 +203,6 @@ class Supervisor(object):
         sys.exit()
 
 
-    def set_jenkins_job_handler(self):
-        try:
-            self.set_job_handler(self.get_jenkins_connection().get_job(self.get_jobname()))
-        except:
-            self.set_failure_status(125)
-            self.set_test_end_status("JenkinsError")
-            logger.critical('{}'.format(LOGGER_INFO[self.get_failure_status()]))
-            self.finish_with_failure()
-
-
     def set_node_for_job(self):
         try:
             job_config_xml = ET.fromstring(self.get_job_handler().get_config())
@@ -215,18 +217,30 @@ class Supervisor(object):
             self.finish_with_failure()
 
 
-    def get_job_status(self):
-        job_status = "Unknown"
+    def set_job_status(self):
         try:
-            job_status = self.get_job_handler().get_last_build().get_status()
+            self.__jenkins_info['job_status'] = self.get_job_handler().get_last_build().get_status()
         except:
+            self.__jenkins_info['job_status'] = "UNKNOWN"
             self.set_failure_status(105)
             self.set_test_end_status("JenkinsError")
             logger.error('{} : {}'.format(self.get_jobname(),LOGGER_INFO[self.get_failure_status()]))
             self.finish_with_failure()
         finally:
-            logger.debug("Job {} status = {}".format(self.get_jobname(), job_status))
-            return job_status
+            logger.debug("Job {} status = {}".format(self.get_jobname(), self.get_job_status()))
+
+
+    def check_job_status(self):
+        job_status = self.get_job_status()
+        if job_status == "FAILURE":
+            self.set_are_any_failed_tests(False)
+            self.check_output_for_other_fails_or_errors_and_set_test_end_status()
+        elif job_status == "UNKNOWN":
+            self.set_failure_status(127)
+            self.set_test_end_status("JenkinsError")
+            self.finish_with_failure()
+        elif job_status == "SUCCESSFUL":
+            pass
 
 
     def _is_queued_or_running(self):
@@ -270,6 +284,7 @@ class Supervisor(object):
         regex = r'\=\s(.*)\s\=\W*.*FAIL'
         try:
             matches = re.findall(regex, self.get_job_output())
+            self.set_are_any_failed_tests(True)
             for match in matches:
                 match = re.sub(" +", "_", match)  #changing " " to "_" - pybot thinks it's the same, i don't
                 if match[-3:] == '...': match = match[:-3]  #cutting last "..."
@@ -307,8 +322,8 @@ class Supervisor(object):
                 return True
         return False
 
-    def check_output_for_other_fails_or_errors_and_get_test_end_status(self):
-        if not self.get_are_any_failed_tests():
+    def check_output_for_other_fails_or_errors_and_set_test_end_status(self):
+        if self.get_are_any_failed_tests() == False:
             if self.check_for_fails() == False:
                 self.set_test_end_status("SUCCESSFUL")
                 logger.info("Test {} was successful".format(self.get_jobname()))
@@ -320,7 +335,6 @@ class Supervisor(object):
                 self.finish_with_failure()
         else:
             self.set_test_end_status("GOT_FAILS")
-            self.set_are_any_failed_tests(True)
             logger.info("Test {} has got some failures".format(self.get_jobname()))
 
 
@@ -370,6 +384,7 @@ class Supervisor(object):
     def remove_tag_from_robots_tests(self, old_tag = 'enable', new_tag = ''):
         tmp_filenames_and_paths = self.__get_robot_files_and_paths()
         filenames_and_paths = self.__match_filenames_and_paths(tmp_filenames_and_paths)
+        SSHClient = None
         try:
             SSHClient = self.__get_SSHClient_connection()
         except:
@@ -377,29 +392,26 @@ class Supervisor(object):
             logger.warning('{}'.format(self.get_failure_status()))
             self.set_test_end_status("SSH_Connection_Failure")
             self.finish_with_failure()
-
+        __found = False
         for filename_and_path in filenames_and_paths:
             try:
-                file = SSHClient.open_sftp().open(os.path.join(filename_and_path['path'], filename_and_path['name']), 'r+')
+                SFTP = SSHClient.open_sftp()
+                file = SFTP.file(os.path.join(filename_and_path['path'], filename_and_path['filename']), 'r+')
                 lines_in_file = file.readlines()
-                file.seek(0)
-                file.truncate()
-                __found = False
+                SFTP.truncate(os.path.join(filename_and_path['path'], filename_and_path['filename']), 0)
+                print lines_in_file
                 for line in lines_in_file:
                     try:
-                        re.search('\[Tags](.*)', line).group(1)
+                        re.search('.*\[Tags](.*)', line).group(1)
                         try:
                             file.write(re.sub(old_tag, new_tag, line))
                             __found = True
                             logger.debug("Changed tag in file: {} from {} to {}".format(os.path.join(filename_and_path['path'], filename_and_path['name']), old_tag, new_tag))
                         except:
-                            file.write(line)
+                            pass
                     except:
-                        pass
-                if not __found:
-                    self.set_failure_status(111)
-                    self.set_test_end_status("NO_TAG")
-                    logger.warning('{} : {}'.format(LOGGER_INFO[self.get_failure_status()], old_tag))
+                        file.write(line)
+
             #   git_result = self.git_launch(file_info=[path, file_name])
             #   if not git_result == True:
             #         self.failureStatus = 114
@@ -409,9 +421,13 @@ class Supervisor(object):
             except:
                 self.set_failure_status(112)
                 self.set_test_end_status("SSH_Connection_Failure")
-                logger.warning('{}'.format(LOGGER_INFO[self.set_failure_status()]))
+                logger.warning('{}'.format(LOGGER_INFO[self.get_failure_status()]))
             finally:
                 SSHClient.close()
+        if not __found:
+            self.set_failure_status(111)
+            self.set_test_end_status("NO_TAG")
+            logger.warning('{} : {}'.format(LOGGER_INFO[self.get_failure_status()], old_tag))
 
 
     def send_information_about_executed_job(self):
@@ -421,7 +437,7 @@ class Supervisor(object):
         if test_end_status == "PASS":
             return 0
 
-        elif test_end_status == "Failed":
+        elif test_end_status == "GOT_FAILS":
             t = self.get_job_handler().get_last_build().get_timestamp()
             build_time = '{}-{:02g}-{:02g}_{:02g}-{:02g}-{:02g}'.format(t.year, t.month, t.day, (t.hour-(time.altzone/3600)), t.minute, t.second)
             logs_url_address = 'http://10.83.200.35/~ltebox/logs/{}_{}/log.html'.format(self.__TLname, build_time)
@@ -442,7 +458,7 @@ class Supervisor(object):
             subject = "Tests status update - finished with fail"
 
 
-        elif test_end_status == 'UNKNOWN_FAIL':
+        elif test_end_status == 'UNKNOWN_ERROR/FAIL':
             logs_url_address = '{url}/job/{job_name}/{bn}/console'.format(url= 'http://plkraaa-jenkins.emea.nsn-net.net:8080',
                                                                   job_name=self.get_jobname(),
                                                                   bn=self.get_job_handler().get_last_buildnumber())
@@ -454,8 +470,26 @@ class Supervisor(object):
             messages.append({'message' : _message})
             subject = "Tests status update - finished with unknown fail"
 
+        elif test_end_status == 'JenkinsError':
+            _message = "Dear Admin! \n\n" \
+                       "There is some problems with Jenkins. Please check it.\n\n" \
+                       "Have a nice day!"
+            messages.append({'message' : _message})
+            subject = "Tests status update - JenkinsError"
 
+        elif test_end_status == 'SSH_Connection_Failure':
+            _message = "Dear Admin! \n\n" \
+                       "There is some problems with SSH connection to Belvedere. Please check it.\n\n" \
+                       "Have a nice day!"
+            messages.append({'message' : _message})
+            subject = "Tests status update - SSHError"
 
+        elif test_end_status == 'NO_TAG':
+            _message = "Dear Admin! \n\n" \
+                       "I couldn't find TAG in files from testsuite '{}'. Please check it.\n\n" \
+                       "Have a nice day!".format(self.get_suitname())
+            messages.append({'message' : _message})
+            subject = "Tests status update - JenkinsError"
 
         if 'feature' in messages[0]:
             for message in messages:
