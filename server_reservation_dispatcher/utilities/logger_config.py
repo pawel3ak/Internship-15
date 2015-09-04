@@ -23,9 +23,9 @@ def add_handler(logger, formatter, logging_level=logging.INFO, log_file_path='se
     logger.addHandler(file_handler)
 
 
-def config_logger(logger):
+def config_logger(logger, config_filename):
     config = ConfigParser.RawConfigParser()
-    config.read('server_config.cfg')
+    config.read(config_filename)
 
     # create formatter
     formatter = logging.Formatter(config.get('Logger', 'formatter'),

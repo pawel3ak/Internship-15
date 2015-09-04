@@ -22,16 +22,16 @@ class ReservationQueue(object):
         if not os.path.exists(self._file_path):
             os.mknod(self._file_path)
 
-    def write_new_record(self, record):
+    def write_new_record_to_queue(self, record):
         with open(self._file_path, "ab") as queue_file:
             json.dump(record, queue_file)
             queue_file.write("\n")
 
-    def read_next_reservation_record(self):
+    def read_next_reservation_record_from_queue(self):
         with open(self._file_path, "rb") as queue_file:
             return json.loads(queue_file.readline())
 
-    def delete_reservation_record(self, queue_number, password):
+    def delete_reservation_record_from_queue(self, queue_number, password):
         with open(self._file_path, "rb+") as queue_file:
             lines = queue_file.readlines()
             for line in lines:
@@ -51,7 +51,7 @@ class ReservationQueue(object):
             return len(queue_file.readlines())
 
     @staticmethod
-    def __get_server_id_number():
+    def __get_record_id_number():
         id_file = os.path.join("files", "temp_id")
         with open(id_file, "ab+") as opened_file:
             lines = opened_file.readlines()

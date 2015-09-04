@@ -19,18 +19,44 @@ from utilities.reservation_queue import ReservationQueue
 logger = logging.getLogger("server." + __name__)
 
 
-class JobManager(object):
-    def __init__(self):
-        self._config = ConfigParser.RawConfigParser()
-        self.__get_parameters_from_config_file('server_config.cfg')
-        self._reservation_queue = ReservationQueue(os.path.join(self._config.get('JobManager', 'directory'),
-                                                                self._config.get('JobManager', 'queue_filename')))
-        self._handle_dictionary = {}
-        self._
+class JobManager(ReservationQueue):
+    def __init__(self, config_filename = 'server_config.cfg'):
+        self._config_filename = config_filename
+        config = ConfigParser.RawConfigParser()
+        config.read(config_filename)
+        self._supervisors_handlers_dictionary = {}    # {reservation_ID: handler}
+        self._job_manager_dictionary = {}      # {reservation_ID: suite_name}
+        self._directory_with_tests = config.get('JobManager', 'directory_with_tests')
+        ReservationQueue.__init__(os.path.join(config.get('JobManager', 'directory'),
+                                               config.get('JobManager', 'queue_filename')))
 
     def __get_parameters_from_config_file(self, config_file_path):
-        self._config.read(config_file_path)
+        config = ConfigParser.RawConfigParser()
+        config.read(config_file_path)
 
+    def delete_done_jobs_from_dictionaries(self):
+        for key in self._supervisors_handlers_dictionary.keys():
+            if self._supervisors_handlers_dictionary[key].is_alive():    # check if job is finished
+                # TODO - send info to ReservationMenager
+                del self._supervisors_handlers_dictionary[key]
+                del self._job_manager_dictionary[key]
+
+    def start_new_job(self, reservation_id=None, request=None):
+        if request is None:
+            logger.debug("Get reservation from queue")
+            request = queue.read_next_reservation_record_from_queue(queue_file)
+            queue.delete_reservation_record_from_queue_file(queue_file, request["serverID"], request["password"])
+        logger.info("Start new thread supervisor.main for serverID: {} reservationID: {}".format(request["serverID"], reservation_id))
+        thread = Thread(target=supervisor.supervise, args=[request["serverID"],
+                                                      request["reservation_data"],
+                                                      server_dictionary,
+                                                      request["jenkins_info"],
+                                                      request["user_info"],
+                                                      reservation_id])
+        thread.daemon = True
+        thread.start()
+        logger.debug("Add thread to handle_dictionary")
+        handle_dictionary[request["serverID"]] = thread
 
 
 def get_list_of_folders_in_dir(directory):
@@ -68,48 +94,7 @@ def make_tests_queue_from_dir(queue_file, directory, max_reservation_time):
         queue.write_to_queue_file(queue_file, request)
 
 
-def start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_id=None, request=None):
-    if request is None:
-        logger.debug("Get reservation from queue")
-        request = queue.read_next_reservation_record_from_queue(queue_file)
-        queue.delete_reservation_record_from_queue_file(queue_file, request["serverID"], request["password"])
-    logger.info("Start new thread supervisor.main for serverID: {} reservationID: {}".format(request["serverID"], reservation_id))
-    thread = Thread(target=supervisor.supervise, args=[request["serverID"],
-                                                  request["reservation_data"],
-                                                  server_dictionary,
-                                                  request["jenkins_info"],
-                                                  request["user_info"],
-                                                  reservation_id])
-    thread.daemon = True
-    thread.start()
-    logger.debug("Add thread to handle_dictionary")
-    handle_dictionary[request["serverID"]] = thread
 
-
-def finish_not_busy_reservation(server_id, server_dictionary, handle_dictionary, remove_tl_reservation=True):
-    logger.debug("Get tl reservation ID")
-    reservation_tl_id = server_dictionary[server_id]["reservationID"]
-    logger.debug("Checking if thread is end for serverID: %d", server_id)
-    handle_dictionary[server_id].join()
-    if remove_tl_reservation & (reservation_tl_id is not None):
-        logger.info("End reservation with ID: {}".format(reservation_tl_id))
-        tl_reservation = TestLineReservation(reservation_tl_id)
-        tl_reservation.release_reservation()
-    logger.debug("Remove record from the dictionaries")
-    del handle_dictionary[server_id]
-    del server_dictionary[server_id]
-    if not remove_tl_reservation:
-        return reservation_tl_id
-    return 0
-
-
-def bind_new_job_to_tl(queue_file, server_id, server_dictionary, handle_dictionary):
-    # check if job is finished, remove from dictionaries and get reservation ID number
-    logger.debug("Get reservation ID and end finished job")
-    reservation_id = finish_not_busy_reservation(server_id, server_dictionary, handle_dictionary, False)
-    # add new job
-    logger.debug("Start new job on existing reservation ID: %d", reservation_id)
-    start_new_job(queue_file, server_dictionary, handle_dictionary, reservation_id)
 
 
 def checking_reservation_queue(queue_file_name, number_of_free_tl, max_tl_number, server_dictionary,
@@ -144,22 +129,6 @@ def checking_reservation_queue(queue_file_name, number_of_free_tl, max_tl_number
             break
         if not loop:
             break
-
-
-def checking_tl_busy(server_dictionary, handle_dictionary, min_time_to_end, max_reservation_time, extend_time):
-    logger.debug("Checking if same reservation are not busy")
-    not_busy_record_list = serv_dictionary.get_not_busy_reservation_list(server_dictionary)
-    for record in not_busy_record_list:
-        finish_not_busy_reservation(record, server_dictionary, handle_dictionary)
-        logger.debug("Finished job: %d", record)
-
-
-def delete_done_reservation_from_dictionary(dictionary):
-    temp = []
-    for key in dictionary.keys():
-        test_reservation = TestLineReservation(dictionary[key]["reservationID"])
-        if test_reservation.get_reservation_details()["status"] > 3:    # reservation status is either canceled or finished
-            del dictionary[key]
 
 
 def main_checking_loop(queue_file_name, server_dictionary_file_name,
