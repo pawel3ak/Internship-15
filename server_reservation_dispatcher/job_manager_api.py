@@ -18,8 +18,8 @@ from utilities.reservation_queue import ReservationQueue
 # create logger
 logger = logging.getLogger("server." + __name__)
 
-
-class JobManager(ReservationQueue):
+# TODO - everything
+class JobManagerApi(ReservationQueue):
     def __init__(self, config_filename = 'server_config.cfg'):
         self._config_filename = config_filename
         config = ConfigParser.RawConfigParser()
@@ -41,7 +41,7 @@ class JobManager(ReservationQueue):
                 del self._supervisors_handlers_dictionary[key]
                 del self._job_manager_dictionary[key]
 
-    def start_new_job(self, reservation_id=None, request=None):
+    def start_new_job(self, reservation_id=None):
         if request is None:
             logger.debug("Get reservation from queue")
             request = queue.read_next_reservation_record_from_queue(queue_file)

@@ -15,7 +15,7 @@ from job_manager import job_manager
 logger = logging.getLogger("server" + __name__)
 
 
-class MainServer(object):
+class MainServerApi(object):
     def __init__(self, host_ip=None, host_port=None, config_filename="server_config.cfg"):
         self._config_filename = config_filename
         self._host_ip = host_ip

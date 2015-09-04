@@ -9,7 +9,7 @@
 import logging
 import logging.handlers
 from utilities.logger_config import config_logger
-from server_api import MainServer
+from server_api import MainServerApi
 
 CONFIG_FILE = 'server_config.cfg'
 
@@ -21,7 +21,7 @@ config_logger(logger, CONFIG_FILE)
 
 
 def main_server():
-    server = MainServer(config_filename=CONFIG_FILE)
+    server = MainServerApi(config_filename=CONFIG_FILE)
     server.get_data_from_config_file()
     server.create_server_dirs_if_not_exists()
 
