@@ -39,24 +39,24 @@ def config_logger(logger):
     # handler for DEBUG lvl
     if config.getboolean('Logger', 'debug'):
         add_handler(logger, formatter, logging.DEBUG, os.path.join(config.get('Logger', 'directory'),config.get('Logger', 'debug_filename')),
-                    config.get('Logger', 'when_backup'), config.getint('Logger', 'backup_interval'), config.getint('Logger', 'backup_count '))
+                    config.get('Logger', 'when_backup'), config.getint('Logger', 'backup_interval'), config.getint('Logger', 'backup_count'))
 
     # handler for INFO lvl
     if config.getboolean('Logger', 'info'):
         add_handler(logger, formatter, logging.INFO, os.path.join(config.get('Logger', 'directory'),config.get('Logger', 'info_filename')),
-                    config.get('Logger', 'when_backup'), config.getint('Logger', 'backup_interval'), config.getint('Logger', 'backup_count '))
+                    config.get('Logger', 'when_backup'), config.getint('Logger', 'backup_interval'), config.getint('Logger', 'backup_count'))
 
     # handler for WARNING lvl
     if config.getboolean('Logger', 'warning'):
         add_handler(logger, formatter, logging.WARNING, os.path.join(config.get('Logger', 'directory'),config.get('Logger', 'warning_filename')),
-                    config.get('Logger', 'when_backup'), config.getint('Logger', 'backup_interval'), config.getint('Logger', 'backup_count '))
+                    config.get('Logger', 'when_backup'), config.getint('Logger', 'backup_interval'), config.getint('Logger', 'backup_count'))
 
     # handler for ERROR lvl
     if config.getboolean('Logger', 'error'):
         add_handler(logger, formatter, logging.ERROR, os.path.join(config.get('Logger', 'directory'),config.get('Logger', 'error_filename')),
-                    config.get('Logger', 'when_backup'), config.getint('Logger', 'backup_interval'), config.getint('Logger', 'backup_count '))
+                    config.get('Logger', 'when_backup'), config.getint('Logger', 'backup_interval'), config.getint('Logger', 'backup_count'))
 
     # handler for CRITICAL lvl
     if config.getboolean('Logger', 'critical'):
         add_handler(logger, formatter, logging.CRITICAL, os.path.join(config.get('Logger', 'directory'),config.get('Logger', 'criticalfilename')),
-                    config.get('Logger', 'when_backup'), config.getint('Logger', 'backup_interval'), config.getint('Logger', 'backup_count '))
+                    config.get('Logger', 'when_backup'), config.getint('Logger', 'backup_interval'), config.getint('Logger', 'backup_count'))
