@@ -5,39 +5,58 @@
 :author: Damian Papiez
 :contact: damian.papiez@nokia.com
 """
+import ConfigParser
 import logging
 import logging.handlers
 import time
 import os
 
-LOG_DIRECTORY = "logs"
 
-
-def add_handler(logger, formatter, logging_level= logging.INFO, filename_log= 'server.log'):
-    file_handler = logging.handlers.TimedRotatingFileHandler(filename=os.path.join(LOG_DIRECTORY, filename_log),
-                                                             when='midnight',
-                                                             interval=1,
-                                                             backupCount=30)
+def add_handler(logger, formatter, logging_level=logging.INFO, log_file_path='server_log.log', when_backup='midnight',
+                backup_interval=1, backup_count=30):
+    file_handler = logging.handlers.TimedRotatingFileHandler(filename=log_file_path,
+                                                             when=when_backup,
+                                                             interval=backup_interval,
+                                                             backupCount=backup_count)
     file_handler.setLevel(logging_level)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
 
 def config_logger(logger):
+    config = ConfigParser.RawConfigParser()
+    config.read('server_config.cfg')
+
     # create formatter
-    formatter = logging.Formatter('%(asctime)s %(levelname)8s: %(name)30s - %(funcName)30s:     %(message)s',
-                                  datefmt='%Y-%m-%d,%H:%M:%S')
+    formatter = logging.Formatter(config.get('Logger', 'formatter'),
+                                  datefmt=config.get('Logger', 'date_fmt'))
     logging.Formatter.converter = time.gmtime
 
     # create catalog for logs if not exist
-    if not os.path.isdir(LOG_DIRECTORY):
-        os.makedirs(LOG_DIRECTORY)
+    if not os.path.isdir(config.get('Logger', 'directory')):
+        os.makedirs(config.get('Logger', 'directory'))
 
     # handler for DEBUG lvl
-    add_handler(logger, formatter, logging.DEBUG, 'server_debug.log')
+    if config.getboolean('Logger', 'debug'):
+        add_handler(logger, formatter, logging.DEBUG, os.path.join(config.get('Logger', 'directory'),config.get('Logger', 'debug_filename')),
+                    config.get('Logger', 'when_backup'), config.getint('Logger', 'backup_interval'), config.getint('Logger', 'backup_count '))
 
     # handler for INFO lvl
-    add_handler(logger, formatter, logging.INFO, 'server_info.log')
+    if config.getboolean('Logger', 'info'):
+        add_handler(logger, formatter, logging.INFO, os.path.join(config.get('Logger', 'directory'),config.get('Logger', 'info_filename')),
+                    config.get('Logger', 'when_backup'), config.getint('Logger', 'backup_interval'), config.getint('Logger', 'backup_count '))
 
-    # handler for WARNING, ERROR, CRITICAL lvl
-    add_handler(logger, formatter, logging.WARNING, 'server_warn.log')
+    # handler for WARNING lvl
+    if config.getboolean('Logger', 'warning'):
+        add_handler(logger, formatter, logging.WARNING, os.path.join(config.get('Logger', 'directory'),config.get('Logger', 'warning_filename')),
+                    config.get('Logger', 'when_backup'), config.getint('Logger', 'backup_interval'), config.getint('Logger', 'backup_count '))
+
+    # handler for ERROR lvl
+    if config.getboolean('Logger', 'error'):
+        add_handler(logger, formatter, logging.ERROR, os.path.join(config.get('Logger', 'directory'),config.get('Logger', 'error_filename')),
+                    config.get('Logger', 'when_backup'), config.getint('Logger', 'backup_interval'), config.getint('Logger', 'backup_count '))
+
+    # handler for CRITICAL lvl
+    if config.getboolean('Logger', 'critical'):
+        add_handler(logger, formatter, logging.CRITICAL, os.path.join(config.get('Logger', 'directory'),config.get('Logger', 'criticalfilename')),
+                    config.get('Logger', 'when_backup'), config.getint('Logger', 'backup_interval'), config.getint('Logger', 'backup_count '))
