@@ -1,4 +1,18 @@
-mail_dict={
+# -*- coding: utf-8 -*-
+"""
+:created on: '11/08/15'
+
+:copyright: Nokia
+:author: Pawel Nogiec
+:contact: pawel.nogiec@nokia.com
+"""
+
+admin = {
+    'name' : 'Pawel Nogiec',
+    'mail' : 'pawel.nogiec@nokia.com'
+}
+
+mail_dict = {
     'LTE1819' : ['damian.papiez@nokia.com'],
     'LTE2351' : ['pawel.nogiec@nokia.com'],
     'LTE738' : ['damian.papiez@nokia.com'],
