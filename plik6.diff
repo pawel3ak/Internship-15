@@ -1,0 +1,2369 @@
+diff --git a/Logs_parser/new_converter/taf_logs_converter.py b/Logs_parser/new_converter/taf_logs_converter.py
+index 3d7cac5ee5fd22a160aa3ce765b585bd53562544..859bea1955d27a5c4fd896703a1c1ace45a4826a 100644
+--- a/Logs_parser/new_converter/taf_logs_converter.py
++++ b/Logs_parser/new_converter/taf_logs_converter.py
+@@ -104,34 +104,36 @@ class TafLogsConverter(object):
+                     raw_file.write(record_payload)
+                     raw_time_file.write(rawtime_record_line)
+ 
+-    def get_number_of_files(self, is_yaml_conversion):
+-        if is_yaml_conversion:
+-            return len(self.filename_raw)
+-        else:
+-            return len(self.filename_yml)
+-
+-    def get_filename(self,is_yaml_conversion,number_of_file):
+-        if is_yaml_conversion:
+-            return self.filename_raw[number_of_file]
+-        else:
++    def get_number_of_raw_files(self):
++        return len(self.filename_raw)
++
++    def get_number_of_yml_files(self):
++        return len(self.filename_yml)
++
++
++    def get_filename_yaml(self,number_of_file):
+             return self.filename_yml[number_of_file]
++
++    def get_filename_raw(self,number_of_file):
++            return self.filename_raw[number_of_file]
++
+     def backup_conversion_target_files(self,filename_to_check):
+         for filename in os.listdir(self.directory):
+                 filename = os.path.join(self.directory, filename)
+                 if filename == filename_to_check:
+                     os.rename(filename, filename+'.bak')
+ 
+-    def convert_to_yaml_format(self, is_yaml_conversion):
+-        number_of_files = file_converter.get_number_of_files(is_yaml_conversion)
++    def convert_to_yaml_format(self):
++        number_of_files = file_converter.get_number_of_raw_files()
+         for number_of_file in range(0, number_of_files):
+-            raw_filename = file_converter.get_filename(is_yaml_conversion, number_of_file)
++            raw_filename = file_converter.get_filename_raw(number_of_file)
+             file_converter.get_and_convert_raw_file(raw_filename)
+             file_converter.create_yml_file(raw_filename)
+ 
+-    def convert_to_raw_format(self, is_yaml_conversion):
+-        number_of_files = file_converter.get_number_of_files(is_yaml_conversion)
++    def convert_to_raw_format(self):
++        number_of_files = file_converter.get_number_of_yml_files()
+         for number_of_file in range(0, number_of_files):
+-            yaml_filename = file_converter.get_filename(is_yaml_conversion, number_of_file)
++            yaml_filename = file_converter.get_filename_yaml(number_of_file)
+             file_converter.create_raw_file(yaml_filename)
+ 
+ 
+@@ -140,7 +142,7 @@ if __name__ == "__main__":
+     file_converter = TafLogsConverter(directory)
+     if is_yaml_conversion:
+         file_converter.find_raw_files()
+-        file_converter.convert_to_yaml_format(is_yaml_conversion)
++        file_converter.convert_to_yaml_format()
+     else:
+         file_converter.find_yml_files()
+-        file_converter.convert_to_raw_format(is_yaml_conversion)
++        file_converter.convert_to_raw_format()
+diff --git a/plik4.diff b/plik4.diff
+index 364700b086a1fe6196a7dae885fb4fe066d4f854..0ab04c643c4e72ccd043d0a6f717dc1933bf96ff 100644
+--- a/plik4.diff
++++ b/plik4.diff
+@@ -1,180 +1,28 @@
+-diff --git a/plik3.diff b/plik3.diff
++diff --git a/plik4.diff b/plik4.diff
+ new file mode 100644
+-index 0000000000000000000000000000000000000000..63883d6718ece3c563e7bc143f3c270f3a06ec5f
++index 0000000000000000000000000000000000000000..364700b086a1fe6196a7dae885fb4fe066d4f854
+ --- /dev/null
+-+++ b/plik3.diff
+-@@ -0,0 +1,1007 @@
+-+diff --git a/plik2.diff b/plik2.diff
+++++ b/plik4.diff
++@@ -0,0 +1,1013 @@
+++diff --git a/plik3.diff b/plik3.diff
+ +new file mode 100644
+-+index 0000000000000000000000000000000000000000..f388db0b834cab8dfd502670b08684c1ee8d523f
+++index 0000000000000000000000000000000000000000..63883d6718ece3c563e7bc143f3c270f3a06ec5f
+ +--- /dev/null
+-++++ b/plik2.diff
+-+@@ -0,0 +1,1001 @@
+-++diff --git a/Logs_parser/new_converter/taf_logs_converter.py b/Logs_parser/new_converter/taf_logs_converter.py
++++++ b/plik3.diff
+++@@ -0,0 +1,1007 @@
++++diff --git a/plik2.diff b/plik2.diff
+ ++new file mode 100644
+-++index 0000000000000000000000000000000000000000..3d7cac5ee5fd22a160aa3ce765b585bd53562544
++++index 0000000000000000000000000000000000000000..f388db0b834cab8dfd502670b08684c1ee8d523f
+ ++--- /dev/null
+-+++++ b/Logs_parser/new_converter/taf_logs_converter.py
+-++@@ -0,0 +1,146 @@
+-+++__author__ = 'klaudia_gadek'
+-+++
+-+++import re
+-+++import yaml
+-+++import os
+-+++from argparse import ArgumentParser
+-+++
+-+++
+-+++def get_scripts_options():
+-+++    parser = ArgumentParser(description='Tool to convert betwen TAF raw log and TAF yaml log formats')
+-+++    parser.add_argument("--d", "--logs_location", type=str, help="Add directory", dest="directory", default="/home/ute/Logs_parser")
+-+++    parser.add_argument("--y", "--to_yaml", help="Convert to yaml files", action="store_true", dest="is_yaml_conversion", default=True)
+-+++    parser.add_argument("--r", "--to_raw", help="Convert to raw files", action="store_true", dest="is_raw_conversion", default=False)
+-+++    args = parser.parse_args()
+-+++    if args.directory != None:
+-+++        print "\tMy directory: "+args.directory
+-+++    if args.is_raw_conversion:
+-+++        print "\tType of conversion: RAW"
+-+++        args.is_yaml_conversion = False
+-+++    if args.is_yaml_conversion:
+-+++        print "\tType of conversion: YAML"
+-+++    return (args.directory,args.is_yaml_conversion)
+-+++
+-+++
+-+++def ascii_to_dec(buffer):
+-+++    output = re.sub(r"<0x(..)>", lambda matchobj: chr(int(matchobj.group(1))), buffer)
+-+++    return output
+-+++
+-+++
+-+++def represent_omap(dumper, data):
+-+++    return dumper.represent_mapping(u'tag:yaml.org,2002:map', data.get_log_record_items())
+-+++
+-+++
+-+++def to_ascii(buffer):
+-+++    output = re.sub(r'[^\x21-\x7e]', lambda matchobj: '<0x%s>' % ord(matchobj.group(0)), buffer)
+-+++    return output
+-+++
+-+++
+-+++class LogsRecord(dict):
+-+++   def get_log_record_items(self):
+-+++        return [('Nr', self['Nr']), ('Time', self['Time']), ('Epoch', self['Epoch']), ('Payload', self['Payload']),
+-+++                ('Type_of_record', self['Type_of_record'])]
+-+++
+-+++
+-+++class TafLogsConverter(object):
+-+++    def __init__(self, directory):
+-+++        self.directory = directory
+-+++        self.filename_raw = []
+-+++        self.time_file = ""
+-+++        self.rawfile_whole_payload = ""
+-+++        self.filename_yml = []
+-+++
+-+++    def find_raw_files(self):
+-+++        for filename in os.listdir(self.directory):
+-+++            if filename.endswith(".raw"):
+-+++                filename_raw = os.path.join(self.directory, filename)
+-+++                self.filename_raw.append(filename_raw)
+-+++
+-+++    def create_yml_file(self, raw_filename):
+-+++        remaining_payload = self.rawfile_whole_payload
+-+++        yaml.add_representer(LogsRecord, represent_omap)
+-+++        record_number = 1
+-+++        filename_yaml = (raw_filename.replace(".raw", ""))+".yml"
+-+++        self.backup_conversion_target_files(filename_yaml)
+-+++        with open(filename_yaml, 'a') as new_yaml_file:
+-+++            while True:  # format of a line: 13:25:27.85 | 39 |> 1438601127.853814 |
+-+++                line = self.time_file.readline()
+-+++                if not line:
+-+++                    break
+-+++                (timestamp, size, type_and_epoch, _) = tuple(line.split("|"))
+-+++                log_data = LogsRecord({
+-+++                    "Nr": record_number,
+-+++                    "Time": timestamp,
+-+++                    "Epoch": type_and_epoch[2:],
+-+++                    "Payload": to_ascii(remaining_payload[0:int(size)]),
+-+++                    "Type_of_record": type_and_epoch[0]})
+-+++                remaining_payload = remaining_payload[int(size):]
+-+++                new_yaml_file.write(yaml.dump(log_data, default_flow_style=False, explicit_start=True))
+-+++                record_number += 1
+-+++
+-+++    def find_yml_files(self):
+-+++        for filename in os.listdir(self.directory):
+-+++            if filename.endswith(".yml"):
+-+++                filename_yml = os.path.join(self.directory, filename)
+-+++                self.filename_yml.append(filename_yml)
+-+++
+-+++    def get_and_convert_raw_file(self, raw_filename):
+-+++        self.time_file = open(raw_filename+".time", "r")
+-+++        log_file = open(raw_filename, "r")
+-+++        self.rawfile_whole_payload = log_file.read()
+-+++
+-+++    def create_raw_file(self, yaml_filename):
+-+++        filename_raw = yaml_filename.replace(".yml", ".raw")
+-+++        filename_raw_time = filename_raw+".time"
+-+++        with open(yaml_filename, 'r') as filename_yaml:
+-+++            yaml_data = yaml.load_all(filename_yaml)
+-+++            self.backup_conversion_target_files(filename_raw)
+-+++            self.backup_conversion_target_files(filename_raw_time)
+-+++            with open(filename_raw, 'w') as raw_file, open(filename_raw_time, 'w') as raw_time_file:
+-+++                for record in yaml_data:
+-+++                    record_payload = ascii_to_dec(record['Payload'])
+-+++                    record_size = len(record_payload)
+-+++                    rawtime_record_line = "%s| %7.7s |%s %s|\n" % (record['Time'], record_size, record['Type_of_record'], record['Epoch'])
+-+++                    raw_file.write(record_payload)
+-+++                    raw_time_file.write(rawtime_record_line)
+-+++
+-+++    def get_number_of_files(self, is_yaml_conversion):
+-+++        if is_yaml_conversion:
+-+++            return len(self.filename_raw)
+-+++        else:
+-+++            return len(self.filename_yml)
+-+++
+-+++    def get_filename(self,is_yaml_conversion,number_of_file):
+-+++        if is_yaml_conversion:
+-+++            return self.filename_raw[number_of_file]
+-+++        else:
+-+++            return self.filename_yml[number_of_file]
+-+++    def backup_conversion_target_files(self,filename_to_check):
+-+++        for filename in os.listdir(self.directory):
+-+++                filename = os.path.join(self.directory, filename)
+-+++                if filename == filename_to_check:
+-+++                    os.rename(filename, filename+'.bak')
+-+++
+-+++    def convert_to_yaml_format(self, is_yaml_conversion):
+-+++        number_of_files = file_converter.get_number_of_files(is_yaml_conversion)
+-+++        for number_of_file in range(0, number_of_files):
+-+++            raw_filename = file_converter.get_filename(is_yaml_conversion, number_of_file)
+-+++            file_converter.get_and_convert_raw_file(raw_filename)
+-+++            file_converter.create_yml_file(raw_filename)
+-+++
+-+++    def convert_to_raw_format(self, is_yaml_conversion):
+-+++        number_of_files = file_converter.get_number_of_files(is_yaml_conversion)
+-+++        for number_of_file in range(0, number_of_files):
+-+++            yaml_filename = file_converter.get_filename(is_yaml_conversion, number_of_file)
+-+++            file_converter.create_raw_file(yaml_filename)
+-+++
+-+++
+-+++if __name__ == "__main__":
+-+++    (directory, is_yaml_conversion) = get_scripts_options()
+-+++    file_converter = TafLogsConverter(directory)
+-+++    if is_yaml_conversion:
+-+++        file_converter.find_raw_files()
+-+++        file_converter.convert_to_yaml_format(is_yaml_conversion)
+-+++    else:
+-+++        file_converter.find_yml_files()
+-+++        file_converter.convert_to_raw_format(is_yaml_conversion)
+-++diff --git a/plik_diff.diff b/plik_diff.diff
+-++new file mode 100644
+-++index 0000000000000000000000000000000000000000..f8ed17dd54c07da8bc34ab51024e2e4afdb315bf
+-++--- /dev/null
+-+++++ b/plik_diff.diff
+-++@@ -0,0 +1,150 @@
+-+++diff --git a/Logs_parser/new_converter/konverter.py b/Logs_parser/new_converter/konverter.py
+++++++ b/plik2.diff
++++@@ -0,0 +1,1001 @@
+++++diff --git a/Logs_parser/new_converter/taf_logs_converter.py b/Logs_parser/new_converter/taf_logs_converter.py
+ +++new file mode 100644
+-+++index 0000000000000000000000000000000000000000..4baca3b7a399c1a8d0d8f677a95b3f7701c09cf7
+++++index 0000000000000000000000000000000000000000..3d7cac5ee5fd22a160aa3ce765b585bd53562544
+ +++--- /dev/null
+-++++++ b/Logs_parser/new_converter/konverter.py
+-+++@@ -0,0 +1,144 @@
+-++++__author__ = 'ute'
++++++++ b/Logs_parser/new_converter/taf_logs_converter.py
+++++@@ -0,0 +1,146 @@
++++++__author__ = 'klaudia_gadek'
+ ++++
+ ++++import re
+ ++++import yaml
+@@ -182,11 +30,11 @@ index 0000000000000000000000000000000000000000..63883d6718ece3c563e7bc143f3c270f
+ ++++from argparse import ArgumentParser
+ ++++
+ ++++
+-++++def parser():
+-++++    parser = ArgumentParser(description='Make .raw and .row.time files.')
+-++++    parser.add_argument("--d", "-directory", type=str, help="Add directory", dest="directory", default="/home/ute/Logs_parser/logi")
+-++++    parser.add_argument("--y", "--YAML", help="Convert to yaml files", action="store_true", dest="is_yaml_conversion", default=True)
+-++++    parser.add_argument("--r", "--RAW", help="Convert to raw files", action="store_true", dest="is_raw_conversion", default=False)
++++++def get_scripts_options():
++++++    parser = ArgumentParser(description='Tool to convert betwen TAF raw log and TAF yaml log formats')
++++++    parser.add_argument("--d", "--logs_location", type=str, help="Add directory", dest="directory", default="/home/ute/Logs_parser")
++++++    parser.add_argument("--y", "--to_yaml", help="Convert to yaml files", action="store_true", dest="is_yaml_conversion", default=True)
++++++    parser.add_argument("--r", "--to_raw", help="Convert to raw files", action="store_true", dest="is_raw_conversion", default=False)
+ ++++    args = parser.parse_args()
+ ++++    if args.directory != None:
+ ++++        print "\tMy directory: "+args.directory
+@@ -204,7 +52,7 @@ index 0000000000000000000000000000000000000000..63883d6718ece3c563e7bc143f3c270f
+ ++++
+ ++++
+ ++++def represent_omap(dumper, data):
+-++++    return dumper.represent_mapping(u'tag:yaml.org,2002:map', data.to_omap())
++++++    return dumper.represent_mapping(u'tag:yaml.org,2002:map', data.get_log_record_items())
+ ++++
+ ++++
+ ++++def to_ascii(buffer):
+@@ -212,16 +60,15 @@ index 0000000000000000000000000000000000000000..63883d6718ece3c563e7bc143f3c270f
+ ++++    return output
+ ++++
+ ++++
+-++++class OrderedDict(dict):  # my order
+-++++   def to_omap(self):
++++++class LogsRecord(dict):
++++++   def get_log_record_items(self):
+ ++++        return [('Nr', self['Nr']), ('Time', self['Time']), ('Epoch', self['Epoch']), ('Payload', self['Payload']),
+ ++++                ('Type_of_record', self['Type_of_record'])]
+ ++++
+ ++++
+-++++class Converter(object):
++++++class TafLogsConverter(object):
+ ++++    def __init__(self, directory):
+ ++++        self.directory = directory
+-++++        self.filename_time = []
+ ++++        self.filename_raw = []
+ ++++        self.time_file = ""
+ ++++        self.rawfile_whole_payload = ""
+@@ -229,785 +76,944 @@ index 0000000000000000000000000000000000000000..63883d6718ece3c563e7bc143f3c270f
+ ++++
+ ++++    def find_raw_files(self):
+ ++++        for filename in os.listdir(self.directory):
+-++++            if filename.endswith(".raw.time"):
+-++++                filename_time = os.path.join(self.directory, filename)
+-++++                filename_raw = filename_time.replace(".time", "")
+-++++                self.filename_time.append(filename_time)
++++++            if filename.endswith(".raw"):
++++++                filename_raw = os.path.join(self.directory, filename)
+ ++++                self.filename_raw.append(filename_raw)
+-++++        return len(self.filename_time)
+ ++++
+-++++    def create_yml_file(self, number_of_file):
++++++    def create_yml_file(self, raw_filename):
+ ++++        remaining_payload = self.rawfile_whole_payload
+-++++        yaml.add_representer(OrderedDict, represent_omap)
++++++        yaml.add_representer(LogsRecord, represent_omap)
+ ++++        record_number = 1
+-++++        line = self.time_file.readline()
+-++++        filename_yaml = self.filename_raw[number_of_file].replace(".raw", "")
+-++++        with open(filename_yaml+".yml", 'a') as new_yaml_file:
+-++++            while line:  # format of a line: 13:25:27.85 | 39 |> 1438601127.853814 |
+-++++                (timestamp, size, type_and_epoch, new_line_sign) = tuple(line.split("|"))
+-++++                size = int(size)
+-++++                type = type_and_epoch[0]
+-++++                epoch = type_and_epoch[2:]
+-++++                single_record_payload = remaining_payload[0:size]
+-++++                remaining_payload = remaining_payload[size:]
+-++++                single_record_payload = to_ascii(single_record_payload)
+-++++                log_data = OrderedDict({
++++++        filename_yaml = (raw_filename.replace(".raw", ""))+".yml"
++++++        self.backup_conversion_target_files(filename_yaml)
++++++        with open(filename_yaml, 'a') as new_yaml_file:
++++++            while True:  # format of a line: 13:25:27.85 | 39 |> 1438601127.853814 |
++++++                line = self.time_file.readline()
++++++                if not line:
++++++                    break
++++++                (timestamp, size, type_and_epoch, _) = tuple(line.split("|"))
++++++                log_data = LogsRecord({
+ ++++                    "Nr": record_number,
+ ++++                    "Time": timestamp,
+-++++                    "Epoch": epoch,
+-++++                    "Payload": single_record_payload,
+-++++                    "Type_of_record": type})
++++++                    "Epoch": type_and_epoch[2:],
++++++                    "Payload": to_ascii(remaining_payload[0:int(size)]),
++++++                    "Type_of_record": type_and_epoch[0]})
++++++                remaining_payload = remaining_payload[int(size):]
+ ++++                new_yaml_file.write(yaml.dump(log_data, default_flow_style=False, explicit_start=True))
+ ++++                record_number += 1
+-++++                line = self.time_file.readline()
+ ++++
+ ++++    def find_yml_files(self):
+ ++++        for filename in os.listdir(self.directory):
+ ++++            if filename.endswith(".yml"):
+ ++++                filename_yml = os.path.join(self.directory, filename)
+ ++++                self.filename_yml.append(filename_yml)
+-++++        return len(self.filename_yml)
+ ++++
+-++++    def get_and_convert_raw_file(self, number_of_file):
+-++++        self.time_file = open(str(self.filename_time[number_of_file]), "r")
+-++++        log_file = open(str(self.filename_raw[number_of_file]), "r")
++++++    def get_and_convert_raw_file(self, raw_filename):
++++++        self.time_file = open(raw_filename+".time", "r")
++++++        log_file = open(raw_filename, "r")
+ ++++        self.rawfile_whole_payload = log_file.read()
+ ++++
+-++++    def create_raw_file(self, number_of_file):
+-++++        filename_raw = self.filename_yml[number_of_file].replace(".yml", ".raw")
++++++    def create_raw_file(self, yaml_filename):
++++++        filename_raw = yaml_filename.replace(".yml", ".raw")
+ ++++        filename_raw_time = filename_raw+".time"
+-++++        with open(self.filename_yml[number_of_file], 'r') as filename_yaml:
++++++        with open(yaml_filename, 'r') as filename_yaml:
+ ++++            yaml_data = yaml.load_all(filename_yaml)
++++++            self.backup_conversion_target_files(filename_raw)
++++++            self.backup_conversion_target_files(filename_raw_time)
++++++            with open(filename_raw, 'w') as raw_file, open(filename_raw_time, 'w') as raw_time_file:
++++++                for record in yaml_data:
++++++                    record_payload = ascii_to_dec(record['Payload'])
++++++                    record_size = len(record_payload)
++++++                    rawtime_record_line = "%s| %7.7s |%s %s|\n" % (record['Time'], record_size, record['Type_of_record'], record['Epoch'])
++++++                    raw_file.write(record_payload)
++++++                    raw_time_file.write(rawtime_record_line)
++++++
++++++    def get_number_of_files(self, is_yaml_conversion):
++++++        if is_yaml_conversion:
++++++            return len(self.filename_raw)
++++++        else:
++++++            return len(self.filename_yml)
++++++
++++++    def get_filename(self,is_yaml_conversion,number_of_file):
++++++        if is_yaml_conversion:
++++++            return self.filename_raw[number_of_file]
++++++        else:
++++++            return self.filename_yml[number_of_file]
++++++    def backup_conversion_target_files(self,filename_to_check):
+ ++++        for filename in os.listdir(self.directory):
+-++++            filename = os.path.join(self.directory, filename)
+-++++            if filename == filename_raw:
+-++++                os.rename(filename, filename+'.bak')
+-++++            elif filename == filename_raw_time:
+-++++                os.rename(filename, filename+'.bak')
+-++++        with open(filename_raw, 'w') as raw_file, open(filename_raw_time, 'w') as raw_time_file:
+-++++            for record in yaml_data:
+-++++                record_timestamp = ""
+-++++                record_size = 0
+-++++                record_type = ""
+-++++                record_epoch = ""
+-++++                record_payload = ""
+-++++                for key, value in record.items():
+-++++                    if key == "Time":
+-++++                        record_timestamp = value
+-++++                    elif key == "Type_of_record":
+-++++                        record_type = value
+-++++                    elif key == "Epoch":
+-++++                        record_epoch = value
+-++++                    elif key == "Payload":
+-++++                        record_payload = ascii_to_dec(value)
+-++++                        record_size = len(record_payload)
+-++++                rawtime_record_line = "%s| %7.7s |%s %s|\n" % (record_timestamp, record_size, record_type, record_epoch)
+-++++                raw_file.write(record_payload)
+-++++                raw_time_file.write(rawtime_record_line)
++++++                filename = os.path.join(self.directory, filename)
++++++                if filename == filename_to_check:
++++++                    os.rename(filename, filename+'.bak')
++++++
++++++    def convert_to_yaml_format(self, is_yaml_conversion):
++++++        number_of_files = file_converter.get_number_of_files(is_yaml_conversion)
++++++        for number_of_file in range(0, number_of_files):
++++++            raw_filename = file_converter.get_filename(is_yaml_conversion, number_of_file)
++++++            file_converter.get_and_convert_raw_file(raw_filename)
++++++            file_converter.create_yml_file(raw_filename)
++++++
++++++    def convert_to_raw_format(self, is_yaml_conversion):
++++++        number_of_files = file_converter.get_number_of_files(is_yaml_conversion)
++++++        for number_of_file in range(0, number_of_files):
++++++            yaml_filename = file_converter.get_filename(is_yaml_conversion, number_of_file)
++++++            file_converter.create_raw_file(yaml_filename)
+ ++++
+ ++++
+ ++++if __name__ == "__main__":
+-++++    (directory, is_yaml_conversion) = parser()
+-++++    file_converter = Converter(directory)
++++++    (directory, is_yaml_conversion) = get_scripts_options()
++++++    file_converter = TafLogsConverter(directory)
+ ++++    if is_yaml_conversion:
+-++++        number_of_files = file_converter.find_raw_files()
+-++++        for number_of_file in range(0, number_of_files):
+-++++            file_converter.get_and_convert_raw_file(number_of_file)
+-++++            file_converter.create_yml_file(number_of_file)
++++++        file_converter.find_raw_files()
++++++        file_converter.convert_to_yaml_format(is_yaml_conversion)
+ ++++    else:
+-++++        number_of_files = file_converter.find_yml_files()
+-++++        for number_of_file in range(0, number_of_files):
+-++++            file_converter.create_raw_file(number_of_file)
+-++diff --git a/server_reservation_dispatcher/superVisor.py b/server_reservation_dispatcher/superVisor.py
+-++new file mode 100644
+-++index 0000000000000000000000000000000000000000..1ac682b59fe808a24357c5492605dca2054afd96
+-++--- /dev/null
+-+++++ b/server_reservation_dispatcher/superVisor.py
+-++@@ -0,0 +1,22 @@
+-+++# -*- coding: utf-8 -*-
+-+++"""
+-+++:created on: '11/08/15'
+-+++
+-+++:copyright: Nokia
+-+++:author: Pawel Nogiec
+-+++:contact: pawel.nogiec@nokia.com
+-+++"""
+-+++
+-+++
+-+++from superVisor_api import Supervisor
+-+++
+-+++
+-+++#
+-+++# __job_status = self.get_job_status()
+-+++# if __job_status == "FAILURE":
+-+++#     self.set_are_any_failed_tests(False)
+-+++#     self.check_output_for_other_fails_or_errors_and_get_test_end_status()
+-+++# elif __job_status == "UNKNOWN":
+-+++#     self.set_failure_status(127)
+-+++#     self.set_test_end_status("JenkinsError")
+-+++#     self.finish_with_failure()
+-++diff --git a/server_reservation_dispatcher/superVisor_api.py b/server_reservation_dispatcher/superVisor_api.py
+-++index a05679f9bdbee3a35d305b7b4bbd35220c3189de..892b716ee757f15afe62a69457569094c13bc84f 100644
+-++--- a/server_reservation_dispatcher/superVisor_api.py
+-+++++ b/server_reservation_dispatcher/superVisor_api.py
+-++@@ -1,4 +1,3 @@
+-++-
+-++ # -*- coding: utf-8 -*-
+-++ """
+-++ :created on: '11/08/15'
+-++@@ -14,14 +13,15 @@ import re
+-++ import os
+-++ import sys
+-++ import logging
+-+++import json
+-++ 
+-++-import jenkinsapi
+-+++from jenkinsapi.api import Jenkins
+-++ import ute_mail.sender
+-++ import ute_mail.mail
+-++ import paramiko
+-++ 
+-++ from utilities.TL_map import TL_map
+-++-from utilities.mailing_list import mail_dict
+-+++from utilities.mailing_list import mail_dict, admin
+-++ from utilities.logger_messages import LOGGER_INFO
+-++ # from server_git_api import git_launch
+-++ 
+-++@@ -36,163 +36,246 @@ config_logger(logger)
+-++ 
+-++ class Supervisor(object):
+-++     def __init__(self,TLname, jenkins_job_info, user_info=None):
+-++-        self._jenkins_info = jenkins_job_info    #dict:{job_name : "", parameters : {param1 : "", ...}}
+-++-        self._user_info = user_info          #dict:{first_name : "", last_name : "", mail :""}
+-++-        self._TLname = TLname
+-++-        self._suitname = jenkins_job_info['parameters']['name']
+-++-
+-++-        self._TLaddress = None
+-++-        self._failureStatus = None
+-++-        self._are_any_failed_tests = False
+-++-        self._test_end_status = None
+-++-        self._job_filenames_failed_tests = None
+-++-
+-++-        self.set_TLaddress()
+-+++        self.__jenkins_info = jenkins_job_info    #dict:{jobname : "", parameters : {param1 : "", ...}}
+-+++        self.__user_info = user_info          #dict:{first_name : "", last_name : "", mail :""}
+-+++        self.__TLname = TLname
+-+++        self.__suitname = jenkins_job_info['parameters']['name']
+-+++
+-+++        self.__TLaddress = self.set_TLaddress_from_map()
+-+++        self.__failureStatus = None
+-+++        self.__are_any_failed_tests = False
+-+++        self.__test_end_status = None
+-+++        self.__filenames_of_failed_tests = None
+-+++
+-++         logger.debug("Created new Supervisor object with args: "
+-++-                     "jenkins_info = {}, user_info = {}, TLname = {}".format(self._jenkins_info,
+-++-                                                                                      self._user_info,
+-++-                                                                                      self._TLname))
+-+++                     "jenkins_info = {}, user_info = {}, TLname = {}".format(self.__jenkins_info,
+-+++                                                                                      self.__user_info,
+-+++                                                                                      self.__TLname))
+-+++
+-+++    #########################################################################################
+-+++    #getters and setters
+-+++    #########################################################################################
+-++ 
+-++     def get_jenkins_info(self):
+-++-        return self._jenkins_info
+-+++        return self.__jenkins_info
+-++ 
+-++ 
+-++     def get_user_info(self):
+-++-        return self._user_info
+-+++        return self.__user_info
+-++ 
+-++ 
+-++     def get_TLname(self):
+-++-        return self._TLname
+-+++        return self.__TLname
+-++ 
+-++ 
+-++-    def set_TLaddress(self):
+-++-        self._TLaddress = TL_map[self._TLname]
+-++-        return self._TLaddress
+-+++    def get_suitname(self):
+-+++        return self.__suitname
+-++ 
+-++ 
+-++-    def finish_with_failure(self):
+-++-        #TODO clear job_info from file
+-++-        self.send_information_about_executed_job(test_status=self._test_end_status)
+-++-        sys.exit()
+-+++    def get_TLaddress(self):
+-+++        return self.__TLaddress
+-+++
+-+++
+-+++    def set_TLaddress_from_map(self):
+-+++        self.__TLaddress = TL_map[self.__TLname]
+-+++        return self.__TLaddress
+-+++
+-+++
+-+++    def get_failure_status(self):
+-+++        return self.__failureStatus
+-+++
+-+++
+-+++    def set_failure_status(self,status):
+-+++        self.__failureStatus = status
+-+++
+-+++
+-+++    def get_are_any_failed_tests(self):
+-+++        return self.__are_any_failed_tests
+-+++
+-+++
+-+++    def set_are_any_failed_tests(self, are_fails):
+-+++        self.__are_any_failed_tests = are_fails
+-+++
+-+++
+-+++    def get_test_end_status(self):
+-+++        return self.__test_end_status
+-+++
+-+++
+-+++    def set_test_end_status(self,status):
+-+++        self.__test_end_status = status
+-+++
+-+++
+-+++    def get_filenames_of_failed_tests(self):
+-+++        return self.__filenames_of_failed_tests
+-+++
+-+++
+-+++    def set_filenames_of_failed_tests(self, failed_tests):
+-+++        self.__filenames_of_failed_tests = failed_tests
+-+++
+-+++
+-+++    def get_job_parameters(self):
+-+++        return self.__jenkins_info['parameters']
+-+++
+-+++
+-+++    def set_default_jobname(self):
+-+++        self.__jenkins_info['jobname'] = 'job_on_{}'.format(self.get_TLname())
+-+++
+-+++
+-+++    def get_jobname(self):
+-+++        if 'jobname' in self.get_jenkins_info():
+-+++            return self.__jenkins_info['jobname']
+-+++        else:
+-+++            return None
+-++ 
+-++ 
+-++     def set_jenkins_connection(self):
+-++-        if not 'job_name' in self._jenkins_info:
+-++-            self._jenkins_info['job_name'] = 'job_on_{tl_name}'.format(tl_name=self._TLname)
+-++         try:
+-++-            jenkins_connection = jenkinsapi.api.Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
+-++-            self._jenkins_info['connection'] = jenkins_connection
+-+++            self.__jenkins_info['connection'] = Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
+-++             logger.debug("jenkins connection has been set")
+-++-            return self._jenkins_info['connection']
+-++         except:
+-++-            self._failureStatus = 106
+-++-            self._test_end_status = "JenkinsError"
+-++-            logger.critical('{}'.format(LOGGER_INFO[self._failureStatus]))
+-+++            self.set_failure_status(106)
+-+++            self.set_test_end_status("JenkinsError")
+-+++            logger.critical('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+-++             self.finish_with_failure()
+-++ 
+-++ 
+-++-    def set_jenkins_job(self):
+-+++    def get_jenkins_connection(self):
+-+++        return self.__jenkins_info['connection']
+-+++
+-+++
+-+++    def set_job_handler(self, job_handler):
+-+++        self.__jenkins_info['job_handler'] = job_handler
+-+++
+-+++
+-+++    def get_job_handler(self):
+-+++        return self.__jenkins_info['job_handler']
+-+++
+-+++
+-+++    def set_job_output(self, job_output):
+-+++        self.__jenkins_info['output'] = job_output
+-+++
+-+++
+-+++    def get_job_output(self):
+-+++        return self.__jenkins_info['output']
+-+++
+-+++
+-+++    #########################################################################################
+-+++    #functions
+-+++    #########################################################################################
+-+++
+-+++
+-+++    def make_file_with_specific_info(self):
+-+++        info_to_save = {
+-+++            'TLname'    : self.get_TLname(),
+-+++            'suitname'  : self.get_suitname(),
+-+++            'job_params': self.get_job_parameters()
+-+++        }
+-+++        path_with_filename = os.path.join('.','files','SuperVisor',self.get_suitname())
+-+++        with open(path_with_filename, 'wb'):
+-+++            json.dump(info_to_save, path_with_filename)
+-+++
+-+++
+-+++    def delete_file_with_specific_info(self):
+-+++        path_with_filename = os.path.join('.','files','SuperVisor',self.get_suitname())
+-+++        for _ in range(10):
+-+++            try:
+-+++                os.remove(path_with_filename)
+-+++                break
+-+++            except:
+-+++                time.sleep(0.1)
+-+++
+-+++
+-+++    def finish_with_failure(self):
+-+++        self.send_information_about_executed_job()
+-+++        self.delete_file_with_specific_info()
+-+++        sys.exit()
+-+++
+-+++
+-+++    def set_jenkins_job_handler(self):
+-++         try:
+-++-            self._jenkins_info['job_handler'] = self._jenkins_info['connection'].get_job(self._jenkins_info['job_name'])
+-++-            return self._jenkins_info['job_handler']
+-+++            self.set_job_handler(self.get_jenkins_connection().get_job(self.get_jobname()))
+-++         except:
+-++-            self._failureStatus = 125
+-++-            self._test_end_status = "JenkinsError"
+-++-            logger.critical('{}'.format(LOGGER_INFO[self._failureStatus]))
+-+++            self.set_failure_status(125)
+-+++            self.set_test_end_status("JenkinsError")
+-+++            logger.critical('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+-++             self.finish_with_failure()
+-++ 
+-++ 
+-++     def set_node_for_job(self):
+-++         try:
+-++-            job = self._jenkins_info['job_handler']
+-++-            job_config_xml = ET.fromstring(job.get_config())
+-+++            job_config_xml = ET.fromstring(self.get_job_handler().get_config())
+-++             assignedNode_tag = job_config_xml.find('assignedNode')
+-++-            assignedNode_tag.text = str(self._TLname)
+-++-            job.update_config(ET.tostring(job_config_xml))
+-++-            logger.debug("Updated TL name: {} in job {}".format(self._TLname, self._jenkins_info['job_name']))
+-++-            return 0
+-+++            assignedNode_tag.text = str(self.get_TLname())
+-+++            self.get_job_handler().update_config(ET.tostring(job_config_xml))
+-+++            logger.debug("Updated TL name: {} in job {}".format(self.get_TLname(), self.get_jobname()))
+-++         except:
+-++-            self._failureStatus = 104
+-++-            self._test_end_status = "JenkinsError"
+-++-            logger.warning('{} : {}'.format(self._TLname, LOGGER_INFO[self._failureStatus]))
+-+++            self.set_failure_status(104)
+-+++            self.set_test_end_status("JenkinsError")
+-+++            logger.warning('{} : {}'.format(self.get_TLname(), LOGGER_INFO[self.get_failure_status()]))
+-++             self.finish_with_failure()
+-++ 
+-++ 
+-++     def get_job_status(self):
+-++-        job_status = None
+-+++        job_status = "Unknown"
+-++         try:
+-++-            job_status = self._jenkins_info['job_handler'].get_last_build().get_status()
+-+++            job_status = self.get_job_handler().get_last_build().get_status()
+-++         except:
+-++-            self._failureStatus = 105
+-++-            self._test_end_status = "JenkinsError"
+-++-            logger.error('{} : {}'.format(self._jenkins_info['job_name'],LOGGER_INFO[self._failureStatus]))
+-+++            self.set_failure_status(105)
+-+++            self.set_test_end_status("JenkinsError")
+-+++            logger.error('{} : {}'.format(self.get_jobname(),LOGGER_INFO[self.get_failure_status()]))
+-++             self.finish_with_failure()
+-++         finally:
+-++-            logger.debug("Job {} status = {}".format(self._jenkins_info['job_name'], job_status))
+-++-            if job_status == "FAILURE":
+-++-                self._are_any_failed_tests = False
+-++-                self.check_output_for_other_fails_or_errors_and_get_test_end_status()
+-++-            else:
+-++-                return job_status
+-+++            logger.debug("Job {} status = {}".format(self.get_jobname(), job_status))
+-+++            return job_status
+-++ 
+-++ 
+-++-    def _is_queued_or_running(self, only_once=None):
+-++-        if only_once:
+-++-            try:
+-++-                return self._jenkins_info['job_handler'].is_queued_or_running()
+-++-            except:
+-++-                self._failureStatus = 124
+-++-                self._test_end_status = "JenkinsError"
+-++-                logger.error('{} : {}'.format(self._jenkins_info['job_name'],LOGGER_INFO[self._failureStatus]))
+-++-                self.finish_with_failure()
+-+++    def _is_queued_or_running(self):
+-++         try:
+-++             while True:
+-++-                if self._jenkins_info['job_handler'].is_queued_or_running():
+-+++                if self.get_job_handler().is_queued_or_running():
+-++                     time.sleep(3)       #TODO LONGER SLEEP LATER
+-++                 else:   break
+-++         except:
+-++-            self._failureStatus = 124
+-++-            self._test_end_status = "JenkinsError"
+-++-            logger.error('{} : {}'.format(self._jenkins_info['job_name'],LOGGER_INFO[self._failureStatus]))
+-+++            self.set_failure_status(124)
+-+++            self.set_test_end_status("JenkinsError")
+-+++            logger.error('{} : {}'.format(self.get_jobname(),LOGGER_INFO[self.get_failure_status()]))
+-++             self.finish_with_failure()
+-++ 
+-++ 
+-++-    def _build_job(self):
+-+++    def build_job(self):
+-++         try:
+-++-            self._jenkins_info['connection'].build_job(jobname=self._jenkins_info['job_name'],
+-++-                                                      params=self._jenkins_info['parameters'])
+-++-            logger.info("Job {} was built".format(self._jenkins_info['job_name']))
+-++-            return 0
+-+++            self.get_jenkins_connection().build_job(jobname=self.get_jobname(),
+-+++                                                      params=self.get_job_parameters())
+-+++            logger.info("Job {} was built".format(self.get_jobname()))
+-++         except:
+-++-            self._failureStatus = 107
+-++-            self._test_end_status = "JenkinsError"
+-++-            logger.error('{}'.format(LOGGER_INFO[self._failureStatus]))
+-+++            self.set_failure_status(107)
+-+++            self.set_test_end_status("JenkinsError")
+-+++            logger.error('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+-++             self.finish_with_failure()
+-++ 
+-++ 
+-++     def set_jenkins_console_output(self):
+-++         try:
+-++-            self._is_queued_or_running()
+-++-            self._jenkins_info['console_output'] = self._jenkins_info['job_handler'].get_last_build().get_console()
+-++-            logger.debug("Console output retrieved from {}".format(self._jenkins_info['job_name']))
+-++-            return self._jenkins_info['console_output']
+-+++            self.set_job_output(self.get_job_handler().get_last_build().get_console())
+-+++            logger.debug("Console output retrieved from {}".format(self.get_jobname()))
+-++         except:
+-++-            self._failureStatus = 108
+-++-            self._test_end_status = "JenkinsError"
+-++-            logger.error('{}'.format(LOGGER_INFO[self._failureStatus]))
+-+++            self.set_failure_status(108)
+-+++            self.set_test_end_status("JenkinsError")
+-+++            logger.error('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+-++             self.finish_with_failure()
+-++ 
+-+++
+-++     def parse_output_and_set_job_failed_tests(self):
+-++         job_filenames_failed_tests=[]
+-++         regex = r'\=\s(.*)\s\=\W*.*FAIL'
+-++         try:
+-++-            matches = re.findall(regex, self._jenkins_info['console_output'])
+-+++            matches = re.findall(regex, self.get_job_output())
+-++             for match in matches:
+-++                 match = re.sub(" +", "_", match)  #changing " " to "_" - pybot thinks it's the same, i don't
+-++                 if match[-3:] == '...': match = match[:-3]  #cutting last "..."
+-++                 elif match[-1:] == '_': match = match[:-1]    #cutting last "_"
+-++                 try:
+-++-                    match = re.search('\w*\.Tests\.{}.*\.(.*)'.format(self._suitname), match).group(1)
+-+++                    match = re.search('\w*\.Tests\.{}.*\.(.*)'.format(self.get_suitname()), match).group(1)
+-++                     job_filenames_failed_tests.append(match)
+-++                 except:
+-++                     try:
+-++@@ -202,19 +285,17 @@ class Supervisor(object):
+-++                         match = re.search('\w*\.(.*)', match).group(1)
+-++                         job_filenames_failed_tests.append(match)
+-++         except:
+-++-            logger.debug("Regex did not find fails in output of {}".format(self._jenkins_info['job_name']))
+-+++            logger.debug("Regex did not find fails in output of {}".format(self.get_jobname()))
+-++         finally:
+-++             if job_filenames_failed_tests:
+-++-                logger.info("Regex found fails in output of {}".format(self._jenkins_info['job_name']))
+-++-            self._job_filenames_failed_tests = job_filenames_failed_tests
+-++-            return self._job_filenames_failed_tests
+-++-
+-+++                logger.info("Regex found fails in output of {}".format(self.get_jobname()))
+-+++            self.set_filenames_of_failed_tests(job_filenames_failed_tests)
+-++ 
+-++ 
+-++     def check_for_fails(self):
+-++-        output = self._jenkins_info['console_output']
+-+++        output = self.get_job_output()
+-++         if not output.find('| FAIL |') == -1:
+-++-            logger.debug("Found 'FAIL' in output of {}".format(self._jenkins_info['job_name']))
+-+++            logger.debug("Found 'FAIL' in output of {}".format(self.get_jobname()))
+-++             return True
+-++         output = output.split('\n')
+-++         for line in output:
+-++@@ -222,91 +303,103 @@ class Supervisor(object):
+-++                 ###mozna zapisac, ze tag ciagle nie zmieniony i wysylac ponownie mail do testerow
+-++                 continue
+-++             if not line.find('[ ERROR ]') == -1:
+-++-                logger.debug("Found 'ERROR' in output of {}".format(self._jenkins_info['job_name']))
+-+++                logger.debug("Found 'ERROR' in output of {}".format(self.get_jobname()))
+-++                 return True
+-++         return False
+-++ 
+-++     def check_output_for_other_fails_or_errors_and_get_test_end_status(self):
+-++-        if not self._are_any_failed_tests:
+-+++        if not self.get_are_any_failed_tests():
+-++             if self.check_for_fails() == False:
+-++-                self._test_end_status = "SUCCESSFUL"
+-++-                logger.info("Test {} was successful".format(self._jenkins_info['job_name']))
+-+++                self.set_test_end_status("SUCCESSFUL")
+-+++                logger.info("Test {} was successful".format(self.get_jobname()))
+-++             else:
+-++-                self._test_end_status = "UNKNOWN_ERROR/FAIL"
+-++-                self._are_any_failed_tests = True
+-++-                self._failureStatus = 109
+-++-                logger.error('{}'.format(LOGGER_INFO[self._failureStatus]))
+-+++                self.set_test_end_status("UNKNOWN_ERROR/FAIL")
+-+++                self.set_are_any_failed_tests(True)
+-+++                self.set_failure_status(109)
+-+++                logger.error('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+-++                 self.finish_with_failure()
+-++         else:
+-++-            self._test_end_status = "GOT_FAILS"
+-++-            self._are_any_failed_tests = True
+-++-            logger.info("Test {} has got some failures".format(self._jenkins_info['job_name']))
+-++-        return self._test_end_status
+-+++            self.set_test_end_status("GOT_FAILS")
+-+++            self.set_are_any_failed_tests(True)
+-+++            logger.info("Test {} has got some failures".format(self.get_jobname()))
+-+++
+-++ 
+-++-    def get_SSHClient_connection(self):
+-++-        SSHClient = paramiko.SSHClient()
+-++-        SSHClient.load_system_host_keys()
+-++-        SSHClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+-++-        SSHClient.connect(self.TLaddress, username='ute', password='ute')
+-++-        return SSHClient
+-+++    def __get_SSHClient_connection(self):
+-+++        try:
+-+++            SSHClient = paramiko.SSHClient()
+-+++            SSHClient.load_system_host_keys()
+-+++            SSHClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+-+++            SSHClient.connect(self.get_TLaddress(), username='ute', password='ute')
+-+++            return SSHClient
+-+++        except:
+-+++            return None
+-++ 
+-++ 
+-++-    def check_if_more_directories(self):
+-+++    def __get_robot_files_and_paths(self):
+-++         tmp_filenames_and_paths = []
+-++-        for root, dirs, files in os.walk('/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}'.format(self._suitname)):
+-+++        for root, dirs, files in os.walk('/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}'.format(self.__suitname)):
+-++             for file in files:
+-++                 if file.endswith('.robot') or file.endswith('.txt'):
+-++                     tmp_filenames_and_paths.append({'path' : root, 'filename' : file})
+-++         return tmp_filenames_and_paths
+-++ 
+-++ 
+-++-    def try_to_match_file_name(self, tmp_filenames_and_paths):
+-+++    def __match_filenames_and_paths(self, tmp_filenames_and_paths):
+-++         filenames_and_paths = []
+-++-        for filename_from_output in self._job_filenames_failed_tests:
+-+++        filenames_and_paths_for_temporary_use = []
+-+++        for filename_from_output in self.get_filenames_of_failed_tests():
+-++             _found = False
+-++             for tmp_filename_and_path in tmp_filenames_and_paths:
+-++                 try:
+-++                     re.search('({}.*)'.format(filename_from_output),tmp_filename_and_path['filename']).group(1)
+-++                     filenames_and_paths.append({'path' : tmp_filename_and_path['path'], 'filename' : tmp_filename_and_path['filename']})
+-+++                    filenames_and_paths_for_temporary_use.append(tmp_filename_and_path['filename'])
+-++                     logger.debug("Found filename: {}".format(tmp_filename_and_path['filename']))
+-++                     _found = True
+-++                     break
+-++                 except:
+-++                     pass
+-++             if not _found:
+-++-                self._failureStatus = 110
+-++-                logger.warning('{} {}'.format(LOGGER_INFO[self._failureStatus],filename_from_output))
+-++-
+-+++                filenames_and_paths_for_temporary_use.append(filename_from_output)
+-+++                self.set_failure_status(110)
+-+++                logger.warning('{} {}'.format(LOGGER_INFO[self.get_failure_status()],filename_from_output))
+-+++        self.set_filenames_of_failed_tests(filenames_and_paths_for_temporary_use)
+-++         return filenames_and_paths
+-++ 
+-++ 
+-++     def remove_tag_from_robots_tests(self, old_tag = 'enable', new_tag = ''):
+-++-        tmp_filenames_and_paths = self.check_if_more_directories()
+-++-        filenames_and_paths = self.try_to_match_file_name(tmp_filenames_and_paths)
+-+++        tmp_filenames_and_paths = self.__get_robot_files_and_paths()
+-+++        filenames_and_paths = self.__match_filenames_and_paths(tmp_filenames_and_paths)
+-+++        try:
+-+++            SSHClient = self.__get_SSHClient_connection()
+-+++        except:
+-+++            self.set_failure_status(128)
+-+++            logger.warning('{}'.format(self.get_failure_status()))
+-+++            self.set_test_end_status("SSH_Connection_Failure")
+-+++            self.finish_with_failure()
+-++ 
+-++         for filename_and_path in filenames_and_paths:
+-++             try:
+-++-                SSHClient = self.get_SSHClient_connection()
+-++                 file = SSHClient.open_sftp().open(os.path.join(filename_and_path['path'], filename_and_path['name']), 'r+')
+-++                 lines_in_file = file.readlines()
+-++                 file.seek(0)
+-++                 file.truncate()
+-++-                _found = False
+-+++                __found = False
+-++                 for line in lines_in_file:
+-++                     try:
+-++                         re.search('\[Tags](.*)', line).group(1)
+-++                         try:
+-++                             file.write(re.sub(old_tag, new_tag, line))
+-++-                            _found = True
+-+++                            __found = True
+-++                             logger.debug("Changed tag in file: {} from {} to {}".format(os.path.join(filename_and_path['path'], filename_and_path['name']), old_tag, new_tag))
+-++                         except:
+-++                             file.write(line)
+-++                     except:
+-++                         pass
+-++-                if not _found:
+-++-                    self._failureStatus = 111
+-++-                    self._test_end_status = "NO_TAG"
+-++-                    logger.warning('{} : {}'.format(LOGGER_INFO[self._failureStatus], old_tag))
+-+++                if not __found:
+-+++                    self.set_failure_status(111)
+-+++                    self.set_test_end_status("NO_TAG")
+-+++                    logger.warning('{} : {}'.format(LOGGER_INFO[self.get_failure_status()], old_tag))
+-++             #   git_result = self.git_launch(file_info=[path, file_name])
+-++             #   if not git_result == True:
+-++             #         self.failureStatus = 114
+-++@@ -314,69 +407,50 @@ class Supervisor(object):
+-++             #   logger.info("Git push successful on {}".format(self.TLname))
+-++ 
+-++             except:
+-++-                self._failureStatus = 112
+-++-                self._test_end_status = "SSH_Connection_Failure"
+-++-                logger.warning('{}'.format(LOGGER_INFO[self._failureStatus]))
+-+++                self.set_failure_status(112)
+-+++                self.set_test_end_status("SSH_Connection_Failure")
+-+++                logger.warning('{}'.format(LOGGER_INFO[self.set_failure_status()]))
+-++             finally:
+-++                 SSHClient.close()
+-++ 
+-++-    def send_information_about_executed_job(self, test_status=None):
+-++-        if test_status:
+-++-            self._test_end_status = test_status
+-++-        if self._test_end_status == "PASS":
+-++-            return 0
+-++-        elif self._test_end_status == None:
+-++-            self._test_end_status = 'UNKNOWN_FAIL'
+-++ 
+-+++    def send_information_about_executed_job(self):
+-+++        test_end_status = self.get_test_end_status()
+-++         messages = []
+-++-        subject = ""
+-++-        if self._test_end_status == "reserv_pending":
+-++-            _message = "Dear {f_name} {l_name}! \n\n" \
+-++-                       "Your reservation is pending.\n" \
+-++-                       "Reservation ID = {rID}\n" \
+-++-                       "Testline name = {tl_name}\n\n" \
+-++-                       "Have a nice day!".format(f_name=self._user_info['first_name'],
+-++-                                                 l_name=self._user_info['last_name'],
+-++-                                                 rID=self.TLreservationID, tl_name=self._TLname)
+-++-            messages.append({'message' : _message})
+-++-            subject = "Reservation status update"
+-++ 
+-+++        if test_end_status == "PASS":
+-+++            return 0
+-++ 
+-++-        elif self._test_end_status == "Failed":
+-++-            job = self._jenkins_info['job_api'].get_job(self._jenkins_info['job_name'])
+-++-            t = job.get_last_build().get_timestamp()
+-+++        elif test_end_status == "Failed":
+-+++            t = self.get_job_handler().get_last_build().get_timestamp()
+-++             build_time = '{}-{:02g}-{:02g}_{:02g}-{:02g}-{:02g}'.format(t.year, t.month, t.day, (t.hour-(time.altzone/3600)), t.minute, t.second)
+-++-            logs_link = 'http://10.83.200.35/~ltebox/logs/{}_{}/log.html'.format(self._TLname, build_time)
+-++-            test_info = ''
+-++-            print "test_status = ", self.parent_dictionary[self.serverID]['test_status']
+-++-
+-++-            for test in self.parent_dictionary[self.serverID]['test_status']:
+-++-                test_info += "Test = {test_name}.{file_name}\n".format(
+-++-                    test_name=test['test_name'],
+-++-                    file_name=test['file_name'])
+-+++            logs_url_address = 'http://10.83.200.35/~ltebox/logs/{}_{}/log.html'.format(self.__TLname, build_time)
+-+++            failed_tests_information = ''
+-+++
+-+++            for filename in self.get_filenames_of_failed_tests():
+-+++                failed_tests_information += "{test_name}.{filename}\n".format(
+-+++                    test_name=self.get_suitname(),
+-+++                    filename=filename)
+-++             _message = "Dear tester! \n\n" \
+-++                         "Your test have failed: \n\n" \
+-++                         "{test_info}\n\n" \
+-++                         "Logs are available at: {logs_link}\n\n" \
+-++-                        "Have a nice day!".format(test_info=test_info,
+-++-                                                  logs_link=logs_link)
+-+++                        "Have a nice day!".format(test_info=failed_tests_information,
+-+++                                                  logs_link=logs_url_address)
+-++             messages.append({'message' : _message,
+-++-                            'feature' : self.parent_dictionary[self.serverID]['test_status'][0]['test_name']})
+-+++                            'feature' : self.get_suitname()})
+-++             subject = "Tests status update - finished with fail"
+-++ 
+-++ 
+-++-        elif self._test_end_status == 'UNKNOWN_FAIL':
+-++-            job = self._jenkins_info['job_api'].get_job(self._jenkins_info['job_name'])
+-++-            logs_link = '{url}/job/{job_name}/{bn}/console'.format(url= 'http://plkraaa-jenkins.emea.nsn-net.net:8080',
+-++-                                                                  job_name=self._jenkins_info['job_name'],
+-++-                                                                  bn=job.get_last_buildnumber())
+-++-            _message = "Dear {f_name} {l_name}! \n\n" \
+-++-                       "Your test on {tl_name} has occured unknown fail.\n" \
+-+++        elif test_end_status == 'UNKNOWN_FAIL':
+-+++            logs_url_address = '{url}/job/{job_name}/{bn}/console'.format(url= 'http://plkraaa-jenkins.emea.nsn-net.net:8080',
+-+++                                                                  job_name=self.get_jobname(),
+-+++                                                                  bn=self.get_job_handler().get_last_buildnumber())
+-+++            _message = "Dear Admin! \n\n" \
+-+++                       "Tests on {tl_name} occured unknown fail.\n" \
+-++                        "Please check logs available at: {logs_link} \n\n" \
+-++-                       "Have a nice day!".format(f_name=self._user_info['first_name'],
+-++-                                                 l_name=self._user_info['last_name'],
+-++-                                                 tl_name=self._TLname,
+-++-                                                 logs_link=logs_link)
+-+++                       "Have a nice day!".format(tl_name=self.get_TLname(),
+-+++                                                 logs_link=logs_url_address)
+-++             messages.append({'message' : _message})
+-++             subject = "Tests status update - finished with unknown fail"
+-++ 
+-++@@ -392,13 +466,14 @@ class Supervisor(object):
+-++                 send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
+-++                 send.connect()
+-++                 send.send(mail)
+-+++
+-++         else:
+-++             mail = ute_mail.mail.Mail(subject=subject,message=messages[0]['message'],
+-++-                                          recipients='pawel.nogiec@nokia.com',  #Bartek Kukla (?) mail here
+-+++                                          recipients=admin['mail'],  #Bartek Kukla (?) mail here
+-++                                           name_from="Reservation Api")          #We need to figure out better name
+-++             send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
+-++             send.connect()
+-++             send.send(mail)
+-++ 
+-++-    def git_launch(self, file_info=None, pull_only=None):
+-++-        return git_launch(TL_address=self.TLaddress, file_info=file_info, pull_only=pull_only)
+-+++    # def git_launch(self, file_info=None, pull_only=None):
+-+++    #     return git_launch(TL_address=self.TLaddress, file_info=file_info, pull_only=pull_only)
+-++diff --git a/server_reservation_dispatcher/utilities/mailing_list.py b/server_reservation_dispatcher/utilities/mailing_list.py
+-++index 8eb8f1757b5a4d738bc17ee32660e1e882a2a26d..67912cb464cb961f024cb63ddcb74294e7daf8b7 100644
+-++--- a/server_reservation_dispatcher/utilities/mailing_list.py
+-+++++ b/server_reservation_dispatcher/utilities/mailing_list.py
+-++@@ -1,4 +1,18 @@
+-++-mail_dict={
+-+++# -*- coding: utf-8 -*-
+-+++"""
+-+++:created on: '11/08/15'
+-+++
+-+++:copyright: Nokia
+-+++:author: Pawel Nogiec
+-+++:contact: pawel.nogiec@nokia.com
+-+++"""
+-+++
+-+++admin = {
+-+++    'name' : 'Pawel Nogiec',
+-+++    'mail' : 'pawel.nogiec@nokia.com'
+-+++}
+-+++
+-+++mail_dict = {
+-++     'LTE1819' : ['damian.papiez@nokia.com'],
+-++     'LTE2351' : ['pawel.nogiec@nokia.com'],
+-++     'LTE738' : ['damian.papiez@nokia.com'],
++++++        file_converter.find_yml_files()
++++++        file_converter.convert_to_raw_format(is_yaml_conversion)
+++++diff --git a/plik_diff.diff b/plik_diff.diff
+++++new file mode 100644
+++++index 0000000000000000000000000000000000000000..f8ed17dd54c07da8bc34ab51024e2e4afdb315bf
+++++--- /dev/null
++++++++ b/plik_diff.diff
+++++@@ -0,0 +1,150 @@
++++++diff --git a/Logs_parser/new_converter/konverter.py b/Logs_parser/new_converter/konverter.py
++++++new file mode 100644
++++++index 0000000000000000000000000000000000000000..4baca3b7a399c1a8d0d8f677a95b3f7701c09cf7
++++++--- /dev/null
+++++++++ b/Logs_parser/new_converter/konverter.py
++++++@@ -0,0 +1,144 @@
+++++++__author__ = 'ute'
+++++++
+++++++import re
+++++++import yaml
+++++++import os
+++++++from argparse import ArgumentParser
+++++++
+++++++
+++++++def parser():
+++++++    parser = ArgumentParser(description='Make .raw and .row.time files.')
+++++++    parser.add_argument("--d", "-directory", type=str, help="Add directory", dest="directory", default="/home/ute/Logs_parser/logi")
+++++++    parser.add_argument("--y", "--YAML", help="Convert to yaml files", action="store_true", dest="is_yaml_conversion", default=True)
+++++++    parser.add_argument("--r", "--RAW", help="Convert to raw files", action="store_true", dest="is_raw_conversion", default=False)
+++++++    args = parser.parse_args()
+++++++    if args.directory != None:
+++++++        print "\tMy directory: "+args.directory
+++++++    if args.is_raw_conversion:
+++++++        print "\tType of conversion: RAW"
+++++++        args.is_yaml_conversion = False
+++++++    if args.is_yaml_conversion:
+++++++        print "\tType of conversion: YAML"
+++++++    return (args.directory,args.is_yaml_conversion)
+++++++
+++++++
+++++++def ascii_to_dec(buffer):
+++++++    output = re.sub(r"<0x(..)>", lambda matchobj: chr(int(matchobj.group(1))), buffer)
+++++++    return output
+++++++
+++++++
+++++++def represent_omap(dumper, data):
+++++++    return dumper.represent_mapping(u'tag:yaml.org,2002:map', data.to_omap())
+++++++
+++++++
+++++++def to_ascii(buffer):
+++++++    output = re.sub(r'[^\x21-\x7e]', lambda matchobj: '<0x%s>' % ord(matchobj.group(0)), buffer)
+++++++    return output
+++++++
+++++++
+++++++class OrderedDict(dict):  # my order
+++++++   def to_omap(self):
+++++++        return [('Nr', self['Nr']), ('Time', self['Time']), ('Epoch', self['Epoch']), ('Payload', self['Payload']),
+++++++                ('Type_of_record', self['Type_of_record'])]
+++++++
+++++++
+++++++class Converter(object):
+++++++    def __init__(self, directory):
+++++++        self.directory = directory
+++++++        self.filename_time = []
+++++++        self.filename_raw = []
+++++++        self.time_file = ""
+++++++        self.rawfile_whole_payload = ""
+++++++        self.filename_yml = []
+++++++
+++++++    def find_raw_files(self):
+++++++        for filename in os.listdir(self.directory):
+++++++            if filename.endswith(".raw.time"):
+++++++                filename_time = os.path.join(self.directory, filename)
+++++++                filename_raw = filename_time.replace(".time", "")
+++++++                self.filename_time.append(filename_time)
+++++++                self.filename_raw.append(filename_raw)
+++++++        return len(self.filename_time)
+++++++
+++++++    def create_yml_file(self, number_of_file):
+++++++        remaining_payload = self.rawfile_whole_payload
+++++++        yaml.add_representer(OrderedDict, represent_omap)
+++++++        record_number = 1
+++++++        line = self.time_file.readline()
+++++++        filename_yaml = self.filename_raw[number_of_file].replace(".raw", "")
+++++++        with open(filename_yaml+".yml", 'a') as new_yaml_file:
+++++++            while line:  # format of a line: 13:25:27.85 | 39 |> 1438601127.853814 |
+++++++                (timestamp, size, type_and_epoch, new_line_sign) = tuple(line.split("|"))
+++++++                size = int(size)
+++++++                type = type_and_epoch[0]
+++++++                epoch = type_and_epoch[2:]
+++++++                single_record_payload = remaining_payload[0:size]
+++++++                remaining_payload = remaining_payload[size:]
+++++++                single_record_payload = to_ascii(single_record_payload)
+++++++                log_data = OrderedDict({
+++++++                    "Nr": record_number,
+++++++                    "Time": timestamp,
+++++++                    "Epoch": epoch,
+++++++                    "Payload": single_record_payload,
+++++++                    "Type_of_record": type})
+++++++                new_yaml_file.write(yaml.dump(log_data, default_flow_style=False, explicit_start=True))
+++++++                record_number += 1
+++++++                line = self.time_file.readline()
+++++++
+++++++    def find_yml_files(self):
+++++++        for filename in os.listdir(self.directory):
+++++++            if filename.endswith(".yml"):
+++++++                filename_yml = os.path.join(self.directory, filename)
+++++++                self.filename_yml.append(filename_yml)
+++++++        return len(self.filename_yml)
+++++++
+++++++    def get_and_convert_raw_file(self, number_of_file):
+++++++        self.time_file = open(str(self.filename_time[number_of_file]), "r")
+++++++        log_file = open(str(self.filename_raw[number_of_file]), "r")
+++++++        self.rawfile_whole_payload = log_file.read()
+++++++
+++++++    def create_raw_file(self, number_of_file):
+++++++        filename_raw = self.filename_yml[number_of_file].replace(".yml", ".raw")
+++++++        filename_raw_time = filename_raw+".time"
+++++++        with open(self.filename_yml[number_of_file], 'r') as filename_yaml:
+++++++            yaml_data = yaml.load_all(filename_yaml)
+++++++        for filename in os.listdir(self.directory):
+++++++            filename = os.path.join(self.directory, filename)
+++++++            if filename == filename_raw:
+++++++                os.rename(filename, filename+'.bak')
+++++++            elif filename == filename_raw_time:
+++++++                os.rename(filename, filename+'.bak')
+++++++        with open(filename_raw, 'w') as raw_file, open(filename_raw_time, 'w') as raw_time_file:
+++++++            for record in yaml_data:
+++++++                record_timestamp = ""
+++++++                record_size = 0
+++++++                record_type = ""
+++++++                record_epoch = ""
+++++++                record_payload = ""
+++++++                for key, value in record.items():
+++++++                    if key == "Time":
+++++++                        record_timestamp = value
+++++++                    elif key == "Type_of_record":
+++++++                        record_type = value
+++++++                    elif key == "Epoch":
+++++++                        record_epoch = value
+++++++                    elif key == "Payload":
+++++++                        record_payload = ascii_to_dec(value)
+++++++                        record_size = len(record_payload)
+++++++                rawtime_record_line = "%s| %7.7s |%s %s|\n" % (record_timestamp, record_size, record_type, record_epoch)
+++++++                raw_file.write(record_payload)
+++++++                raw_time_file.write(rawtime_record_line)
+++++++
+++++++
+++++++if __name__ == "__main__":
+++++++    (directory, is_yaml_conversion) = parser()
+++++++    file_converter = Converter(directory)
+++++++    if is_yaml_conversion:
+++++++        number_of_files = file_converter.find_raw_files()
+++++++        for number_of_file in range(0, number_of_files):
+++++++            file_converter.get_and_convert_raw_file(number_of_file)
+++++++            file_converter.create_yml_file(number_of_file)
+++++++    else:
+++++++        number_of_files = file_converter.find_yml_files()
+++++++        for number_of_file in range(0, number_of_files):
+++++++            file_converter.create_raw_file(number_of_file)
+++++diff --git a/server_reservation_dispatcher/superVisor.py b/server_reservation_dispatcher/superVisor.py
+++++new file mode 100644
+++++index 0000000000000000000000000000000000000000..1ac682b59fe808a24357c5492605dca2054afd96
+++++--- /dev/null
++++++++ b/server_reservation_dispatcher/superVisor.py
+++++@@ -0,0 +1,22 @@
++++++# -*- coding: utf-8 -*-
++++++"""
++++++:created on: '11/08/15'
++++++
++++++:copyright: Nokia
++++++:author: Pawel Nogiec
++++++:contact: pawel.nogiec@nokia.com
++++++"""
++++++
++++++
++++++from superVisor_api import Supervisor
++++++
++++++
++++++#
++++++# __job_status = self.get_job_status()
++++++# if __job_status == "FAILURE":
++++++#     self.set_are_any_failed_tests(False)
++++++#     self.check_output_for_other_fails_or_errors_and_get_test_end_status()
++++++# elif __job_status == "UNKNOWN":
++++++#     self.set_failure_status(127)
++++++#     self.set_test_end_status("JenkinsError")
++++++#     self.finish_with_failure()
+++++diff --git a/server_reservation_dispatcher/superVisor_api.py b/server_reservation_dispatcher/superVisor_api.py
+++++index a05679f9bdbee3a35d305b7b4bbd35220c3189de..892b716ee757f15afe62a69457569094c13bc84f 100644
+++++--- a/server_reservation_dispatcher/superVisor_api.py
++++++++ b/server_reservation_dispatcher/superVisor_api.py
+++++@@ -1,4 +1,3 @@
+++++-
+++++ # -*- coding: utf-8 -*-
+++++ """
+++++ :created on: '11/08/15'
+++++@@ -14,14 +13,15 @@ import re
+++++ import os
+++++ import sys
+++++ import logging
++++++import json
+++++ 
+++++-import jenkinsapi
++++++from jenkinsapi.api import Jenkins
+++++ import ute_mail.sender
+++++ import ute_mail.mail
+++++ import paramiko
+++++ 
+++++ from utilities.TL_map import TL_map
+++++-from utilities.mailing_list import mail_dict
++++++from utilities.mailing_list import mail_dict, admin
+++++ from utilities.logger_messages import LOGGER_INFO
+++++ # from server_git_api import git_launch
+++++ 
+++++@@ -36,163 +36,246 @@ config_logger(logger)
+++++ 
+++++ class Supervisor(object):
+++++     def __init__(self,TLname, jenkins_job_info, user_info=None):
+++++-        self._jenkins_info = jenkins_job_info    #dict:{job_name : "", parameters : {param1 : "", ...}}
+++++-        self._user_info = user_info          #dict:{first_name : "", last_name : "", mail :""}
+++++-        self._TLname = TLname
+++++-        self._suitname = jenkins_job_info['parameters']['name']
+++++-
+++++-        self._TLaddress = None
+++++-        self._failureStatus = None
+++++-        self._are_any_failed_tests = False
+++++-        self._test_end_status = None
+++++-        self._job_filenames_failed_tests = None
+++++-
+++++-        self.set_TLaddress()
++++++        self.__jenkins_info = jenkins_job_info    #dict:{jobname : "", parameters : {param1 : "", ...}}
++++++        self.__user_info = user_info          #dict:{first_name : "", last_name : "", mail :""}
++++++        self.__TLname = TLname
++++++        self.__suitname = jenkins_job_info['parameters']['name']
++++++
++++++        self.__TLaddress = self.set_TLaddress_from_map()
++++++        self.__failureStatus = None
++++++        self.__are_any_failed_tests = False
++++++        self.__test_end_status = None
++++++        self.__filenames_of_failed_tests = None
++++++
+++++         logger.debug("Created new Supervisor object with args: "
+++++-                     "jenkins_info = {}, user_info = {}, TLname = {}".format(self._jenkins_info,
+++++-                                                                                      self._user_info,
+++++-                                                                                      self._TLname))
++++++                     "jenkins_info = {}, user_info = {}, TLname = {}".format(self.__jenkins_info,
++++++                                                                                      self.__user_info,
++++++                                                                                      self.__TLname))
++++++
++++++    #########################################################################################
++++++    #getters and setters
++++++    #########################################################################################
+++++ 
+++++     def get_jenkins_info(self):
+++++-        return self._jenkins_info
++++++        return self.__jenkins_info
+++++ 
+++++ 
+++++     def get_user_info(self):
+++++-        return self._user_info
++++++        return self.__user_info
+++++ 
+++++ 
+++++     def get_TLname(self):
+++++-        return self._TLname
++++++        return self.__TLname
+++++ 
+++++ 
+++++-    def set_TLaddress(self):
+++++-        self._TLaddress = TL_map[self._TLname]
+++++-        return self._TLaddress
++++++    def get_suitname(self):
++++++        return self.__suitname
+++++ 
+++++ 
+++++-    def finish_with_failure(self):
+++++-        #TODO clear job_info from file
+++++-        self.send_information_about_executed_job(test_status=self._test_end_status)
+++++-        sys.exit()
++++++    def get_TLaddress(self):
++++++        return self.__TLaddress
++++++
++++++
++++++    def set_TLaddress_from_map(self):
++++++        self.__TLaddress = TL_map[self.__TLname]
++++++        return self.__TLaddress
++++++
++++++
++++++    def get_failure_status(self):
++++++        return self.__failureStatus
++++++
++++++
++++++    def set_failure_status(self,status):
++++++        self.__failureStatus = status
++++++
++++++
++++++    def get_are_any_failed_tests(self):
++++++        return self.__are_any_failed_tests
++++++
++++++
++++++    def set_are_any_failed_tests(self, are_fails):
++++++        self.__are_any_failed_tests = are_fails
++++++
++++++
++++++    def get_test_end_status(self):
++++++        return self.__test_end_status
++++++
++++++
++++++    def set_test_end_status(self,status):
++++++        self.__test_end_status = status
++++++
++++++
++++++    def get_filenames_of_failed_tests(self):
++++++        return self.__filenames_of_failed_tests
++++++
++++++
++++++    def set_filenames_of_failed_tests(self, failed_tests):
++++++        self.__filenames_of_failed_tests = failed_tests
++++++
++++++
++++++    def get_job_parameters(self):
++++++        return self.__jenkins_info['parameters']
++++++
++++++
++++++    def set_default_jobname(self):
++++++        self.__jenkins_info['jobname'] = 'job_on_{}'.format(self.get_TLname())
++++++
++++++
++++++    def get_jobname(self):
++++++        if 'jobname' in self.get_jenkins_info():
++++++            return self.__jenkins_info['jobname']
++++++        else:
++++++            return None
+++++ 
+++++ 
+++++     def set_jenkins_connection(self):
+++++-        if not 'job_name' in self._jenkins_info:
+++++-            self._jenkins_info['job_name'] = 'job_on_{tl_name}'.format(tl_name=self._TLname)
+++++         try:
+++++-            jenkins_connection = jenkinsapi.api.Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
+++++-            self._jenkins_info['connection'] = jenkins_connection
++++++            self.__jenkins_info['connection'] = Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
+++++             logger.debug("jenkins connection has been set")
+++++-            return self._jenkins_info['connection']
+++++         except:
+++++-            self._failureStatus = 106
+++++-            self._test_end_status = "JenkinsError"
+++++-            logger.critical('{}'.format(LOGGER_INFO[self._failureStatus]))
++++++            self.set_failure_status(106)
++++++            self.set_test_end_status("JenkinsError")
++++++            logger.critical('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+++++             self.finish_with_failure()
+++++ 
+++++ 
+++++-    def set_jenkins_job(self):
++++++    def get_jenkins_connection(self):
++++++        return self.__jenkins_info['connection']
++++++
++++++
++++++    def set_job_handler(self, job_handler):
++++++        self.__jenkins_info['job_handler'] = job_handler
++++++
++++++
++++++    def get_job_handler(self):
++++++        return self.__jenkins_info['job_handler']
++++++
++++++
++++++    def set_job_output(self, job_output):
++++++        self.__jenkins_info['output'] = job_output
++++++
++++++
++++++    def get_job_output(self):
++++++        return self.__jenkins_info['output']
++++++
++++++
++++++    #########################################################################################
++++++    #functions
++++++    #########################################################################################
++++++
++++++
++++++    def make_file_with_specific_info(self):
++++++        info_to_save = {
++++++            'TLname'    : self.get_TLname(),
++++++            'suitname'  : self.get_suitname(),
++++++            'job_params': self.get_job_parameters()
++++++        }
++++++        path_with_filename = os.path.join('.','files','SuperVisor',self.get_suitname())
++++++        with open(path_with_filename, 'wb'):
++++++            json.dump(info_to_save, path_with_filename)
++++++
++++++
++++++    def delete_file_with_specific_info(self):
++++++        path_with_filename = os.path.join('.','files','SuperVisor',self.get_suitname())
++++++        for _ in range(10):
++++++            try:
++++++                os.remove(path_with_filename)
++++++                break
++++++            except:
++++++                time.sleep(0.1)
++++++
++++++
++++++    def finish_with_failure(self):
++++++        self.send_information_about_executed_job()
++++++        self.delete_file_with_specific_info()
++++++        sys.exit()
++++++
++++++
++++++    def set_jenkins_job_handler(self):
+++++         try:
+++++-            self._jenkins_info['job_handler'] = self._jenkins_info['connection'].get_job(self._jenkins_info['job_name'])
+++++-            return self._jenkins_info['job_handler']
++++++            self.set_job_handler(self.get_jenkins_connection().get_job(self.get_jobname()))
+++++         except:
+++++-            self._failureStatus = 125
+++++-            self._test_end_status = "JenkinsError"
+++++-            logger.critical('{}'.format(LOGGER_INFO[self._failureStatus]))
++++++            self.set_failure_status(125)
++++++            self.set_test_end_status("JenkinsError")
++++++            logger.critical('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+++++             self.finish_with_failure()
+++++ 
+++++ 
+++++     def set_node_for_job(self):
+++++         try:
+++++-            job = self._jenkins_info['job_handler']
+++++-            job_config_xml = ET.fromstring(job.get_config())
++++++            job_config_xml = ET.fromstring(self.get_job_handler().get_config())
+++++             assignedNode_tag = job_config_xml.find('assignedNode')
+++++-            assignedNode_tag.text = str(self._TLname)
+++++-            job.update_config(ET.tostring(job_config_xml))
+++++-            logger.debug("Updated TL name: {} in job {}".format(self._TLname, self._jenkins_info['job_name']))
+++++-            return 0
++++++            assignedNode_tag.text = str(self.get_TLname())
++++++            self.get_job_handler().update_config(ET.tostring(job_config_xml))
++++++            logger.debug("Updated TL name: {} in job {}".format(self.get_TLname(), self.get_jobname()))
+++++         except:
+++++-            self._failureStatus = 104
+++++-            self._test_end_status = "JenkinsError"
+++++-            logger.warning('{} : {}'.format(self._TLname, LOGGER_INFO[self._failureStatus]))
++++++            self.set_failure_status(104)
++++++            self.set_test_end_status("JenkinsError")
++++++            logger.warning('{} : {}'.format(self.get_TLname(), LOGGER_INFO[self.get_failure_status()]))
+++++             self.finish_with_failure()
+++++ 
+++++ 
+++++     def get_job_status(self):
+++++-        job_status = None
++++++        job_status = "Unknown"
+++++         try:
+++++-            job_status = self._jenkins_info['job_handler'].get_last_build().get_status()
++++++            job_status = self.get_job_handler().get_last_build().get_status()
+++++         except:
+++++-            self._failureStatus = 105
+++++-            self._test_end_status = "JenkinsError"
+++++-            logger.error('{} : {}'.format(self._jenkins_info['job_name'],LOGGER_INFO[self._failureStatus]))
++++++            self.set_failure_status(105)
++++++            self.set_test_end_status("JenkinsError")
++++++            logger.error('{} : {}'.format(self.get_jobname(),LOGGER_INFO[self.get_failure_status()]))
+++++             self.finish_with_failure()
+++++         finally:
+++++-            logger.debug("Job {} status = {}".format(self._jenkins_info['job_name'], job_status))
+++++-            if job_status == "FAILURE":
+++++-                self._are_any_failed_tests = False
+++++-                self.check_output_for_other_fails_or_errors_and_get_test_end_status()
+++++-            else:
+++++-                return job_status
++++++            logger.debug("Job {} status = {}".format(self.get_jobname(), job_status))
++++++            return job_status
+++++ 
+++++ 
+++++-    def _is_queued_or_running(self, only_once=None):
+++++-        if only_once:
+++++-            try:
+++++-                return self._jenkins_info['job_handler'].is_queued_or_running()
+++++-            except:
+++++-                self._failureStatus = 124
+++++-                self._test_end_status = "JenkinsError"
+++++-                logger.error('{} : {}'.format(self._jenkins_info['job_name'],LOGGER_INFO[self._failureStatus]))
+++++-                self.finish_with_failure()
++++++    def _is_queued_or_running(self):
+++++         try:
+++++             while True:
+++++-                if self._jenkins_info['job_handler'].is_queued_or_running():
++++++                if self.get_job_handler().is_queued_or_running():
+++++                     time.sleep(3)       #TODO LONGER SLEEP LATER
+++++                 else:   break
+++++         except:
+++++-            self._failureStatus = 124
+++++-            self._test_end_status = "JenkinsError"
+++++-            logger.error('{} : {}'.format(self._jenkins_info['job_name'],LOGGER_INFO[self._failureStatus]))
++++++            self.set_failure_status(124)
++++++            self.set_test_end_status("JenkinsError")
++++++            logger.error('{} : {}'.format(self.get_jobname(),LOGGER_INFO[self.get_failure_status()]))
+++++             self.finish_with_failure()
+++++ 
+++++ 
+++++-    def _build_job(self):
++++++    def build_job(self):
+++++         try:
+++++-            self._jenkins_info['connection'].build_job(jobname=self._jenkins_info['job_name'],
+++++-                                                      params=self._jenkins_info['parameters'])
+++++-            logger.info("Job {} was built".format(self._jenkins_info['job_name']))
+++++-            return 0
++++++            self.get_jenkins_connection().build_job(jobname=self.get_jobname(),
++++++                                                      params=self.get_job_parameters())
++++++            logger.info("Job {} was built".format(self.get_jobname()))
+++++         except:
+++++-            self._failureStatus = 107
+++++-            self._test_end_status = "JenkinsError"
+++++-            logger.error('{}'.format(LOGGER_INFO[self._failureStatus]))
++++++            self.set_failure_status(107)
++++++            self.set_test_end_status("JenkinsError")
++++++            logger.error('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+++++             self.finish_with_failure()
+++++ 
+++++ 
+++++     def set_jenkins_console_output(self):
+++++         try:
+++++-            self._is_queued_or_running()
+++++-            self._jenkins_info['console_output'] = self._jenkins_info['job_handler'].get_last_build().get_console()
+++++-            logger.debug("Console output retrieved from {}".format(self._jenkins_info['job_name']))
+++++-            return self._jenkins_info['console_output']
++++++            self.set_job_output(self.get_job_handler().get_last_build().get_console())
++++++            logger.debug("Console output retrieved from {}".format(self.get_jobname()))
+++++         except:
+++++-            self._failureStatus = 108
+++++-            self._test_end_status = "JenkinsError"
+++++-            logger.error('{}'.format(LOGGER_INFO[self._failureStatus]))
++++++            self.set_failure_status(108)
++++++            self.set_test_end_status("JenkinsError")
++++++            logger.error('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+++++             self.finish_with_failure()
+++++ 
++++++
+++++     def parse_output_and_set_job_failed_tests(self):
+++++         job_filenames_failed_tests=[]
+++++         regex = r'\=\s(.*)\s\=\W*.*FAIL'
+++++         try:
+++++-            matches = re.findall(regex, self._jenkins_info['console_output'])
++++++            matches = re.findall(regex, self.get_job_output())
+++++             for match in matches:
+++++                 match = re.sub(" +", "_", match)  #changing " " to "_" - pybot thinks it's the same, i don't
+++++                 if match[-3:] == '...': match = match[:-3]  #cutting last "..."
+++++                 elif match[-1:] == '_': match = match[:-1]    #cutting last "_"
+++++                 try:
+++++-                    match = re.search('\w*\.Tests\.{}.*\.(.*)'.format(self._suitname), match).group(1)
++++++                    match = re.search('\w*\.Tests\.{}.*\.(.*)'.format(self.get_suitname()), match).group(1)
+++++                     job_filenames_failed_tests.append(match)
+++++                 except:
+++++                     try:
+++++@@ -202,19 +285,17 @@ class Supervisor(object):
+++++                         match = re.search('\w*\.(.*)', match).group(1)
+++++                         job_filenames_failed_tests.append(match)
+++++         except:
+++++-            logger.debug("Regex did not find fails in output of {}".format(self._jenkins_info['job_name']))
++++++            logger.debug("Regex did not find fails in output of {}".format(self.get_jobname()))
+++++         finally:
+++++             if job_filenames_failed_tests:
+++++-                logger.info("Regex found fails in output of {}".format(self._jenkins_info['job_name']))
+++++-            self._job_filenames_failed_tests = job_filenames_failed_tests
+++++-            return self._job_filenames_failed_tests
+++++-
++++++                logger.info("Regex found fails in output of {}".format(self.get_jobname()))
++++++            self.set_filenames_of_failed_tests(job_filenames_failed_tests)
+++++ 
+++++ 
+++++     def check_for_fails(self):
+++++-        output = self._jenkins_info['console_output']
++++++        output = self.get_job_output()
+++++         if not output.find('| FAIL |') == -1:
+++++-            logger.debug("Found 'FAIL' in output of {}".format(self._jenkins_info['job_name']))
++++++            logger.debug("Found 'FAIL' in output of {}".format(self.get_jobname()))
+++++             return True
+++++         output = output.split('\n')
+++++         for line in output:
+++++@@ -222,91 +303,103 @@ class Supervisor(object):
+++++                 ###mozna zapisac, ze tag ciagle nie zmieniony i wysylac ponownie mail do testerow
+++++                 continue
+++++             if not line.find('[ ERROR ]') == -1:
+++++-                logger.debug("Found 'ERROR' in output of {}".format(self._jenkins_info['job_name']))
++++++                logger.debug("Found 'ERROR' in output of {}".format(self.get_jobname()))
+++++                 return True
+++++         return False
+++++ 
+++++     def check_output_for_other_fails_or_errors_and_get_test_end_status(self):
+++++-        if not self._are_any_failed_tests:
++++++        if not self.get_are_any_failed_tests():
+++++             if self.check_for_fails() == False:
+++++-                self._test_end_status = "SUCCESSFUL"
+++++-                logger.info("Test {} was successful".format(self._jenkins_info['job_name']))
++++++                self.set_test_end_status("SUCCESSFUL")
++++++                logger.info("Test {} was successful".format(self.get_jobname()))
+++++             else:
+++++-                self._test_end_status = "UNKNOWN_ERROR/FAIL"
+++++-                self._are_any_failed_tests = True
+++++-                self._failureStatus = 109
+++++-                logger.error('{}'.format(LOGGER_INFO[self._failureStatus]))
++++++                self.set_test_end_status("UNKNOWN_ERROR/FAIL")
++++++                self.set_are_any_failed_tests(True)
++++++                self.set_failure_status(109)
++++++                logger.error('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+++++                 self.finish_with_failure()
+++++         else:
+++++-            self._test_end_status = "GOT_FAILS"
+++++-            self._are_any_failed_tests = True
+++++-            logger.info("Test {} has got some failures".format(self._jenkins_info['job_name']))
+++++-        return self._test_end_status
++++++            self.set_test_end_status("GOT_FAILS")
++++++            self.set_are_any_failed_tests(True)
++++++            logger.info("Test {} has got some failures".format(self.get_jobname()))
++++++
+++++ 
+++++-    def get_SSHClient_connection(self):
+++++-        SSHClient = paramiko.SSHClient()
+++++-        SSHClient.load_system_host_keys()
+++++-        SSHClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+++++-        SSHClient.connect(self.TLaddress, username='ute', password='ute')
+++++-        return SSHClient
++++++    def __get_SSHClient_connection(self):
++++++        try:
++++++            SSHClient = paramiko.SSHClient()
++++++            SSHClient.load_system_host_keys()
++++++            SSHClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
++++++            SSHClient.connect(self.get_TLaddress(), username='ute', password='ute')
++++++            return SSHClient
++++++        except:
++++++            return None
+++++ 
+++++ 
+++++-    def check_if_more_directories(self):
++++++    def __get_robot_files_and_paths(self):
+++++         tmp_filenames_and_paths = []
+++++-        for root, dirs, files in os.walk('/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}'.format(self._suitname)):
++++++        for root, dirs, files in os.walk('/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}'.format(self.__suitname)):
+++++             for file in files:
+++++                 if file.endswith('.robot') or file.endswith('.txt'):
+++++                     tmp_filenames_and_paths.append({'path' : root, 'filename' : file})
+++++         return tmp_filenames_and_paths
+++++ 
+++++ 
+++++-    def try_to_match_file_name(self, tmp_filenames_and_paths):
++++++    def __match_filenames_and_paths(self, tmp_filenames_and_paths):
+++++         filenames_and_paths = []
+++++-        for filename_from_output in self._job_filenames_failed_tests:
++++++        filenames_and_paths_for_temporary_use = []
++++++        for filename_from_output in self.get_filenames_of_failed_tests():
+++++             _found = False
+++++             for tmp_filename_and_path in tmp_filenames_and_paths:
+++++                 try:
+++++                     re.search('({}.*)'.format(filename_from_output),tmp_filename_and_path['filename']).group(1)
+++++                     filenames_and_paths.append({'path' : tmp_filename_and_path['path'], 'filename' : tmp_filename_and_path['filename']})
++++++                    filenames_and_paths_for_temporary_use.append(tmp_filename_and_path['filename'])
+++++                     logger.debug("Found filename: {}".format(tmp_filename_and_path['filename']))
+++++                     _found = True
+++++                     break
+++++                 except:
+++++                     pass
+++++             if not _found:
+++++-                self._failureStatus = 110
+++++-                logger.warning('{} {}'.format(LOGGER_INFO[self._failureStatus],filename_from_output))
+++++-
++++++                filenames_and_paths_for_temporary_use.append(filename_from_output)
++++++                self.set_failure_status(110)
++++++                logger.warning('{} {}'.format(LOGGER_INFO[self.get_failure_status()],filename_from_output))
++++++        self.set_filenames_of_failed_tests(filenames_and_paths_for_temporary_use)
+++++         return filenames_and_paths
+++++ 
+++++ 
+++++     def remove_tag_from_robots_tests(self, old_tag = 'enable', new_tag = ''):
+++++-        tmp_filenames_and_paths = self.check_if_more_directories()
+++++-        filenames_and_paths = self.try_to_match_file_name(tmp_filenames_and_paths)
++++++        tmp_filenames_and_paths = self.__get_robot_files_and_paths()
++++++        filenames_and_paths = self.__match_filenames_and_paths(tmp_filenames_and_paths)
++++++        try:
++++++            SSHClient = self.__get_SSHClient_connection()
++++++        except:
++++++            self.set_failure_status(128)
++++++            logger.warning('{}'.format(self.get_failure_status()))
++++++            self.set_test_end_status("SSH_Connection_Failure")
++++++            self.finish_with_failure()
+++++ 
+++++         for filename_and_path in filenames_and_paths:
+++++             try:
+++++-                SSHClient = self.get_SSHClient_connection()
+++++                 file = SSHClient.open_sftp().open(os.path.join(filename_and_path['path'], filename_and_path['name']), 'r+')
+++++                 lines_in_file = file.readlines()
+++++                 file.seek(0)
+++++                 file.truncate()
+++++-                _found = False
++++++                __found = False
+++++                 for line in lines_in_file:
+++++                     try:
+++++                         re.search('\[Tags](.*)', line).group(1)
+++++                         try:
+++++                             file.write(re.sub(old_tag, new_tag, line))
+++++-                            _found = True
++++++                            __found = True
+++++                             logger.debug("Changed tag in file: {} from {} to {}".format(os.path.join(filename_and_path['path'], filename_and_path['name']), old_tag, new_tag))
+++++                         except:
+++++                             file.write(line)
+++++                     except:
+++++                         pass
+++++-                if not _found:
+++++-                    self._failureStatus = 111
+++++-                    self._test_end_status = "NO_TAG"
+++++-                    logger.warning('{} : {}'.format(LOGGER_INFO[self._failureStatus], old_tag))
++++++                if not __found:
++++++                    self.set_failure_status(111)
++++++                    self.set_test_end_status("NO_TAG")
++++++                    logger.warning('{} : {}'.format(LOGGER_INFO[self.get_failure_status()], old_tag))
+++++             #   git_result = self.git_launch(file_info=[path, file_name])
+++++             #   if not git_result == True:
+++++             #         self.failureStatus = 114
+++++@@ -314,69 +407,50 @@ class Supervisor(object):
+++++             #   logger.info("Git push successful on {}".format(self.TLname))
+++++ 
+++++             except:
+++++-                self._failureStatus = 112
+++++-                self._test_end_status = "SSH_Connection_Failure"
+++++-                logger.warning('{}'.format(LOGGER_INFO[self._failureStatus]))
++++++                self.set_failure_status(112)
++++++                self.set_test_end_status("SSH_Connection_Failure")
++++++                logger.warning('{}'.format(LOGGER_INFO[self.set_failure_status()]))
+++++             finally:
+++++                 SSHClient.close()
+++++ 
+++++-    def send_information_about_executed_job(self, test_status=None):
+++++-        if test_status:
+++++-            self._test_end_status = test_status
+++++-        if self._test_end_status == "PASS":
+++++-            return 0
+++++-        elif self._test_end_status == None:
+++++-            self._test_end_status = 'UNKNOWN_FAIL'
+++++ 
++++++    def send_information_about_executed_job(self):
++++++        test_end_status = self.get_test_end_status()
+++++         messages = []
+++++-        subject = ""
+++++-        if self._test_end_status == "reserv_pending":
+++++-            _message = "Dear {f_name} {l_name}! \n\n" \
+++++-                       "Your reservation is pending.\n" \
+++++-                       "Reservation ID = {rID}\n" \
+++++-                       "Testline name = {tl_name}\n\n" \
+++++-                       "Have a nice day!".format(f_name=self._user_info['first_name'],
+++++-                                                 l_name=self._user_info['last_name'],
+++++-                                                 rID=self.TLreservationID, tl_name=self._TLname)
+++++-            messages.append({'message' : _message})
+++++-            subject = "Reservation status update"
+++++ 
++++++        if test_end_status == "PASS":
++++++            return 0
+++++ 
+++++-        elif self._test_end_status == "Failed":
+++++-            job = self._jenkins_info['job_api'].get_job(self._jenkins_info['job_name'])
+++++-            t = job.get_last_build().get_timestamp()
++++++        elif test_end_status == "Failed":
++++++            t = self.get_job_handler().get_last_build().get_timestamp()
+++++             build_time = '{}-{:02g}-{:02g}_{:02g}-{:02g}-{:02g}'.format(t.year, t.month, t.day, (t.hour-(time.altzone/3600)), t.minute, t.second)
+++++-            logs_link = 'http://10.83.200.35/~ltebox/logs/{}_{}/log.html'.format(self._TLname, build_time)
+++++-            test_info = ''
+++++-            print "test_status = ", self.parent_dictionary[self.serverID]['test_status']
+++++-
+++++-            for test in self.parent_dictionary[self.serverID]['test_status']:
+++++-                test_info += "Test = {test_name}.{file_name}\n".format(
+++++-                    test_name=test['test_name'],
+++++-                    file_name=test['file_name'])
++++++            logs_url_address = 'http://10.83.200.35/~ltebox/logs/{}_{}/log.html'.format(self.__TLname, build_time)
++++++            failed_tests_information = ''
++++++
++++++            for filename in self.get_filenames_of_failed_tests():
++++++                failed_tests_information += "{test_name}.{filename}\n".format(
++++++                    test_name=self.get_suitname(),
++++++                    filename=filename)
+++++             _message = "Dear tester! \n\n" \
+++++                         "Your test have failed: \n\n" \
+++++                         "{test_info}\n\n" \
+++++                         "Logs are available at: {logs_link}\n\n" \
+++++-                        "Have a nice day!".format(test_info=test_info,
+++++-                                                  logs_link=logs_link)
++++++                        "Have a nice day!".format(test_info=failed_tests_information,
++++++                                                  logs_link=logs_url_address)
+++++             messages.append({'message' : _message,
+++++-                            'feature' : self.parent_dictionary[self.serverID]['test_status'][0]['test_name']})
++++++                            'feature' : self.get_suitname()})
+++++             subject = "Tests status update - finished with fail"
+++++ 
+++++ 
+++++-        elif self._test_end_status == 'UNKNOWN_FAIL':
+++++-            job = self._jenkins_info['job_api'].get_job(self._jenkins_info['job_name'])
+++++-            logs_link = '{url}/job/{job_name}/{bn}/console'.format(url= 'http://plkraaa-jenkins.emea.nsn-net.net:8080',
+++++-                                                                  job_name=self._jenkins_info['job_name'],
+++++-                                                                  bn=job.get_last_buildnumber())
+++++-            _message = "Dear {f_name} {l_name}! \n\n" \
+++++-                       "Your test on {tl_name} has occured unknown fail.\n" \
++++++        elif test_end_status == 'UNKNOWN_FAIL':
++++++            logs_url_address = '{url}/job/{job_name}/{bn}/console'.format(url= 'http://plkraaa-jenkins.emea.nsn-net.net:8080',
++++++                                                                  job_name=self.get_jobname(),
++++++                                                                  bn=self.get_job_handler().get_last_buildnumber())
++++++            _message = "Dear Admin! \n\n" \
++++++                       "Tests on {tl_name} occured unknown fail.\n" \
+++++                        "Please check logs available at: {logs_link} \n\n" \
+++++-                       "Have a nice day!".format(f_name=self._user_info['first_name'],
+++++-                                                 l_name=self._user_info['last_name'],
+++++-                                                 tl_name=self._TLname,
+++++-                                                 logs_link=logs_link)
++++++                       "Have a nice day!".format(tl_name=self.get_TLname(),
++++++                                                 logs_link=logs_url_address)
+++++             messages.append({'message' : _message})
+++++             subject = "Tests status update - finished with unknown fail"
+++++ 
+++++@@ -392,13 +466,14 @@ class Supervisor(object):
+++++                 send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
+++++                 send.connect()
+++++                 send.send(mail)
++++++
+++++         else:
+++++             mail = ute_mail.mail.Mail(subject=subject,message=messages[0]['message'],
+++++-                                          recipients='pawel.nogiec@nokia.com',  #Bartek Kukla (?) mail here
++++++                                          recipients=admin['mail'],  #Bartek Kukla (?) mail here
+++++                                           name_from="Reservation Api")          #We need to figure out better name
+++++             send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
+++++             send.connect()
+++++             send.send(mail)
+++++ 
+++++-    def git_launch(self, file_info=None, pull_only=None):
+++++-        return git_launch(TL_address=self.TLaddress, file_info=file_info, pull_only=pull_only)
++++++    # def git_launch(self, file_info=None, pull_only=None):
++++++    #     return git_launch(TL_address=self.TLaddress, file_info=file_info, pull_only=pull_only)
+++++diff --git a/server_reservation_dispatcher/utilities/mailing_list.py b/server_reservation_dispatcher/utilities/mailing_list.py
+++++index 8eb8f1757b5a4d738bc17ee32660e1e882a2a26d..67912cb464cb961f024cb63ddcb74294e7daf8b7 100644
+++++--- a/server_reservation_dispatcher/utilities/mailing_list.py
++++++++ b/server_reservation_dispatcher/utilities/mailing_list.py
+++++@@ -1,4 +1,18 @@
+++++-mail_dict={
++++++# -*- coding: utf-8 -*-
++++++"""
++++++:created on: '11/08/15'
++++++
++++++:copyright: Nokia
++++++:author: Pawel Nogiec
++++++:contact: pawel.nogiec@nokia.com
++++++"""
++++++
++++++admin = {
++++++    'name' : 'Pawel Nogiec',
++++++    'mail' : 'pawel.nogiec@nokia.com'
++++++}
++++++
++++++mail_dict = {
+++++     'LTE1819' : ['damian.papiez@nokia.com'],
+++++     'LTE2351' : ['pawel.nogiec@nokia.com'],
+++++     'LTE738' : ['damian.papiez@nokia.com'],
+diff --git a/server_reservation_dispatcher/superVisor.py b/server_reservation_dispatcher/superVisor.py
+index 1ac682b59fe808a24357c5492605dca2054afd96..cd340e2c9bd165cfcb6ba1eada6b4c646ad7c844 100644
+--- a/server_reservation_dispatcher/superVisor.py
++++ b/server_reservation_dispatcher/superVisor.py
+@@ -8,15 +8,50 @@
+ """
+ 
+ 
+-from superVisor_api import Supervisor
+-
+-
+-#
+-# __job_status = self.get_job_status()
+-# if __job_status == "FAILURE":
+-#     self.set_are_any_failed_tests(False)
+-#     self.check_output_for_other_fails_or_errors_and_get_test_end_status()
+-# elif __job_status == "UNKNOWN":
+-#     self.set_failure_status(127)
+-#     self.set_test_end_status("JenkinsError")
+-#     self.finish_with_failure()
++from superVisor_api import SuperVisor
++
++def supervise(TLname, jenkins_job_info, user_info = None):
++    superVisor_api = SuperVisor(TLname, jenkins_job_info, user_info)
++    superVisor_api.make_file_with_specific_info()
++    superVisor_api.set_jenkins_connection()
++    print superVisor_api.get_jenkins_connection()
++    print superVisor_api.get_jobname()
++    superVisor_api.set_job_handler()
++    if superVisor_api._is_queued_or_running():
++        superVisor_api.set_job_status()
++        superVisor_api.check_job_status()
++
++
++    superVisor_api.set_node_for_job()
++    # superVisor_api.build_job()
++    superVisor_api._is_queued_or_running()
++    superVisor_api.set_job_status()
++    superVisor_api.check_job_status()
++    superVisor_api.set_jenkins_console_output()
++    superVisor_api.parse_output_and_set_job_failed_tests()
++    print superVisor_api.get_are_any_failed_tests()
++    superVisor_api.check_output_for_other_fails_or_errors_and_set_test_end_status()
++    print superVisor_api.get_test_end_status()
++    superVisor_api.remove_tag_from_robots_tests()
++    superVisor_api.send_information_about_executed_job()
++    superVisor_api.delete_file_with_specific_info()
++
++    # print superVisor_api.get_jenkins_info()
++    # print superVisor_api.get_user_info()
++    # print superVisor_api.get_TLname()
++    # print superVisor_api.get_suitname()
++    # print superVisor_api.get_TLaddress()
++    # print superVisor_api.get_failure_status()
++    # print superVisor_api.get_are_any_failed_tests()
++    # print superVisor_api.get_test_end_status()
++    # print superVisor_api.get_filenames_of_failed_tests()
++
++
++if __name__ == '__main__':
++    jenkins_job_info = {
++        'parameters' : {
++            'name' : 'LTEXYZ'
++        }
++    }
++    supervise('tl99_test', jenkins_job_info)
++
+diff --git a/server_reservation_dispatcher/superVisor_api.py b/server_reservation_dispatcher/superVisor_api.py
+index 892b716ee757f15afe62a69457569094c13bc84f..caf4426f012dea0b4d6ef4a9d6cb08176b1e6cb4 100644
+--- a/server_reservation_dispatcher/superVisor_api.py
++++ b/server_reservation_dispatcher/superVisor_api.py
+@@ -34,8 +34,8 @@ from utilities.logger_config import config_logger
+ config_logger(logger)
+ ########################################################################################
+ 
+-class Supervisor(object):
+-    def __init__(self,TLname, jenkins_job_info, user_info=None):
++class SuperVisor(object):
++    def __init__(self,TLname, jenkins_job_info, user_info):
+         self.__jenkins_info = jenkins_job_info    #dict:{jobname : "", parameters : {param1 : "", ...}}
+         self.__user_info = user_info          #dict:{first_name : "", last_name : "", mail :""}
+         self.__TLname = TLname
+@@ -118,7 +118,7 @@ class Supervisor(object):
+ 
+ 
+     def set_default_jobname(self):
+-        self.__jenkins_info['jobname'] = 'job_on_{}'.format(self.get_TLname())
++        self.__jenkins_info['jobname'] = 'test_on_{}'.format(self.get_TLname())
+ 
+ 
+     def get_jobname(self):
+@@ -129,6 +129,8 @@ class Supervisor(object):
+ 
+ 
+     def set_jenkins_connection(self):
++        if not self.get_jobname():
++            self.set_default_jobname()
+         try:
+             self.__jenkins_info['connection'] = Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
+             logger.debug("jenkins connection has been set")
+@@ -143,8 +145,14 @@ class Supervisor(object):
+         return self.__jenkins_info['connection']
+ 
+ 
+-    def set_job_handler(self, job_handler):
+-        self.__jenkins_info['job_handler'] = job_handler
++    def set_job_handler(self):
++        try:
++            self.__jenkins_info['job_handler'] = self.get_jenkins_connection().get_job(self.get_jobname())
++        except:
++            self.set_failure_status(125)
++            self.set_test_end_status("JenkinsError")
++            logger.critical('{}'.format(LOGGER_INFO[self.get_failure_status()]))
++            self.finish_with_failure()
+ 
+ 
+     def get_job_handler(self):
+@@ -159,6 +167,10 @@ class Supervisor(object):
+         return self.__jenkins_info['output']
+ 
+ 
++    def get_job_status(self):
++        return self.__jenkins_info['job_status']
++
++
+     #########################################################################################
+     #functions
+     #########################################################################################
+@@ -171,8 +183,8 @@ class Supervisor(object):
+             'job_params': self.get_job_parameters()
+         }
+         path_with_filename = os.path.join('.','files','SuperVisor',self.get_suitname())
+-        with open(path_with_filename, 'wb'):
+-            json.dump(info_to_save, path_with_filename)
++        with open(path_with_filename, 'wb') as file_with_specific_info:
++            json.dump(info_to_save, file_with_specific_info)
+ 
+ 
+     def delete_file_with_specific_info(self):
+@@ -191,16 +203,6 @@ class Supervisor(object):
+         sys.exit()
+ 
+ 
+-    def set_jenkins_job_handler(self):
+-        try:
+-            self.set_job_handler(self.get_jenkins_connection().get_job(self.get_jobname()))
+-        except:
+-            self.set_failure_status(125)
+-            self.set_test_end_status("JenkinsError")
+-            logger.critical('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+-            self.finish_with_failure()
+-
+-
+     def set_node_for_job(self):
+         try:
+             job_config_xml = ET.fromstring(self.get_job_handler().get_config())
+@@ -215,18 +217,30 @@ class Supervisor(object):
+             self.finish_with_failure()
+ 
+ 
+-    def get_job_status(self):
+-        job_status = "Unknown"
++    def set_job_status(self):
+         try:
+-            job_status = self.get_job_handler().get_last_build().get_status()
++            self.__jenkins_info['job_status'] = self.get_job_handler().get_last_build().get_status()
+         except:
++            self.__jenkins_info['job_status'] = "UNKNOWN"
+             self.set_failure_status(105)
+             self.set_test_end_status("JenkinsError")
+             logger.error('{} : {}'.format(self.get_jobname(),LOGGER_INFO[self.get_failure_status()]))
+             self.finish_with_failure()
+         finally:
+-            logger.debug("Job {} status = {}".format(self.get_jobname(), job_status))
+-            return job_status
++            logger.debug("Job {} status = {}".format(self.get_jobname(), self.get_job_status()))
++
++
++    def check_job_status(self):
++        job_status = self.get_job_status()
++        if job_status == "FAILURE":
++            self.set_are_any_failed_tests(False)
++            self.check_output_for_other_fails_or_errors_and_set_test_end_status()
++        elif job_status == "UNKNOWN":
++            self.set_failure_status(127)
++            self.set_test_end_status("JenkinsError")
++            self.finish_with_failure()
++        elif job_status == "SUCCESSFUL":
++            pass
+ 
+ 
+     def _is_queued_or_running(self):
+@@ -270,6 +284,7 @@ class Supervisor(object):
+         regex = r'\=\s(.*)\s\=\W*.*FAIL'
+         try:
+             matches = re.findall(regex, self.get_job_output())
++            self.set_are_any_failed_tests(True)
+             for match in matches:
+                 match = re.sub(" +", "_", match)  #changing " " to "_" - pybot thinks it's the same, i don't
+                 if match[-3:] == '...': match = match[:-3]  #cutting last "..."
+@@ -307,8 +322,8 @@ class Supervisor(object):
+                 return True
+         return False
+ 
+-    def check_output_for_other_fails_or_errors_and_get_test_end_status(self):
+-        if not self.get_are_any_failed_tests():
++    def check_output_for_other_fails_or_errors_and_set_test_end_status(self):
++        if self.get_are_any_failed_tests() == False:
+             if self.check_for_fails() == False:
+                 self.set_test_end_status("SUCCESSFUL")
+                 logger.info("Test {} was successful".format(self.get_jobname()))
+@@ -320,7 +335,6 @@ class Supervisor(object):
+                 self.finish_with_failure()
+         else:
+             self.set_test_end_status("GOT_FAILS")
+-            self.set_are_any_failed_tests(True)
+             logger.info("Test {} has got some failures".format(self.get_jobname()))
+ 
+ 
+@@ -370,6 +384,7 @@ class Supervisor(object):
+     def remove_tag_from_robots_tests(self, old_tag = 'enable', new_tag = ''):
+         tmp_filenames_and_paths = self.__get_robot_files_and_paths()
+         filenames_and_paths = self.__match_filenames_and_paths(tmp_filenames_and_paths)
++        SSHClient = None
+         try:
+             SSHClient = self.__get_SSHClient_connection()
+         except:
+@@ -377,29 +392,26 @@ class Supervisor(object):
+             logger.warning('{}'.format(self.get_failure_status()))
+             self.set_test_end_status("SSH_Connection_Failure")
+             self.finish_with_failure()
+-
++        __found = False
+         for filename_and_path in filenames_and_paths:
+             try:
+-                file = SSHClient.open_sftp().open(os.path.join(filename_and_path['path'], filename_and_path['name']), 'r+')
++                SFTP = SSHClient.open_sftp()
++                file = SFTP.file(os.path.join(filename_and_path['path'], filename_and_path['filename']), 'r+')
+                 lines_in_file = file.readlines()
+-                file.seek(0)
+-                file.truncate()
+-                __found = False
++                SFTP.truncate(os.path.join(filename_and_path['path'], filename_and_path['filename']), 0)
++                print lines_in_file
+                 for line in lines_in_file:
+                     try:
+-                        re.search('\[Tags](.*)', line).group(1)
++                        re.search('.*\[Tags](.*)', line).group(1)
+                         try:
+                             file.write(re.sub(old_tag, new_tag, line))
+                             __found = True
+                             logger.debug("Changed tag in file: {} from {} to {}".format(os.path.join(filename_and_path['path'], filename_and_path['name']), old_tag, new_tag))
+                         except:
+-                            file.write(line)
++                            pass
+                     except:
+-                        pass
+-                if not __found:
+-                    self.set_failure_status(111)
+-                    self.set_test_end_status("NO_TAG")
+-                    logger.warning('{} : {}'.format(LOGGER_INFO[self.get_failure_status()], old_tag))
++                        file.write(line)
++
+             #   git_result = self.git_launch(file_info=[path, file_name])
+             #   if not git_result == True:
+             #         self.failureStatus = 114
+@@ -409,9 +421,13 @@ class Supervisor(object):
+             except:
+                 self.set_failure_status(112)
+                 self.set_test_end_status("SSH_Connection_Failure")
+-                logger.warning('{}'.format(LOGGER_INFO[self.set_failure_status()]))
++                logger.warning('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+             finally:
+                 SSHClient.close()
++        if not __found:
++            self.set_failure_status(111)
++            self.set_test_end_status("NO_TAG")
++            logger.warning('{} : {}'.format(LOGGER_INFO[self.get_failure_status()], old_tag))
+ 
+ 
+     def send_information_about_executed_job(self):
+@@ -421,7 +437,7 @@ class Supervisor(object):
+         if test_end_status == "PASS":
+             return 0
+ 
+-        elif test_end_status == "Failed":
++        elif test_end_status == "GOT_FAILS":
+             t = self.get_job_handler().get_last_build().get_timestamp()
+             build_time = '{}-{:02g}-{:02g}_{:02g}-{:02g}-{:02g}'.format(t.year, t.month, t.day, (t.hour-(time.altzone/3600)), t.minute, t.second)
+             logs_url_address = 'http://10.83.200.35/~ltebox/logs/{}_{}/log.html'.format(self.__TLname, build_time)
+@@ -442,7 +458,7 @@ class Supervisor(object):
+             subject = "Tests status update - finished with fail"
+ 
+ 
+-        elif test_end_status == 'UNKNOWN_FAIL':
++        elif test_end_status == 'UNKNOWN_ERROR/FAIL':
+             logs_url_address = '{url}/job/{job_name}/{bn}/console'.format(url= 'http://plkraaa-jenkins.emea.nsn-net.net:8080',
+                                                                   job_name=self.get_jobname(),
+                                                                   bn=self.get_job_handler().get_last_buildnumber())
+@@ -454,8 +470,26 @@ class Supervisor(object):
+             messages.append({'message' : _message})
+             subject = "Tests status update - finished with unknown fail"
+ 
++        elif test_end_status == 'JenkinsError':
++            _message = "Dear Admin! \n\n" \
++                       "There is some problems with Jenkins. Please check it.\n\n" \
++                       "Have a nice day!"
++            messages.append({'message' : _message})
++            subject = "Tests status update - JenkinsError"
+ 
++        elif test_end_status == 'SSH_Connection_Failure':
++            _message = "Dear Admin! \n\n" \
++                       "There is some problems with SSH connection to Belvedere. Please check it.\n\n" \
++                       "Have a nice day!"
++            messages.append({'message' : _message})
++            subject = "Tests status update - SSHError"
+ 
++        elif test_end_status == 'NO_TAG':
++            _message = "Dear Admin! \n\n" \
++                       "I couldn't find TAG in files from testsuite '{}'. Please check it.\n\n" \
++                       "Have a nice day!".format(self.get_suitname())
++            messages.append({'message' : _message})
++            subject = "Tests status update - JenkinsError"
+ 
+         if 'feature' in messages[0]:
+             for message in messages:
+diff --git a/server_reservation_dispatcher/utilities/TL_map.py b/server_reservation_dispatcher/utilities/TL_map.py
+index 3fc424cc7c4c2606d2f75599405ceeff5ee6bacc..c0a05e13f4c3562a9d1afd346b3e1285cee07994 100644
+--- a/server_reservation_dispatcher/utilities/TL_map.py
++++ b/server_reservation_dispatcher/utilities/TL_map.py
+@@ -8,7 +8,7 @@
+ """
+ 
+ TL_map = {
+-    'TL99' : 'wmp-tl99.lab0.krk-lab.nsn-rdnet.net',
++    'tl99_test' : 'wmp-tl99.lab0.krk-lab.nsn-rdnet.net',
+     'TL63' : 'wmp-tl63.lab0.krk-lab.nsn-rdnet.net',
+     'TL88' : 'iav-kra-tl088.lab0.krk-lab.nsn-rdnet.net'
+ }
+diff --git a/server_reservation_dispatcher/utilities/logger_messages.py b/server_reservation_dispatcher/utilities/logger_messages.py
+index ec566102c97526bdce08abceccc606a123f273a2..4c94d6e018b3c9df1080ce61dd9b2ea41ba4a4e5 100644
+--- a/server_reservation_dispatcher/utilities/logger_messages.py
++++ b/server_reservation_dispatcher/utilities/logger_messages.py
+@@ -12,5 +12,7 @@ LOGGER_INFO = {
+     111: "Finding tag in file error",
+     112: "Opening file to change tag failed (probably wrong file name)",
+     113: "No duration in reseration_data",
+-    114: "Git error"
++    114: "Git error",
++    128: "SSH Connection Failure",
++
+ }
