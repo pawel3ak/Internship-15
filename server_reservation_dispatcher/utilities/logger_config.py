@@ -60,3 +60,4 @@ def config_logger(logger):
     if config.getboolean('Logger', 'critical'):
         add_handler(logger, formatter, logging.CRITICAL, os.path.join(config.get('Logger', 'directory'),config.get('Logger', 'criticalfilename')),
                     config.get('Logger', 'when_backup'), config.getint('Logger', 'backup_interval'), config.getint('Logger', 'backup_count'))
+
