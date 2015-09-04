@@ -20,9 +20,11 @@ import ute_mail.sender
 import ute_mail.mail
 import paramiko
 
-from mailing_list import mail_dict
-from utilities.logger_messages import LOGGER_INFO
-from server_git_api import git_launch
+from utilities.TL_map import TL_map
+# from mailing_list import mail_dict
+# from utilities.logger_messages import LOGGER_INFO
+# from server_git_api import git_launch
+
 
 # create logger
 logger = logging.getLogger("server." + __name__)
