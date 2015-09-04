@@ -104,34 +104,36 @@ class TafLogsConverter(object):
                     raw_file.write(record_payload)
                     raw_time_file.write(rawtime_record_line)
 
-    def get_number_of_files(self, is_yaml_conversion):
-        if is_yaml_conversion:
-            return len(self.filename_raw)
-        else:
-            return len(self.filename_yml)
+    def get_number_of_raw_files(self):
+        return len(self.filename_raw)
 
-    def get_filename(self,is_yaml_conversion,number_of_file):
-        if is_yaml_conversion:
-            return self.filename_raw[number_of_file]
-        else:
+    def get_number_of_yml_files(self):
+        return len(self.filename_yml)
+
+
+    def get_filename_yaml(self,number_of_file):
             return self.filename_yml[number_of_file]
+
+    def get_filename_raw(self,number_of_file):
+            return self.filename_raw[number_of_file]
+
     def backup_conversion_target_files(self,filename_to_check):
         for filename in os.listdir(self.directory):
                 filename = os.path.join(self.directory, filename)
                 if filename == filename_to_check:
                     os.rename(filename, filename+'.bak')
 
-    def convert_to_yaml_format(self, is_yaml_conversion):
-        number_of_files = file_converter.get_number_of_files(is_yaml_conversion)
+    def convert_to_yaml_format(self):
+        number_of_files = file_converter.get_number_of_raw_files()
         for number_of_file in range(0, number_of_files):
-            raw_filename = file_converter.get_filename(is_yaml_conversion, number_of_file)
+            raw_filename = file_converter.get_filename_raw(number_of_file)
             file_converter.get_and_convert_raw_file(raw_filename)
             file_converter.create_yml_file(raw_filename)
 
-    def convert_to_raw_format(self, is_yaml_conversion):
-        number_of_files = file_converter.get_number_of_files(is_yaml_conversion)
+    def convert_to_raw_format(self):
+        number_of_files = file_converter.get_number_of_yml_files()
         for number_of_file in range(0, number_of_files):
-            yaml_filename = file_converter.get_filename(is_yaml_conversion, number_of_file)
+            yaml_filename = file_converter.get_filename_yaml(number_of_file)
             file_converter.create_raw_file(yaml_filename)
 
 
@@ -140,7 +142,7 @@ if __name__ == "__main__":
     file_converter = TafLogsConverter(directory)
     if is_yaml_conversion:
         file_converter.find_raw_files()
-        file_converter.convert_to_yaml_format(is_yaml_conversion)
+        file_converter.convert_to_yaml_format()
     else:
         file_converter.find_yml_files()
-        file_converter.convert_to_raw_format(is_yaml_conversion)
+        file_converter.convert_to_raw_format()
