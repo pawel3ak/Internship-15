@@ -12,7 +12,7 @@ import sys
 import json
 import argparse
 
-HOST_IP, HOST_PORT = "127.0.0.1", 5005
+HOST_IP, HOST_PORT = "127.0.0.1", 50010
 
 
 def get_all(sock):
@@ -48,6 +48,17 @@ def get_info(sock, id):
         #     break
     sock.close()
 
+def get_tlname(sock):
+    sock.send("request/get_testline")
+    try:
+        response = sock.recv(1024)
+        if response != "": print response
+    except:
+        pass
+
+
+
+
 def main():
     parser = argparse.ArgumentParser(argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-a', '--host', default=HOST_IP,
@@ -56,10 +67,13 @@ def main():
                         help='set port number for server')
     parser.add_argument('--info', default='',
                         help='check informations about given ID')
+    parser.add_argument('--tl', default='',
+                        help='check informations about given ID')
     args = parser.parse_args()
     host = args.host
     port = args.port
     info = args.info
+    tl = args.tl
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((host, port))
@@ -72,6 +86,8 @@ def main():
                 get_info(sock,info)
             except:
                 pass
+    elif tl != '':
+        get_tlname(sock)
     # elif len(sys.argv) == 3:
     #     if sys.argv[1] == "info":
     #         get_info(sock,sys.argv[2])

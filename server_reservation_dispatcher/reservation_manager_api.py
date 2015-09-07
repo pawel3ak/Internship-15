@@ -19,6 +19,10 @@ import os
 import json
 import socket
 import time
+import select
+import re
+import sys
+
 
 logger = logging.getLogger("server" + __name__)
 
@@ -27,12 +31,48 @@ class ReservationManager(CloudReservationApi):
         super(ReservationManager, self).__init__(api_token='99e66a269e648c9c1a3fb896bec34cd04f50a7d2', api_address='http://cloud.ute.inside.nsn.com')
         self.__reservations_dictionary = {}
         self.backup_file_path = os.path.join('.','files','ReservationManager','backup.data')
-
-
-    def create_and_bind_socket(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.bind(('127.0.0.1', 50010))
+        self.socket.listen(5)
+        self.outputs = []
+        self.MAXTL = 1
+        self.FREETL = -1
+
+
+    def handle_client_request_and_response(self, client_socket):
+        client_request = client_socket.recv(1024)
+        if client_request == "request/get_testline":
+            print self.request_get_testline()
+            client_socket.send(self.request_get_testline())
+        elif client_request == re.search("response\/tlname=(.*)\&jobname=(.*)", client_request):
+            client_socket.send(self.response_jobname(client_request))
+        elif client_request == re.search("request/free_testline=(.*)", client_request):
+            client_socket.send()
+        else:
+            client_socket.send("Unknown command")
+
+
+    def request_get_testline(self):
+        TLname = self.find_first_free_TL()
+        if TLname == -1:
+            return "No available TL"
+        else:
+            return TLname
+
+
+    def response_jobname(self, client_request):
+        match = re.search("response\/tlname=(.*)\&jobname=(.*)",client_request)
+        TLname = match.group(1)
+        jobname = match.group(2)
+        self.set_jobname_for_TL_in_dictionary(TLname, jobname)
+        return '{}&{}'.format(jobname, TLname)
+
+
+    def request_free_testline(self, client_request):
+        TLname = re.search("request/free_testline=(.*)", client_request).group(1)
+        self.set_jobname_for_TL_in_dictionary(TLname)
+        return TLname
 
 
     def __create_reservation(self):
@@ -89,6 +129,7 @@ class ReservationManager(CloudReservationApi):
             ID = self.__create_reservation()
             if ID ==102 or ID ==103:
                 pass
+            print ID
             self.__set_TLinfo(ID)
         except:
             logger.error('{}'.format(LOGGER_INFO[1104]))
@@ -109,7 +150,9 @@ class ReservationManager(CloudReservationApi):
 
 
     def find_first_free_TL(self):
-        for TLname in self.__reservations_dictionary:
+        if len(self.get_reservation_dictionary()) == 0:
+            return -1
+        for TLname in self.get_reservation_dictionary():
             if not self.get_reservation_dictionary()[TLname]['job']:
                 status = self.get_reservation_status(TLname)
                 if status !=3:
@@ -117,7 +160,7 @@ class ReservationManager(CloudReservationApi):
                 else:
                     return TLname
             else:
-                return 0
+                return -1
 
 
     def get_reservation_status(self, TLname):
@@ -190,22 +233,63 @@ class ReservationManager(CloudReservationApi):
                 print backup_data
 
 
+    def serve(self):
+        inputs = [self.socket, sys.stdin]
+        while True:
+            try:
+                inputready, outputready, exceptready = select.select(inputs, [], [])
+            except select.error, e:
+                self.make_backup_file()
+                break
+
+            for s in inputready:
+
+                if s == self.socket:
+                    client_socket, address = self.socket.accept()
+                    self.handle_client_request_and_response(client_socket)
+
+                elif s == sys.stdin:
+                    pass
+                else:
+                    pass
+
+
+
 
 
 if __name__ == '__main__':
-    MAX_TL = 3
-    free_TL = 1
+    import threading
+#     MAX_TL = 3
+#     free_TL = 1
     ReservManager = ReservationManager()
-    # ReservManager.read_backup_file()
-    for availableTL in range(1,MAX_TL-free_TL):
-        ReservManager.create_reservation_and_set_TL_info()
-        time.sleep(1)
-        print ReservManager.get_reservation_dictionary()
-    # ReservManager.make_backup_file()
+    t = threading.Thread(target=ReservManager.serve)
+    t.setDaemon(True)
+    t.start()
     while True:
+        print "Available TL on Cloud F = {}".format(ReservManager.get_available_tl_count_group_by_type()['CLOUD_F'])
+        print "FreeTL = {}".format(ReservManager.FREETL)
+        print "Len of dict = {}".format(len(ReservManager.get_reservation_dictionary()))
+        print "MAXTL = {}".format(ReservManager.MAXTL)
+        if ReservManager.get_available_tl_count_group_by_type()['CLOUD_F'] > ReservManager.FREETL:
+            if len(ReservManager.get_reservation_dictionary()) < ReservManager.MAXTL:
+                print "no wzialbym cos..."
+                ReservManager.create_reservation_and_set_TL_info()
+            else:
+                pass
         ReservManager.periodically_check_all_TL_for_extending_or_releasing(no_free_TL=False)
         print ReservManager.get_reservation_dictionary()
         time.sleep(30)
 
-
-
+#     # ReservManager.read_backup_file()
+#     for availableTL in range(1,MAX_TL-free_TL):
+#         ReservManager.create_reservation_and_set_TL_info()
+#         time.sleep(1)
+#         print ReservManager.get_reservation_dictionary()
+#     # ReservManager.make_backup_file()
+#     while True:
+#         ReservManager.periodically_check_all_TL_for_extending_or_releasing(no_free_TL=False)
+#         print ReservManager.get_reservation_dictionary()
+#         time.sleep(30)
+#
+#
+#
