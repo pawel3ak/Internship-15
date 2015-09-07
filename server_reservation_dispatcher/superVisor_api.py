@@ -148,7 +148,7 @@ class SuperVisor(Jenkins):
 
     def set_job_handler(self):
         try:
-            self.__jenkins_info['job_handler'] = self.get_jenkins_connection().get_job(self.get_jobname())
+            self.__jenkins_info['job_handler'] = self.get_job(self.get_jobname())
         except:
             self.set_failure_status(125)
             self.set_test_end_status("JenkinsError")
@@ -501,7 +501,6 @@ class SuperVisor(Jenkins):
                 mail = ute_mail.mail.Mail(subject=subject,message=message['message'],
                                           recipients=mail_dict[message['feature']],
                                           name_from="Reservation Api")
-                print mail_dict[message['feature']]
                 send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
                 send.connect()
                 send.send(mail)
