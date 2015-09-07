@@ -17,40 +17,30 @@ logger = logging.getLogger("server." + __name__)
 
 class ReservationQueue(object):
     def __init__(self, queue_file_path):
-        self._file_path = queue_file_path
-        logger.debug("Create new queue object: {}".format(self._file_path))
-        if not os.path.exists(self._file_path):
-            os.mknod(self._file_path)
+        self._queue_file_path = queue_file_path
+        logger.debug("Create new queue object: {}".format(self._queue_file_path))
+        if not os.path.exists(self._queue_file_path):
+            os.mknod(self._queue_file_path)
         self._queue_length = self.__check_queue_length()
 
     def write_new_record_to_queue(self, record):
-        with open(self._file_path, "ab") as queue_file:
+        with open(self._queue_file_path, "ab") as queue_file:
             json.dump(record, queue_file)
             queue_file.write("\n")
             self._queue_length += 1
 
-    def read_next_reservation_record_from_queue(self):
-        with open(self._file_path, "rb") as queue_file:
-            return json.loads(queue_file.readline())
-
-    def delete_reservation_record_from_queue(self, queue_number, password):
-        with open(self._file_path, "rb+") as queue_file:
+    def read_next_reservation_record_and_delete_from_queue(self):
+        with open(self._queue_file_path, "rb+") as queue_file:
             lines = queue_file.readlines()
-            for line in lines:
-                if (json.loads(line)["record_ID"] == queue_number) & (json.loads(line)["password"] != password):
-                    logger.warning("Wrong password")
-                    return -101
-            logger.debug("Delete from queue record_ID: {}".format(queue_number))
+            next_record = json.loads(lines.pop(0))
             queue_file.seek(0)
             queue_file.truncate()
-            for line in lines:
-                if json.loads(line)["record_ID"] != queue_number:
-                    queue_file.write(line)
+            queue_file.writelines(lines)
             self._queue_length -= 1
-        return 0
+        return next_record
 
     def __check_queue_length(self):
-        with open(self._file_path, "rb") as queue_file:
+        with open(self._queue_file_path, "rb") as queue_file:
             return len(queue_file.readlines())
 
     @staticmethod
@@ -80,5 +70,4 @@ class ReservationQueue(object):
 
 
 if __name__ == "__main__":
-    queue = ReservationQueue("test")
-    print queue.check_queue_length()
+    pass
