@@ -14,6 +14,7 @@ import logging
 import pexpect
 import ConfigParser
 from utilities.reservation_queue import ReservationQueue
+#import superVisor
 
 # create logger
 logger = logging.getLogger("server." + __name__)
@@ -24,15 +25,20 @@ class JobManagerApi(ReservationQueue):
         self._config_filename = config_filename
         config = ConfigParser.RawConfigParser()
         config.read(config_filename)
+        ReservationQueue.__init__(self, os.path.join(config.get('JobManager', 'directory'),
+                                               config.get('JobManager', 'queue_filename')))
         self._supervisors_handlers_dictionary = {}    # {reservation_ID: handler}
         self._job_manager_dictionary = {}      # {reservation_ID: suite_name}
-        self._directory_with_tests = config.get('JobManager', 'directory_with_tests')
-        ReservationQueue.__init__(os.path.join(config.get('JobManager', 'directory'),
-                                               config.get('JobManager', 'queue_filename')))
+        self._job_manager_dictionary_file_path = os.path.join(config.get('JobManager', 'directory'),
+                                                               config.get('JobManager', 'JM_dictionary_filename'))
+        if not os.path.exists(self._job_manager_dictionary_file_path):
+            os.mknod(self._job_manager_dictionary_file_path)
+        self._directory_with_testsuites = config.get('JobManager', 'directory_with_testsuites')
 
-    def __get_parameters_from_config_file(self, config_file_path):
+    def __get_parameters_from_config_file(self):
         config = ConfigParser.RawConfigParser()
-        config.read(config_file_path)
+        config.read(self._config_filename)
+        self._directory_with_testsuites = config.get('JobManager', 'directory_with_testsuites')
 
     def delete_done_jobs_from_dictionaries(self):
         for key in self._supervisors_handlers_dictionary.keys():
@@ -41,7 +47,23 @@ class JobManagerApi(ReservationQueue):
                 del self._supervisors_handlers_dictionary[key]
                 del self._job_manager_dictionary[key]
 
-    def start_new_job(self, reservation_id=None):
+    def make_tests_queue_from_testsuites_dir(self):
+        logger.debug("Make new queue")
+        directory_list = []
+        [directory_list.append(x) for x in os.listdir(self._directory_with_testsuites)
+         if os.path.isdir(os.path.join(self._directory_with_testsuites, x))]
+        for dir in directory_list:
+            request = {'reservation_data': {'testline_type': 'CLOUD_F',
+                                            'duration': (60*max_reservation_time)},
+                       'serverID': queue.get_server_id_number(),
+                       'password': queue.generate_password(),
+                       'user_info': None,
+                       'jenkins_info': {'parameters': {'name': dir}}
+                       }
+            logger.debug("Write new queue to file: %s", queue_file)
+            queue.write_to_queue_file(queue_file, request)
+
+    def start_new_supervisor(self, reservation_id=None):
         if request is None:
             logger.debug("Get reservation from queue")
             request = queue.read_next_reservation_record_from_queue(queue_file)
@@ -59,10 +81,12 @@ class JobManagerApi(ReservationQueue):
         handle_dictionary[request["serverID"]] = thread
 
 
+
+
 def get_list_of_folders_in_dir(directory):
     logger.debug("Get catalog list from directory: %s", directory)
     directory_list = []
-    [directory_list.append(x) for x in os.listdir(directory) if os.path.isdir(os.path.join(directory, x))]
+
     return directory_list
 
 
@@ -79,19 +103,7 @@ def update_repository():
         logger.error("Repository update - fail - timeout")
 
 
-def make_tests_queue_from_dir(queue_file, directory, max_reservation_time):
-    logger.debug("Make new queue")
-    directory_list = get_list_of_folders_in_dir(directory)
-    for dir in directory_list:
-        request = {'reservation_data': {'testline_type': 'CLOUD_F',
-                                        'duration': (60*max_reservation_time)},
-                   'serverID': queue.get_server_id_number(),
-                   'password': queue.generate_password(),
-                   'user_info': None,
-                   'jenkins_info': {'parameters': {'name': dir}}
-                   }
-        logger.debug("Write new queue to file: %s", queue_file)
-        queue.write_to_queue_file(queue_file, request)
+
 
 
 

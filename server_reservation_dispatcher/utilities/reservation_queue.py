@@ -21,11 +21,13 @@ class ReservationQueue(object):
         logger.debug("Create new queue object: {}".format(self._file_path))
         if not os.path.exists(self._file_path):
             os.mknod(self._file_path)
+        self._queue_length = self.__check_queue_length()
 
     def write_new_record_to_queue(self, record):
         with open(self._file_path, "ab") as queue_file:
             json.dump(record, queue_file)
             queue_file.write("\n")
+            self._queue_length += 1
 
     def read_next_reservation_record_from_queue(self):
         with open(self._file_path, "rb") as queue_file:
@@ -44,9 +46,10 @@ class ReservationQueue(object):
             for line in lines:
                 if json.loads(line)["record_ID"] != queue_number:
                     queue_file.write(line)
+            self._queue_length -= 1
         return 0
 
-    def check_queue_length(self):
+    def __check_queue_length(self):
         with open(self._file_path, "rb") as queue_file:
             return len(queue_file.readlines())
 
@@ -65,12 +68,12 @@ class ReservationQueue(object):
             return id_number
 
     @staticmethod
-    def __generate_password(passw_lenght=4):
+    def __generate_password(passw_length=4):
         import random
         alphabet = string.letters+string.digits
         ''.join(random.choice(alphabet) for _ in range(3))
         password = ""
-        for i in range(passw_lenght):
+        for i in range(passw_length):
             next_sign = random.randrange(len(alphabet))
             password += alphabet[next_sign]
         return password

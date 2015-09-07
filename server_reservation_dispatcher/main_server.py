@@ -27,7 +27,7 @@ def main_server():
 
     # start JobManager
     logger.info("Start new thread with checking loop")
-    handle = server.start_job_manager()
+    server.start_job_manager()
 
     server.set_up_server()
     logger.info("Start server loop - waiting for request")
@@ -35,7 +35,7 @@ def main_server():
         print "hehe"
         [connection, data] = server.get_request_from_client()
         server.response_for_client_request(connection, data)
-    server.finish_server()
+    server.stop()
     logger.info("Server stopped")
 
 
