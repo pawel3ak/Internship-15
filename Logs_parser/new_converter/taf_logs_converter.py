@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 
 
 def get_scripts_options():
-    parser = ArgumentParser(description='Tool to convert betwen TAF raw log and TAF yaml log formats')
+    parser = ArgumentParser(description='Tool to convert between TAF raw log and TAF yaml log formats')
     parser.add_argument("--d", "--logs_location", type=str, help="Add directory", dest="directory", default="/home/ute/Logs_parser")
     parser.add_argument("--y", "--to_yaml", help="Convert to yaml files", action="store_true", dest="is_yaml_conversion", default=True)
     parser.add_argument("--r", "--to_raw", help="Convert to raw files", action="store_true", dest="is_raw_conversion", default=False)
@@ -19,11 +19,11 @@ def get_scripts_options():
         args.is_yaml_conversion = False
     if args.is_yaml_conversion:
         print "\tType of conversion: YAML"
-    return (args.directory,args.is_yaml_conversion)
+    return (args.directory, args.is_yaml_conversion)
 
 
 def ascii_to_dec(buffer):
-    output = re.sub(r"<0x(..)>", lambda matchobj: chr(int(matchobj.group(1))), buffer)
+    output = re.sub(r"<0x(..)>", lambda matchobj: chr(int(matchobj.group(1),16)), buffer)
     return output
 
 
@@ -32,7 +32,7 @@ def represent_omap(dumper, data):
 
 
 def to_ascii(buffer):
-    output = re.sub(r'[^\x21-\x7e]', lambda matchobj: '<0x%s>' % ord(matchobj.group(0)), buffer)
+    output = re.sub(r'[^\x21-\x7e]', lambda matchobj: '<0x%2.2x>' % ord(matchobj.group(0)), buffer)
     return output
 
 
@@ -56,7 +56,7 @@ class TafLogsConverter(object):
                 filename_raw = os.path.join(self.directory, filename)
                 self.filename_raw.append(filename_raw)
 
-    def create_yml_file(self, raw_filename):
+    def create_yaml_file(self, raw_filename):
         remaining_payload = self.rawfile_whole_payload
         yaml.add_representer(LogsRecord, represent_omap)
         record_number = 1
@@ -100,7 +100,7 @@ class TafLogsConverter(object):
                 for record in yaml_data:
                     record_payload = ascii_to_dec(record['Payload'])
                     record_size = len(record_payload)
-                    rawtime_record_line = "%s| %7.7s |%s %s|\n" % (record['Time'], record_size, record['Type_of_record'], record['Epoch'])
+                    rawtime_record_line = "%s|%7.7s |%s %s|\n" % (record['Time'], record_size, record['Type_of_record'], record['Epoch'])
                     raw_file.write(record_payload)
                     raw_time_file.write(rawtime_record_line)
 
@@ -110,14 +110,13 @@ class TafLogsConverter(object):
     def get_number_of_yml_files(self):
         return len(self.filename_yml)
 
-
-    def get_filename_yaml(self,number_of_file):
+    def get_filename_yaml(self, number_of_file):
             return self.filename_yml[number_of_file]
 
-    def get_filename_raw(self,number_of_file):
+    def get_filename_raw(self, number_of_file):
             return self.filename_raw[number_of_file]
 
-    def backup_conversion_target_files(self,filename_to_check):
+    def backup_conversion_target_files(self, filename_to_check):
         for filename in os.listdir(self.directory):
                 filename = os.path.join(self.directory, filename)
                 if filename == filename_to_check:
@@ -128,7 +127,7 @@ class TafLogsConverter(object):
         for number_of_file in range(0, number_of_files):
             raw_filename = file_converter.get_filename_raw(number_of_file)
             file_converter.get_and_convert_raw_file(raw_filename)
-            file_converter.create_yml_file(raw_filename)
+            file_converter.create_yaml_file(raw_filename)
 
     def convert_to_raw_format(self):
         number_of_files = file_converter.get_number_of_yml_files()
