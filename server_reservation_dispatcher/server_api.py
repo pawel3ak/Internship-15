@@ -21,6 +21,7 @@ class MainServerApi(object):
         self._host_ip = host_ip
         self._host_port = host_port
         self._server_socket = None
+        self._job_manager_handler = None
 
     def set_config_filename(self, config_filename):
         self._config_filename = config_filename
@@ -40,6 +41,9 @@ class MainServerApi(object):
     def get_server_port(self):
         return self._host_port
 
+    def get_job_manager_handler(self):
+        return self._job_manager_handler
+
     def get_data_from_config_file(self):
         config = ConfigParser.RawConfigParser()
         config.read(self._config_filename)
@@ -52,9 +56,6 @@ class MainServerApi(object):
         self._server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._server_socket.bind((self._host_ip, self._host_port))
         self._server_socket.listen(5)
-
-    def finish_server(self):
-        self._server_socket.close()
 
     def get_request_from_client(self):
         client_connection, address = self._server_socket.accept()
@@ -84,6 +85,9 @@ class MainServerApi(object):
             os.makedirs(config.get('SuperVisor', 'directory'))
 
     def start_job_manager(self):
-        pool = multiprocessing.Pool(1)
-        handle = pool.apply_async(job_manager, [self._config_filename])
-        return handle
+        self._job_manager_handler = multiprocessing.Process(target=job_manager, args=(self._config_filename,))
+        self._job_manager_handler.start()
+
+    def stop(self):
+        self._server_socket.close()
+        self._job_manager_handler.join()
