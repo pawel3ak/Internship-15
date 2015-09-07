@@ -40,7 +40,7 @@ def main():
     tests = {key : tests[key] for key in tests.keys() if options.feature in key}
     suites = build_suites(tests)
     run_tests(options, suites, tags, variables, excludes)
-    os.system("python taf_logs_converter.py")
+    os.system("python taf_logs_converter.py >> /dev/null")
 
     endTime = time.time()
     print time.strftime(' - %H:%M:%S %d/%m/%Y -')
