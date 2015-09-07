@@ -8,32 +8,32 @@ from argparse import ArgumentParser
 
 def get_scripts_options():
     parser = ArgumentParser(description='Tool to convert between TAF raw log and TAF yaml log formats')
-    parser.add_argument("--d", "--logs_location", type=str, help="Add directory", dest="directory", default="/home/ute/Logs_parser")
-    parser.add_argument("--y", "--to_yaml", help="Convert to yaml files", action="store_true", dest="is_yaml_conversion", default=True)
-    parser.add_argument("--r", "--to_raw", help="Convert to raw files", action="store_true", dest="is_raw_conversion", default=False)
+    parser.add_argument("--l", "--logs_location", type=str, help="Directory with logs to convert", dest="logs_location", default="/home/ute/Logs_parser")
+    parser.add_argument("--2y", "--to_yaml", help="Convert to yaml files", action="store_true", dest="is_conversion_to_yaml", default=True)
+    parser.add_argument("--2r", "--to_raw", help="Convert to raw files", action="store_true", dest="is_conversion_to_raw", default=False)
     args = parser.parse_args()
-    if args.directory != None:
-        print "\tMy directory: "+args.directory
-    if args.is_raw_conversion:
-        print "\tType of conversion: RAW"
-        args.is_yaml_conversion = False
-    if args.is_yaml_conversion:
-        print "\tType of conversion: YAML"
-    return (args.directory, args.is_yaml_conversion)
+    if args.logs_location != None:
+        print "\tWill convert logs from: "+args.logs_location
+    if args.is_conversion_to_raw:
+        print "\tWill convert to raw format"
+        args.is_conversion_to_yaml = False
+    elif args.is_conversion_to_yaml:
+        print "\tWill convert to yaml format"
+    return (args.logs_location, args.is_conversion_to_yaml)
 
 
-def ascii_to_dec(buffer):
+def restore_non_printable(buffer):
     output = re.sub(r"<0x(..)>", lambda matchobj: chr(int(matchobj.group(1),16)), buffer)
+    return output
+
+
+def non_printable_to_ascii(buffer):
+    output = re.sub(r'[^\x21-\x7e]', lambda matchobj: '<0x%2.2x>' % ord(matchobj.group(0)), buffer)
     return output
 
 
 def represent_omap(dumper, data):
     return dumper.represent_mapping(u'tag:yaml.org,2002:map', data.get_log_record_items())
-
-
-def to_ascii(buffer):
-    output = re.sub(r'[^\x21-\x7e]', lambda matchobj: '<0x%2.2x>' % ord(matchobj.group(0)), buffer)
-    return output
 
 
 class LogsRecord(dict):
@@ -43,8 +43,8 @@ class LogsRecord(dict):
 
 
 class TafLogsConverter(object):
-    def __init__(self, directory):
-        self.directory = directory
+    def __init__(self, logs_location):
+        self.logs_location = logs_location
         self.time_file = ""
         self.rawfile_whole_payload = ""
 
@@ -62,7 +62,7 @@ class TafLogsConverter(object):
                     "Nr": record_number,
                     "Time": timestamp,
                     "Epoch": type_and_epoch[2:],
-                    "Payload": to_ascii(remaining_payload[0:int(size)]),
+                    "Payload": non_printable_to_ascii(remaining_payload[0:int(size)]),
                     "Type_of_record": type_and_epoch[0]})
                 remaining_payload = remaining_payload[int(size):]
                 new_yaml_file.write(yaml.dump(log_data, default_flow_style=False, explicit_start=True))
@@ -82,36 +82,36 @@ class TafLogsConverter(object):
             self.backup_conversion_target_files(filename_raw_time)
             with open(filename_raw, 'w') as raw_file, open(filename_raw_time, 'w') as raw_time_file:
                 for record in yaml_data:
-                    record_payload = ascii_to_dec(record['Payload'])
+                    record_payload = restore_non_printable(record['Payload'])
                     record_size = len(record_payload)
                     rawtime_record_line = "%s|%7.7s |%s %s|\n" % (record['Time'], record_size, record['Type_of_record'], record['Epoch'])
                     raw_file.write(record_payload)
                     raw_time_file.write(rawtime_record_line)
 
     def backup_conversion_target_files(self, filename_to_check):
-        for filename in os.listdir(self.directory):
-                filename = os.path.join(self.directory, filename)
+        for filename in os.listdir(self.logs_location):
+                filename = os.path.join(self.logs_location, filename)
                 if filename == filename_to_check:
                     os.rename(filename, filename+'.bak')
 
     def convert_to_yaml_format(self):
-        for filename in os.listdir(self.directory):
+        for filename in os.listdir(self.logs_location):
             if filename.endswith(".raw"):
-                raw_filename = os.path.join(self.directory, filename)
+                raw_filename = os.path.join(self.logs_location, filename)
                 self.get_and_convert_raw_file(raw_filename)
                 self.create_yaml_file(raw_filename)
 
     def convert_to_raw_format(self):
-        for filename in os.listdir(self.directory):
+        for filename in os.listdir(self.logs_location):
             if filename.endswith(".yml"):
-                yaml_filename = os.path.join(self.directory, filename)
+                yaml_filename = os.path.join(self.logs_location, filename)
                 self.create_raw_file(yaml_filename)
 
 
 if __name__ == "__main__":
-    (directory, is_yaml_conversion) = get_scripts_options()
-    file_converter = TafLogsConverter(directory)
-    if is_yaml_conversion:
+    (logs_location, is_conversion_to_yaml) = get_scripts_options()
+    file_converter = TafLogsConverter(logs_location)
+    if is_conversion_to_yaml:
         file_converter.convert_to_yaml_format()
     else:
         file_converter.convert_to_raw_format()
