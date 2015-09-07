@@ -50,6 +50,7 @@ def job_manager(config_filename='server_config.cfg'):
             save dictionary to file
             '''
             manager.write_job_manager_dictionary_to_file()
+            break
         sleep(loop_interval*60)
 
 

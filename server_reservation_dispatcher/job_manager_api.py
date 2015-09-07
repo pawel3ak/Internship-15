@@ -14,12 +14,12 @@ import multiprocessing
 import ConfigParser
 from utilities.reservation_queue import ReservationQueue
 from superVisor import supervise
+from server_git_api import git_launch
 
 # create logger
 logger = logging.getLogger("server." + __name__)
 
 
-# TODO - everything
 class JobManagerApi(ReservationQueue):
     def __init__(self, config_filename='server_config.cfg'):
         self._config_filename = config_filename
@@ -49,13 +49,12 @@ class JobManagerApi(ReservationQueue):
     def delete_done_jobs_from_dictionaries(self):
         for key in self._supervisors_handlers_dictionary.keys():
             if not self._supervisors_handlers_dictionary[key].is_alive():    # check if job is finished
-                # TODO - send info to ReservationMenager
+                # TODO - send info to ReservationManager
                 del self._supervisors_handlers_dictionary[key]
                 del self._job_manager_dictionary[key]
 
     def make_tests_queue_from_testsuites_dir(self):
         logger.debug("Make new queue")
-        # TODO update repository in this method or other
         directory_list = []
         [directory_list.append(x) for x in os.listdir(self._directory_with_testsuites)
             if os.path.isdir(os.path.join(self._directory_with_testsuites, x))]
@@ -82,6 +81,9 @@ class JobManagerApi(ReservationQueue):
                 open_file.seek(0, 0)
                 self._job_manager_dictionary = json.load(open_file)
 
+    @staticmethod
+    def update_local_git_repository():
+        git_launch('localhost', file_info=None, pull_only=True)
 
 if __name__ == "__main__":
     pass
