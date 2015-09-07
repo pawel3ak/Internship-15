@@ -15,6 +15,7 @@ import sys
 import logging
 import json
 
+import jenkinsapi
 from jenkinsapi.api import Jenkins
 import ute_mail.sender
 import ute_mail.mail
@@ -31,16 +32,16 @@ logger = logging.getLogger("server." + __name__)
 #######################################################################################
 # temporary
 from utilities.logger_config import config_logger
-config_logger(logger)
+config_logger(logger,'server_config.cfg')
 ########################################################################################
 
-class SuperVisor(object):
+class SuperVisor(Jenkins):
     def __init__(self,TLname, jenkins_job_info, user_info):
         self.__jenkins_info = jenkins_job_info    #dict:{jobname : "", parameters : {param1 : "", ...}}
         self.__user_info = user_info          #dict:{first_name : "", last_name : "", mail :""}
         self.__TLname = TLname
         self.__suitname = jenkins_job_info['parameters']['name']
-
+        super(SuperVisor, self).__init__('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
         self.__TLaddress = self.set_TLaddress_from_map()
         self.__failureStatus = None
         self.__are_any_failed_tests = False
@@ -243,7 +244,7 @@ class SuperVisor(object):
             pass
 
 
-    def _is_queued_or_running(self):
+    def is_queued_or_running(self):
         try:
             while True:
                 if self.get_job_handler().is_queued_or_running():
@@ -258,7 +259,7 @@ class SuperVisor(object):
 
     def build_job(self):
         try:
-            self.get_jenkins_connection().build_job(jobname=self.get_jobname(),
+            super(SuperVisor, self).build_job(jobname=self.get_jobname(),
                                                       params=self.get_job_parameters())
             logger.info("Job {} was built".format(self.get_jobname()))
         except:
@@ -396,21 +397,25 @@ class SuperVisor(object):
         for filename_and_path in filenames_and_paths:
             try:
                 SFTP = SSHClient.open_sftp()
-                file = SFTP.file(os.path.join(filename_and_path['path'], filename_and_path['filename']), 'r+')
+                file = SFTP.file(os.path.join(filename_and_path['path'], filename_and_path['filename']), 'r')
                 lines_in_file = file.readlines()
-                SFTP.truncate(os.path.join(filename_and_path['path'], filename_and_path['filename']), 0)
-                print lines_in_file
                 for line in lines_in_file:
                     try:
                         re.search('.*\[Tags](.*)', line).group(1)
                         try:
-                            file.write(re.sub(old_tag, new_tag, line))
+                            lines_in_file[lines_in_file.index(line)] = re.sub(old_tag, new_tag, line)
                             __found = True
                             logger.debug("Changed tag in file: {} from {} to {}".format(os.path.join(filename_and_path['path'], filename_and_path['name']), old_tag, new_tag))
                         except:
-                            pass
+                            self.set_failure_status(129)
+                            logger.warning('"{}" {}'.format(old_tag, LOGGER_INFO[self.get_failure_status()]))
                     except:
-                        file.write(line)
+                        pass
+                file.close()
+                file2 = SFTP.file(os.path.join(filename_and_path['path'], filename_and_path['filename']), 'w')
+                file2.writelines(lines_in_file)
+                file2.close()
+                SSHClient.close()
 
             #   git_result = self.git_launch(file_info=[path, file_name])
             #   if not git_result == True:

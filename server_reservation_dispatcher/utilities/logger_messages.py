@@ -14,5 +14,5 @@ LOGGER_INFO = {
     113: "No duration in reseration_data",
     114: "Git error",
     128: "SSH Connection Failure",
-
+    129: "TAG not found in proper line"
 }

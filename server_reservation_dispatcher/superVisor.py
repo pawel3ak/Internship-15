@@ -17,14 +17,14 @@ def supervise(TLname, jenkins_job_info, user_info = None):
     print superVisor_api.get_jenkins_connection()
     print superVisor_api.get_jobname()
     superVisor_api.set_job_handler()
-    if superVisor_api._is_queued_or_running():
+    if superVisor_api.is_queued_or_running():
         superVisor_api.set_job_status()
         superVisor_api.check_job_status()
 
 
     superVisor_api.set_node_for_job()
-    # superVisor_api.build_job()
-    superVisor_api._is_queued_or_running()
+    superVisor_api.build_job()
+    superVisor_api.is_queued_or_running()
     superVisor_api.set_job_status()
     superVisor_api.check_job_status()
     superVisor_api.set_jenkins_console_output()
@@ -35,16 +35,6 @@ def supervise(TLname, jenkins_job_info, user_info = None):
     superVisor_api.remove_tag_from_robots_tests()
     superVisor_api.send_information_about_executed_job()
     superVisor_api.delete_file_with_specific_info()
-
-    # print superVisor_api.get_jenkins_info()
-    # print superVisor_api.get_user_info()
-    # print superVisor_api.get_TLname()
-    # print superVisor_api.get_suitname()
-    # print superVisor_api.get_TLaddress()
-    # print superVisor_api.get_failure_status()
-    # print superVisor_api.get_are_any_failed_tests()
-    # print superVisor_api.get_test_end_status()
-    # print superVisor_api.get_filenames_of_failed_tests()
 
 
 if __name__ == '__main__':
