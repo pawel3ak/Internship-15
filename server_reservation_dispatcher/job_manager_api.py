@@ -12,6 +12,7 @@ import os
 import logging
 import multiprocessing
 import ConfigParser
+import socket
 from utilities.reservation_queue import ReservationQueue
 from superVisor import supervise
 from server_git_api import git_launch
@@ -34,6 +35,8 @@ class JobManagerApi(ReservationQueue):
         if not os.path.exists(self._job_manager_dictionary_file_path):
             os.mknod(self._job_manager_dictionary_file_path)
         self._directory_with_testsuites = config.get('JobManager', 'directory_with_testsuites')
+        self._reservation_manager_ip = config.get('ReservationManager', 'host_ip')
+        self._reservation_manager_port = config.getint('ReservationManager', 'host_port')
 
     def get_job_manager_dictionary(self):
         return self._job_manager_dictionary
@@ -80,6 +83,32 @@ class JobManagerApi(ReservationQueue):
             if len(open_file.readlines()) > 0:
                 open_file.seek(0, 0)
                 self._job_manager_dictionary = json.load(open_file)
+
+    def start_reservation_manager(self):
+        pass
+        '''
+        self._reservation_manager_handler = multiprocessing.Process(target=reservation_manager,
+                                                                    args=(,))
+        self._reservation_manager_handler.start()
+        '''
+
+    def stop_reservation_manager(self):
+        pass
+        '''
+        self._reservation_manager_handler.join()
+        '''
+
+    def __send_request_to_reservation_manager(self, request):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((self._reservation_manager_ip, self._reservation_manager_port))
+        sock.send(request)
+        response = sock.recv(1024)
+        sock.close()
+        return response
+
+    def get_tl_name_from_reservation_manager(self):
+        return self.__send_request_to_reservation_manager('get/free_tl')
+
 
     @staticmethod
     def update_local_git_repository():

@@ -88,6 +88,6 @@ class MainServerApi(object):
         self._job_manager_handler = multiprocessing.Process(target=job_manager, args=(self._config_filename,))
         self._job_manager_handler.start()
 
-    def stop(self):
+    def stop_server(self):
         self._server_socket.close()
         self._job_manager_handler.join()

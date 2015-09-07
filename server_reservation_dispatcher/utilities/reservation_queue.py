@@ -23,6 +23,9 @@ class ReservationQueue(object):
             os.mknod(self._queue_file_path)
         self._queue_length = self.__check_queue_length()
 
+    def get_queue_length(self):
+        return self._queue_length
+
     def write_new_record_to_queue(self, record):
         with open(self._queue_file_path, "ab") as queue_file:
             json.dump(record, queue_file)
@@ -38,6 +41,15 @@ class ReservationQueue(object):
             queue_file.writelines(lines)
             self._queue_length -= 1
         return next_record
+
+    def read_all_records_from_queue(self):
+        with open(self._queue_file_path, "rb") as queue_file:
+            lines = queue_file.readlines()
+
+    def write_queue_to_file(self, queue):
+        with open(self._queue_file_path, "wb") as queue_file:
+            queue_file.writelines(queue)
+        self._queue_length = len(queue)
 
     def __check_queue_length(self):
         with open(self._queue_file_path, "rb") as queue_file:
