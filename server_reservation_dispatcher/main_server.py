@@ -35,7 +35,7 @@ def main_server():
         print "hehe"
         [connection, data] = server.get_request_from_client()
         server.response_for_client_request(connection, data)
-    server.stop()
+    server.stop_server()
     logger.info("Server stopped")
 
 
