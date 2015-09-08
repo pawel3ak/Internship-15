@@ -323,12 +323,11 @@ class ReservationManager(CloudReservationApi):
 
 
 
-if __name__ == '__main__':
+def managing_reservations():
     import threading
     ReservManager = ReservationManager()
     ReservManager.read_backup_file()
     ReservManager.check_if_TL_reservation_didnt_expire_during_breakdown()
-    # print ReservManager.get_reservation_dictionary()
     t = threading.Thread(target=ReservManager.serve)
     t.setDaemon(True)
     t.start()
