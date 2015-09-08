@@ -131,21 +131,21 @@ class SuperVisor(Jenkins):
             return None
 
 
-    # def set_jenkins_connection(self):
-    #     if not self.get_jobname():
-    #         self.set_default_jobname()
-    #     try:
-    #         self.__jenkins_info['connection'] = Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
-    #         logger.debug("jenkins connection has been set")
-    #     except:
-    #         self.set_failure_status(106)
-    #         self.set_test_end_status("JenkinsError")
-    #         logger.critical('{}'.format(LOGGER_INFO[self.get_failure_status()]))
-    #         self.finish_with_failure()
+    def set_jenkins_connection(self):
+        if not self.get_jobname():
+            self.set_default_jobname()
+        try:
+            self.__jenkins_info['connection'] = Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
+            logger.debug("jenkins connection has been set")
+        except:
+            self.set_failure_status(106)
+            self.set_test_end_status("JenkinsError")
+            logger.critical('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+            self.finish_with_failure()
 
 
-    # def get_jenkins_connection(self):
-    #     return self.__jenkins_info['connection']
+    def get_jenkins_connection(self):
+        return self.__jenkins_info['connection']
 
 
     def set_job_handler(self):
