@@ -45,13 +45,30 @@ class ReservationManager(CloudReservationApi):
         client_request = client_socket.recv(1024).strip()
         if client_request == "request/get_testline":
             client_socket.send(self.request_get_testline())
-        # elif client_request == re.search("response\/tlname=(.*)\&jobname=(.*)", client_request):
-        #     client_socket.send(self.response_jobname(client_request))
+        elif re.search("request\/status_of_=(.*)", client_request):
+            client_socket.send(self.get_reserved_TL_status(client_request))
         elif re.search("request\/free_testline\=(.*).*", client_request):
             client_socket.send(self.request_free_testline(client_request))
+        elif client_request == "request/manager_status":
+            client_socket.send(self.check_if_I_am_working())
         else:
-            print client_request
             client_socket.send("Unknown command")
+
+
+    def get_reserved_TL_status(self, client_request):
+        TLname = re.search("request\/status_of_\=(.*)", client_request).group(1)
+        try:
+            status = self.get_reservation_status(TLname)
+            if status == 3:
+                return "Active"
+            else:
+                return "Not active"
+        except:
+            return "Wrong TL name"
+
+
+    def check_if_I_am_working(self):
+        return "YES!"
 
 
     def request_get_testline(self):
@@ -165,7 +182,6 @@ class ReservationManager(CloudReservationApi):
                         continue
                     else:
                         _TLname = TLname
-
         except:
             pass
         finally:
@@ -203,8 +219,20 @@ class ReservationManager(CloudReservationApi):
             logger.error('{}'.format(LOGGER_INFO[1105]))
 
 
-    def periodically_check_all_TL_for_extending_or_releasing(self, no_free_TL):
+    def remove_TL_from_reservations_dictionary(self,TLname):
+        del self.__reservations_dictionary[TLname]
 
+
+    def check_if_TL_reservation_didnt_expire_during_breakdown(self):
+        for TLname in self.get_reservation_dictionary():
+            status = self.get_reservation_status(TLname)
+            if status > 3:
+                self.release_reservation(TLname)
+                self.remove_TL_from_reservations_dictionary(TLname)
+                self.make_backup_file()
+
+
+    def periodically_check_all_TL_for_extending_or_releasing(self, no_free_TL):
         if True:
             for TLname in self.get_reservation_dictionary():
                 TLinfo = self.get_reservation_dictionary()[TLname]
@@ -223,7 +251,8 @@ class ReservationManager(CloudReservationApi):
                     #or
                     #no active job and reservation is longer than 24h (60s*60m*24h)
                     self.release_reservation(TLname)
-                    self.set_jobname_for_TL_in_dictionary(TLname)   #actually we're deleting jobname
+                    self.remove_TL_from_reservations_dictionary()
+                    self.make_backup_file()
                 elif (TLinfo['end_date'] - datetime.datetime.utcnow()).total_seconds() < 60*30:
                     # self.extend_reservation(TLname,120)    #not yet
                     #self.set_end_date(TLname) #extend by 120min
@@ -298,6 +327,7 @@ if __name__ == '__main__':
     import threading
     ReservManager = ReservationManager()
     ReservManager.read_backup_file()
+    ReservManager.check_if_TL_reservation_didnt_expire_during_breakdown()
     # print ReservManager.get_reservation_dictionary()
     t = threading.Thread(target=ReservManager.serve)
     t.setDaemon(True)

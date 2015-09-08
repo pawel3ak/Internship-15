@@ -65,6 +65,25 @@ def set_freetl(sock, freetl):
     except:
         pass
 
+
+def get_status(sock, status):
+    if status == "server":
+        sock.send("request/manager_status")
+        try:
+            response = sock.recv(1024)
+            if response != "": print response
+        except:
+            pass
+    else:
+        print "request/status_of_={}".format(status)
+        sock.send("request/status_of_={}".format(status))
+        try:
+            response = sock.recv(1024)
+            if response != "": print response
+        except:
+            pass
+
+
 def main():
     parser = argparse.ArgumentParser(argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-a', '--host', default=HOST_IP,
@@ -77,12 +96,15 @@ def main():
                         help='check informations about given ID')
     parser.add_argument('--freetl', default='',
                         help='not yet')
+    parser.add_argument('-s', '--status', type=str, default='',
+                        help='ask for status')
     args = parser.parse_args()
     host = args.host
     port = args.port
     info = args.info
     tl = args.tl
     freetl = args.freetl
+    status = args.status
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((host, port))
@@ -99,6 +121,8 @@ def main():
         get_tlname(sock)
     elif freetl !='':
         set_freetl(sock, freetl)
+    elif status !='':
+        get_status(sock, status)
     # elif len(sys.argv) == 3:
     #     if sys.argv[1] == "info":
     #         get_info(sock,sys.argv[2])
