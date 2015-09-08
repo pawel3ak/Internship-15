@@ -1,4 +1,3 @@
-
 """
 :created on: '13/08/15'
 
@@ -107,12 +106,31 @@ class JobManagerApi(ReservationQueue):
         return response
 
     def get_tl_name_from_reservation_manager(self):
-        return self.__send_request_to_reservation_manager('get/free_tl')
+        return self.__send_request_to_reservation_manager('request/get_testline')
 
+    def get_tl_status_from_reservation_manager(self, tl_name):
+        '''
+        Get reservation status as integer.
+
+        Status list:
+            1 - 'Pending for testline'
+            2 - 'Testline assigned'
+            3 - 'Confirmed'
+            4 - 'Finished'
+            5 - 'Canceled'
+
+        :param tl_name: string
+        :return: int
+        '''
+        return self.__send_request_to_reservation_manager('')
+
+    def free_testline_in_reservation_manager(self, tl_name):
+        return self.__send_request_to_reservation_manager(("request/free_testline=" + tl_name))
 
     @staticmethod
     def update_local_git_repository():
         git_launch('localhost', file_info=None, pull_only=True)
+
 
 if __name__ == "__main__":
     pass

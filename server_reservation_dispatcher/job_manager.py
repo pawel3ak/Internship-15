@@ -1,21 +1,24 @@
 import json
+import logging
 from time import sleep
 import ConfigParser
 from job_manager_api import JobManagerApi
+
+# create logger
+logger = logging.getLogger("server." + __name__)
 
 
 def start_suites_from_job_manager_dictionary(manager):
     manager.read_job_manager_dictionary_from_file()
     dictionary = manager.get_job_manager_dictionary()
-    for key in dictionary.keys():
-        # TODO check tl reservation in RM
-        # if reservation is still confirmed or less (<=3)
-        manager.start_new_supervisor(key, dictionary[key])
 
-    '''
-    else
-        manager.remove_record_from_job_manager_dictionary(key)
-    '''
+    for key in dictionary.keys():
+        # if reservation is still confirmed or less (<=3)
+        if manager.get_tl_status_from_reservation_manager(key) < 4:
+            manager.start_new_supervisor(key, dictionary[key])
+        else:
+            manager.remove_record_from_job_manager_dictionary(key)
+
     manager.write_job_manager_dictionary_to_file()
 
 
@@ -45,18 +48,10 @@ def job_manager(config_filename='server_config.cfg'):
 
     start_suites_from_job_manager_dictionary(manager)
 
-    '''
-    TODO later
-    start from queue to less files operation
-    read all queue
-    start all possible suites
-    write to file
-    '''
-
     while True:
         manager.delete_done_jobs_from_dictionaries()
         manager.write_job_manager_dictionary_to_file()
-        while False:# True: TODO after do function in RM
+        while False:  # True: TODO after do function in RM
             tl_name = manager.get_tl_name_from_reservation_manager()
             if tl_name is None:
                 break
