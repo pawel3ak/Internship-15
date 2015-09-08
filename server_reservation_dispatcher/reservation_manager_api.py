@@ -347,3 +347,7 @@ def managing_reservations():
         ReservManager.periodically_check_all_TL_for_extending_or_releasing(no_free_TL=False)
         print ReservManager.get_reservation_dictionary()
         time.sleep(10)
+
+
+if __name__ == "__main__":
+    managing_reservations()

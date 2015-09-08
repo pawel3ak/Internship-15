@@ -22,7 +22,7 @@ def start_suites_from_job_manager_dictionary(manager):
     manager.write_job_manager_dictionary_to_file()
 
 
-def start_jobs_as_much_as_possible(manager):
+def fast_supervisors_start(manager):
     queue_list = manager.read_all_records_from_queue()
     while True:
         tl_name = manager.get_tl_name_from_reservation_manager()
@@ -46,14 +46,17 @@ def job_manager(config_filename='server_config.cfg'):
 
     manager.start_reservation_manager()
 
-    start_suites_from_job_manager_dictionary(manager)
-
+    # start_suites_from_job_manager_dictionary(manager)
+    sleep(5)
     while True:
+        print "1"
         manager.delete_done_jobs_from_dictionaries()
         manager.write_job_manager_dictionary_to_file()
-        while False:  # True: TODO after do function in RM
+        while True:
+            print "loop"
             tl_name = manager.get_tl_name_from_reservation_manager()
-            if tl_name is None:
+            print tl_name
+            if tl_name == "No available TL":
                 break
             else:
                 if manager.get_queue_length() == 0:
@@ -63,6 +66,8 @@ def job_manager(config_filename='server_config.cfg'):
                 manager.start_new_supervisor(tl_name, next_suite)
         manager.write_job_manager_dictionary_to_file()
         sleep(loop_interval*60)
+        print "3"
+    print "end"
 
 
 if __name__ == "__main__":

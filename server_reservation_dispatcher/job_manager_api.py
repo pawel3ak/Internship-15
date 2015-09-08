@@ -15,6 +15,7 @@ import socket
 from utilities.reservation_queue import ReservationQueue
 from superVisor import supervise
 from server_git_api import git_launch
+from reservation_manager_api import managing_reservations
 
 # create logger
 logger = logging.getLogger("server." + __name__)
@@ -36,6 +37,7 @@ class JobManagerApi(ReservationQueue):
         self._directory_with_testsuites = config.get('JobManager', 'directory_with_testsuites')
         self._reservation_manager_ip = config.get('ReservationManager', 'host_ip')
         self._reservation_manager_port = config.getint('ReservationManager', 'host_port')
+        self._reservation_manager_handler = None
 
     def get_job_manager_dictionary(self):
         return self._job_manager_dictionary
@@ -50,8 +52,9 @@ class JobManagerApi(ReservationQueue):
 
     def delete_done_jobs_from_dictionaries(self):
         for key in self._supervisors_handlers_dictionary.keys():
-            if not self._supervisors_handlers_dictionary[key].is_alive():    # check if job is finished
-                # TODO - send info to ReservationManager
+            # check if job is finished
+            if not self._supervisors_handlers_dictionary[key].is_alive():
+                self.free_testline_in_reservation_manager(key)
                 del self._supervisors_handlers_dictionary[key]
                 del self._job_manager_dictionary[key]
 
@@ -61,17 +64,19 @@ class JobManagerApi(ReservationQueue):
         [directory_list.append(x) for x in os.listdir(self._directory_with_testsuites)
             if os.path.isdir(os.path.join(self._directory_with_testsuites, x))]
         for directory in directory_list:
-            request = {'jenkins_info': {'parameters': {'name': directory}}}
+            jenkins_info = {'parameters': {'name': directory}}
             logger.debug("Write new queue to file")
-            self.write_new_record_to_queue(request)
+            self.write_new_record_to_queue(jenkins_info)
 
-    def start_new_supervisor(self, tl_name, request, user_info=None):
-        logger.info("Start new supervisor wit suite {} at TL name: {}".format(request['jenkins_info']['parameters']['name'], tl_name))
-        handle = multiprocessing.Process(target=supervise, args=(tl_name, request, user_info,))
+    def start_new_supervisor(self, tl_name, jenkins_info, user_info=None):
+        logger.info("Start new supervisor wit suite {} at TL name: {}".format(jenkins_info['parameters']['name'], tl_name))
+        # TODO remove temp
+        handle = multiprocessing.Process(target=supervise, args=('tl99_test' , jenkins_info, user_info,))
+        # handle = multiprocessing.Process(target=supervise, args=(tl_name, jenkins_info, user_info,))
         handle.start()
         logger.debug("Add process to dictionaries")
         self._supervisors_handlers_dictionary[tl_name] = handle
-        self._job_manager_dictionary[tl_name] = request
+        self._job_manager_dictionary[tl_name] = jenkins_info
 
     def write_job_manager_dictionary_to_file(self):
         with open(self._job_manager_dictionary_file_path, "wb") as open_file:
@@ -84,18 +89,11 @@ class JobManagerApi(ReservationQueue):
                 self._job_manager_dictionary = json.load(open_file)
 
     def start_reservation_manager(self):
-        pass
-        '''
-        self._reservation_manager_handler = multiprocessing.Process(target=reservation_manager,
-                                                                    args=(,))
+        self._reservation_manager_handler = multiprocessing.Process(target=managing_reservations)
         self._reservation_manager_handler.start()
-        '''
 
     def stop_reservation_manager(self):
-        pass
-        '''
         self._reservation_manager_handler.join()
-        '''
 
     def __send_request_to_reservation_manager(self, request):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -106,11 +104,11 @@ class JobManagerApi(ReservationQueue):
         return response
 
     def get_tl_name_from_reservation_manager(self):
-        return self.__send_request_to_reservation_manager('request/get_testline')
+        return self.__send_request_to_reservation_manager("request/get_testline")
 
     def get_tl_status_from_reservation_manager(self, tl_name):
         '''
-        Get reservation status as integer.
+        Get testline status as integer.
 
         Status list:
             1 - 'Pending for testline'
@@ -122,7 +120,7 @@ class JobManagerApi(ReservationQueue):
         :param tl_name: string
         :return: int
         '''
-        return self.__send_request_to_reservation_manager('')
+        return self.__send_request_to_reservation_manager(("request/status_of_=" + tl_name))
 
     def free_testline_in_reservation_manager(self, tl_name):
         return self.__send_request_to_reservation_manager(("request/free_testline=" + tl_name))
