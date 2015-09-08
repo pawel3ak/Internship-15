@@ -36,14 +36,13 @@ class ReservationManager(CloudReservationApi):
         self.socket.bind(('127.0.0.1', 50010))
         self.socket.listen(5)
         self.outputs = []
-        self.MAXTL = 1
-        self.FREETL = -1
+        self.MAXTL = 2
+        self.FREETL = 0
 
 
     def handle_client_request_and_response(self, client_socket):
         client_request = client_socket.recv(1024)
         if client_request == "request/get_testline":
-            print self.request_get_testline()
             client_socket.send(self.request_get_testline())
         elif client_request == re.search("response\/tlname=(.*)\&jobname=(.*)", client_request):
             client_socket.send(self.response_jobname(client_request))
@@ -55,10 +54,7 @@ class ReservationManager(CloudReservationApi):
 
     def request_get_testline(self):
         TLname = self.find_first_free_TL()
-        if TLname == -1:
-            return "No available TL"
-        else:
-            return TLname
+        return TLname
 
 
     def response_jobname(self, client_request):
@@ -101,8 +97,9 @@ class ReservationManager(CloudReservationApi):
                 break
         TLadd_date = datetime.datetime.strptime(TLinfo['add_date'].split('.')[0],"%Y-%m-%d %H:%M:%S")
         #TLend_date = datetime.datetime.strptime(TLinfo['end_date'].split('.')[0],"%Y-%m-%d %H:%M:%S")
+        print TLname
         TLend_date = TLadd_date.replace(hour=TLadd_date.hour + 8)
-        self.__reservations_dictionary[TLname] = {'ID' : ID,
+        self.__reservations_dictionary[TLname] = {'id' : ID,
                                                   'job' : None,
                                                   'add_date' : TLadd_date,
                                                   'end_date' : TLend_date,
@@ -150,17 +147,23 @@ class ReservationManager(CloudReservationApi):
 
 
     def find_first_free_TL(self):
-        if len(self.get_reservation_dictionary()) == 0:
-            return -1
-        for TLname in self.get_reservation_dictionary():
-            if not self.get_reservation_dictionary()[TLname]['job']:
-                status = self.get_reservation_status(TLname)
-                if status !=3:
-                    continue
-                else:
-                    return TLname
+        _TLname = None
+        try:
+            for TLname in self.get_reservation_dictionary():
+                if not self.get_reservation_dictionary()[TLname]['job']:
+                    status = self.get_reservation_status(TLname)
+                    if status !=3:
+                        continue
+                    else:
+                        _TLname = TLname
+
+        except:
+            pass
+        finally:
+            if not _TLname:
+                return "No available TL"
             else:
-                return -1
+                return _TLname
 
 
     def get_reservation_status(self, TLname):
@@ -192,7 +195,7 @@ class ReservationManager(CloudReservationApi):
 
 
     def periodically_check_all_TL_for_extending_or_releasing(self, no_free_TL):
-        while True:
+        if True:
             for TLname in self.get_reservation_dictionary():
                 TLinfo = self.get_reservation_dictionary()[TLname]
                 if TLinfo['job']:
@@ -274,6 +277,7 @@ if __name__ == '__main__':
             if len(ReservManager.get_reservation_dictionary()) < ReservManager.MAXTL:
                 print "no wzialbym cos..."
                 ReservManager.create_reservation_and_set_TL_info()
+                print "zarezerwowalem"
             else:
                 pass
         ReservManager.periodically_check_all_TL_for_extending_or_releasing(no_free_TL=False)
