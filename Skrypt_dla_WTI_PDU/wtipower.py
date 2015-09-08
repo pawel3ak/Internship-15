@@ -17,12 +17,11 @@ def get_scripts_options():
 
 
 def check_status(telnet_session):
-    telnet_session.read_until(">")
-    telnet_session.write("/S\r\n")
+    #telnet_session.read_until(">")
+    #gotelnet_session.write("/S\r\n")
     circuit_status_options = telnet_session.read_until('-----+------------------+-------------+--------+-----------------+---------+')
     circuit_status_output = telnet_session.read_until('-----+------------------+-------------+--------+-----------------+---------+')
     print circuit_status_options, circuit_status_output
-    telnet_session.read_until("RPC>")
 
 
 def convert_circuit_status(circuit_status):
@@ -39,7 +38,9 @@ def turn_on_off_circuit(telnet_session, circuit_status, ckt_name_or_number):
     telnet_session.read_until(">")
     telnet_session.write(circuit_status + " "+ckt_name_or_number + "\r\n")
 
-
+def confirm_command():
+    telnet_session.read_until("Sure? (Y/N):")
+    telnet_session.write("Y\r\n")
 
 def set_telnet_session(hostname, password):
     telnet_session = telnetlib.Telnet(hostname, 23, 3)
@@ -49,11 +50,12 @@ def set_telnet_session(hostname, password):
 
 
 if __name__ == "__main__":
-
     (hostname, username, password, circuit_status, ckt_name_or_number) = get_scripts_options()
     circuit_status_command = convert_circuit_status(circuit_status)
 
     telnet_session = set_telnet_session(hostname, password)
-    # turn_on_off_circuit(telnet_session, circuit_status_command, ckt_name_or_number)
+    turn_on_off_circuit(telnet_session, circuit_status_command, ckt_name_or_number)
+    confirm_command()
     check_status(telnet_session)
+    telnet_session.read_until(">")
     telnet_session.close()
