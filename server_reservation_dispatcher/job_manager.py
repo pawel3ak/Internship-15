@@ -11,10 +11,9 @@ logger = logging.getLogger("server." + __name__)
 def start_suites_from_job_manager_dictionary(manager):
     manager.read_job_manager_dictionary_from_file()
     dictionary = manager.get_job_manager_dictionary()
-
+    print dictionary
     for key in dictionary.keys():
-        # if reservation is still confirmed or less (<=3)
-        if manager.get_tl_status_from_reservation_manager(key) < 4:
+        if manager.get_tl_status_from_reservation_manager(key) == "Active":
             manager.start_new_supervisor(key, dictionary[key])
         else:
             manager.remove_record_from_job_manager_dictionary(key)
@@ -45,15 +44,15 @@ def job_manager(config_filename='server_config.cfg'):
     loop_interval = config.getfloat('JobManager', 'loop_interval')
 
     manager.start_reservation_manager()
+    print "RM started"
+    start_suites_from_job_manager_dictionary(manager)
 
-    # start_suites_from_job_manager_dictionary(manager)
-    sleep(5)
     while True:
-        print "1"
+        print "loop1"
         manager.delete_done_jobs_from_dictionaries()
         manager.write_job_manager_dictionary_to_file()
         while True:
-            print "loop"
+            print "loop2"
             tl_name = manager.get_tl_name_from_reservation_manager()
             print tl_name
             if tl_name == "No available TL":
@@ -65,8 +64,8 @@ def job_manager(config_filename='server_config.cfg'):
                 next_suite = manager.read_next_reservation_record_and_delete_from_queue()
                 manager.start_new_supervisor(tl_name, next_suite)
         manager.write_job_manager_dictionary_to_file()
+        print "sleep"
         sleep(loop_interval*60)
-        print "3"
     print "end"
 
 

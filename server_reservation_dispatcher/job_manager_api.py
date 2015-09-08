@@ -12,6 +12,8 @@ import logging
 import multiprocessing
 import ConfigParser
 import socket
+import select
+from time import sleep
 from utilities.reservation_queue import ReservationQueue
 from superVisor import supervise
 from server_git_api import git_launch
@@ -74,6 +76,7 @@ class JobManagerApi(ReservationQueue):
         handle = multiprocessing.Process(target=supervise, args=('tl99_test' , jenkins_info, user_info,))
         # handle = multiprocessing.Process(target=supervise, args=(tl_name, jenkins_info, user_info,))
         handle.start()
+        print "start"
         logger.debug("Add process to dictionaries")
         self._supervisors_handlers_dictionary[tl_name] = handle
         self._job_manager_dictionary[tl_name] = jenkins_info
@@ -91,6 +94,7 @@ class JobManagerApi(ReservationQueue):
     def start_reservation_manager(self):
         self._reservation_manager_handler = multiprocessing.Process(target=managing_reservations)
         self._reservation_manager_handler.start()
+        sleep(5)
 
     def stop_reservation_manager(self):
         self._reservation_manager_handler.join()
@@ -103,22 +107,23 @@ class JobManagerApi(ReservationQueue):
         sock.close()
         return response
 
+    def check_reservation_manager_status(self):
+        return self.__send_request_to_reservation_manager("request/manager_status")
+
     def get_tl_name_from_reservation_manager(self):
         return self.__send_request_to_reservation_manager("request/get_testline")
 
     def get_tl_status_from_reservation_manager(self, tl_name):
         '''
-        Get testline status as integer.
+        Get testline status as string.
 
         Status list:
-            1 - 'Pending for testline'
-            2 - 'Testline assigned'
-            3 - 'Confirmed'
-            4 - 'Finished'
-            5 - 'Canceled'
+            'Active'
+            'Not active'
+            'Wrong TL name'
 
         :param tl_name: string
-        :return: int
+        :return: string
         '''
         return self.__send_request_to_reservation_manager(("request/status_of_=" + tl_name))
 
