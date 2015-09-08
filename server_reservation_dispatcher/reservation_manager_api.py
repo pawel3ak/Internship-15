@@ -22,6 +22,7 @@ import time
 import select
 import re
 import sys
+import copy
 
 
 logger = logging.getLogger("server" + __name__)
@@ -207,8 +208,6 @@ class ReservationManager(CloudReservationApi):
         if True:
             for TLname in self.get_reservation_dictionary():
                 TLinfo = self.get_reservation_dictionary()[TLname]
-                print TLinfo['add_date'].__class__
-                print TLinfo['end_date'].__class__
                 # print TLinfo['end_date']
                 # print TLinfo
                 if TLinfo['job']:
@@ -232,7 +231,7 @@ class ReservationManager(CloudReservationApi):
 
 
     def prepare_dictionary_to_write_to_file(self):
-        tmp_dictionary = dict(self.get_reservation_dictionary())
+        tmp_dictionary = copy.deepcopy(self.get_reservation_dictionary())
         for TLname in tmp_dictionary:
             try:
                 tmp_dictionary[TLname]['add_date'] = tmp_dictionary[TLname]['add_date'].strftime("%Y-%m-%d %H:%M:%S")
@@ -243,15 +242,11 @@ class ReservationManager(CloudReservationApi):
 
 
     def prepare_dictionary_to_read_to_memory(self, tmp_dictionary):
-        # print tmp_dictionary
         for TLname in tmp_dictionary:
             tmp_dictionary[TLname]['add_date'] = \
                 datetime.datetime.strptime(tmp_dictionary[TLname]['add_date'],"%Y-%m-%d %H:%M:%S")
-
             tmp_dictionary[TLname]['end_date'] = \
                 datetime.datetime.strptime(tmp_dictionary[TLname]['end_date'],"%Y-%m-%d %H:%M:%S")
-            print tmp_dictionary[TLname]['add_date'].__class__
-            print tmp_dictionary[TLname]['end_date'].__class__
         return tmp_dictionary
 
 
@@ -323,17 +318,3 @@ if __name__ == '__main__':
         ReservManager.periodically_check_all_TL_for_extending_or_releasing(no_free_TL=False)
         print ReservManager.get_reservation_dictionary()
         time.sleep(10)
-
-#     # ReservManager.read_backup_file()
-#     for availableTL in range(1,MAX_TL-free_TL):
-#         ReservManager.create_reservation_and_set_TL_info()
-#         time.sleep(1)
-#         print ReservManager.get_reservation_dictionary()
-#     # ReservManager.make_backup_file()
-#     while True:
-#         ReservManager.periodically_check_all_TL_for_extending_or_releasing(no_free_TL=False)
-#         print ReservManager.get_reservation_dictionary()
-#         time.sleep(30)
-#
-#
-#
