@@ -31,11 +31,11 @@ from utilities.logger_messages import LOGGER_INFO
 logger = logging.getLogger("server." + __name__)
 #######################################################################################
 # temporary
-
+'''
 from utilities.logger_config import config_logger
 logger.setLevel(logging.DEBUG)
 config_logger(logger,'server_config.cfg')
-
+'''
 ########################################################################################
 
 class SuperVisor(Jenkins):
