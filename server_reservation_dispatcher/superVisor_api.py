@@ -486,13 +486,20 @@ class SuperVisor(Jenkins):
             logger.warning('{} : {}'.format(LOGGER_INFO[self.get_failure_status()], old_tag))
 
 
-    def send_information_about_executed_job(self):
+    def set_mail_message_and_subject(self):
         test_end_status = self.get_test_end_status()
         messages = []
 
         if test_end_status == "SUCCESSFUL":
-            return 0
-
+            if self.get_user_info():
+                _message = "Dear {} {}!\n\n" \
+                           "Your test '{}' was successful\n\n" \
+                           "Have a nice day!".format(self.get_user_info()['first_name'],
+                                                     self.get_user_info()['last_name'])
+                messages.append({'message' : _message})
+                subject = "Test status update - Success"
+            else:
+                return 0
 
         elif test_end_status == "GOT_FAILS":
             t = self.get_job_handler().get_last_build().get_timestamp()
@@ -553,23 +560,33 @@ class SuperVisor(Jenkins):
                              'feature' : self.get_suitname()})
             subject = "Tests status update - You are slacking"
 
+        return messages, subject
 
-        if 'feature' in messages[0]:
-            for message in messages:
-                mail = ute_mail.mail.Mail(subject=subject,message=message['message'],
-                                          recipients=mail_dict[message['feature']],
-                                          name_from="Reservation Api")
-                send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
-                send.connect()
-                send.send(mail)
+    def send_information_about_executed_job(self):
+        messages, subject = self.set_mail_message_and_subject()
 
+        if self.get_user_info():
+            recipents = self.get_user_info()['mail']
         else:
-            mail = ute_mail.mail.Mail(subject=subject,message=messages[0]['message'],
-                                          recipients=admin['mail'],  #Bartek Kukla (?) mail here
-                                          name_from="Reservation Api")          #We need to figure out better name
-            send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
-            send.connect()
-            send.send(mail)
+            if 'feature' in messages[0]:
+                recipents = mail_dict[messages[0]['feature']]
+            else:
+                recipents = admin['mail']
+
+        mail = ute_mail.mail.Mail(subject=subject,message=messages[0]['message'],
+                                  recipients=recipents,
+                                  name_from="Reservation Api")
+        send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
+        send.connect()
+        send.send(mail)
+
+        # else:
+        #     mail = ute_mail.mail.Mail(subject=subject,message=messages[0]['message'],
+        #                                   recipients=admin['mail'],  #Bartek Kukla (?) mail here
+        #                                   name_from="Reservation Api")          #We need to figure out better name
+        #     send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
+        #     send.connect()
+        #     send.send(mail)
 
     # def git_launch(self, file_info=None, pull_only=None):
     #     return git_launch(TL_address=self.TLaddress, file_info=file_info, pull_only=pull_only)
