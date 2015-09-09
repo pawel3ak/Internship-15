@@ -13,8 +13,11 @@ def start_suites_from_job_manager_dictionary(manager):
     dictionary = manager.get_job_manager_dictionary()
     print dictionary
     for key in dictionary.keys():
-        if manager.get_tl_status_from_reservation_manager(key) == "Active":
+        status = manager.get_tl_status_from_reservation_manager(key)
+        if status == "Active":
             manager.start_new_supervisor(key, dictionary[key])
+        elif not status:
+            logger.debug("Connection error")
         else:
             manager.remove_record_from_job_manager_dictionary(key)
 
@@ -56,6 +59,9 @@ def job_manager(config_filename='server_config.cfg'):
             tl_name = manager.get_tl_name_from_reservation_manager()
             print tl_name
             if tl_name == "No available TL":
+                break
+            if not tl_name:
+                logger.debug("Connection error")
                 break
             else:
                 if manager.get_queue_length() == 0:

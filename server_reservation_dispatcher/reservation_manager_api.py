@@ -327,7 +327,11 @@ class ReservationManager(CloudReservationApi):
 
 def managing_reservations():
     import threading
-    ReservManager = ReservationManager()
+    try:
+        ReservManager = ReservationManager()
+    except socket.error, err:
+        logger.warning("Error while starting RM process: {}".format(err))
+        return None
     ReservManager.read_backup_file()
     ReservManager.check_if_TL_reservation_didnt_expire_during_breakdown()
     t = threading.Thread(target=ReservManager.serve)
