@@ -25,7 +25,7 @@ def main_server():
     server.create_server_dirs_if_not_exists()
 
     # start JobManager
-    logger.info("Start new thread with checking loop")
+    logger.info("Start new thread with job manager")
     server.start_job_manager()
 
     server.set_up_server()
@@ -33,6 +33,9 @@ def main_server():
     while True:
         [connection, data] = server.get_request_from_client()
         server.response_for_client_request(connection, data)
+        if not server.check_if_job_manager_is_alive():
+            logger.info("Job manager is not alive")
+            break
     server.stop_server()
     logger.info("Server stopped")
 

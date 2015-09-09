@@ -93,3 +93,7 @@ class MainServerApi(object):
     def stop_server(self):
         self._server_socket.close()
         self._job_manager_handler.join()
+
+    def check_if_job_manager_is_alive(self):
+        logger.debug("Chceck job manager status")
+        return self._job_manager_handler.is_alive()

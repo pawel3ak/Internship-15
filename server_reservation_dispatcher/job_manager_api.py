@@ -98,11 +98,14 @@ class JobManagerApi(ReservationQueue):
         logger.info("Start new RM process")
         self._reservation_manager_handler = multiprocessing.Process(target=managing_reservations)
         self._reservation_manager_handler.start()
-        while True:
+        for counter in range(1, 10, 1):
             sleep(5)
+            logger.debug("{} try connection with RM".format(counter))
             if self.check_reservation_manager_status():
                 logger.info("Reservation Manager is working")
-                break
+                return True
+        logger.error("Cannot connect to RM")
+        return False
 
     def stop_reservation_manager(self):
         self._reservation_manager_handler.join()
