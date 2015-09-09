@@ -12,7 +12,6 @@ import logging
 import multiprocessing
 import ConfigParser
 import socket
-import select
 from time import sleep
 from utilities.reservation_queue import ReservationQueue
 from superVisor import supervise
@@ -35,6 +34,7 @@ class JobManagerApi(ReservationQueue):
         self._job_manager_dictionary_file_path = os.path.join(config.get('JobManager', 'directory'),
                                                               config.get('JobManager', 'JM_dictionary_filename'))
         if not os.path.exists(self._job_manager_dictionary_file_path):
+            logger.debug("Make directory: {}".format(self._job_manager_dictionary_file_path))
             os.mknod(self._job_manager_dictionary_file_path)
         self._directory_with_testsuites = config.get('JobManager', 'directory_with_testsuites')
         self._reservation_manager_ip = config.get('ReservationManager', 'host_ip')
@@ -56,6 +56,7 @@ class JobManagerApi(ReservationQueue):
         for key in self._supervisors_handlers_dictionary.keys():
             # check if job is finished
             if not self._supervisors_handlers_dictionary[key].is_alive():
+                logger.debug("Delete from dictionaries: {}".format(key))
                 self.free_testline_in_reservation_manager(key)
                 del self._supervisors_handlers_dictionary[key]
                 del self._job_manager_dictionary[key]
@@ -73,7 +74,7 @@ class JobManagerApi(ReservationQueue):
     def start_new_supervisor(self, tl_name, jenkins_info, user_info=None):
         logger.info("Start new supervisor wit suite {} at TL name: {}".format(jenkins_info['parameters']['name'], tl_name))
         # TODO remove temp
-        handle = multiprocessing.Process(target=supervise, args=('tl99_test' , jenkins_info, user_info,))
+        handle = multiprocessing.Process(target=supervise, args=('tl99_test', jenkins_info, user_info,))
         # handle = multiprocessing.Process(target=supervise, args=(tl_name, jenkins_info, user_info,))
         handle.start()
         print "start"
@@ -82,16 +83,19 @@ class JobManagerApi(ReservationQueue):
         self._job_manager_dictionary[tl_name] = jenkins_info
 
     def write_job_manager_dictionary_to_file(self):
+        logger.debug("Write JM dictionary to file: {}".format(self._job_manager_dictionary_file_path))
         with open(self._job_manager_dictionary_file_path, "wb") as open_file:
             json.dump(self._job_manager_dictionary, open_file)
 
     def read_job_manager_dictionary_from_file(self):
+        logger.debug("Read JM dictionary from file: {}".format(self._job_manager_dictionary_file_path))
         with open(self._job_manager_dictionary_file_path, "rb") as open_file:
             if len(open_file.readlines()) > 0:
                 open_file.seek(0, 0)
                 self._job_manager_dictionary = json.load(open_file)
 
     def start_reservation_manager(self):
+        logger.info("Start new RM process")
         self._reservation_manager_handler = multiprocessing.Process(target=managing_reservations)
         self._reservation_manager_handler.start()
         while True:
@@ -100,23 +104,24 @@ class JobManagerApi(ReservationQueue):
                 logger.info("Reservation Manager is working")
                 break
 
-
     def stop_reservation_manager(self):
         self._reservation_manager_handler.join()
 
     def __send_request_to_rm_and_get_response(self, request):
         try:
+            logger.debug("Connect to RM")
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((self._reservation_manager_ip, self._reservation_manager_port))
+            logger.debug("Send request to RM: {}".format(request))
             sock.send(request)
             response = sock.recv(1024)
+            logger.debug("Receive from RM: {}".format(response))
             sock.close()
             return response
         except socket.error, err:
             print err
             logger.error("Error in connection with RM: {}".format(err))
             return False
-
 
     def check_reservation_manager_status(self):
         return self.__send_request_to_rm_and_get_response("request/manager_status")
@@ -143,6 +148,7 @@ class JobManagerApi(ReservationQueue):
 
     @staticmethod
     def update_local_git_repository():
+        logger.debug("Update local git repository")
         git_launch('localhost', file_info=None, pull_only=True)
 
 

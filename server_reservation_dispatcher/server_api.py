@@ -45,6 +45,7 @@ class MainServerApi(object):
         return self._job_manager_handler
 
     def get_data_from_config_file(self):
+        logger.debug("Get server configuration from file")
         config = ConfigParser.RawConfigParser()
         config.read(self._config_filename)
         self._host_ip = config.get('Server', 'host_ip')
@@ -60,7 +61,7 @@ class MainServerApi(object):
     def get_request_from_client(self):
         client_connection, address = self._server_socket.accept()
         data = client_connection.recv(1024).strip()
-        logger.debug("New request: {}".format(data))
+        logger.debug("New request from client: {}".format(data))
         return [client_connection, data]
 
     def response_for_client_request(self, client_connection, data):
@@ -73,6 +74,7 @@ class MainServerApi(object):
         client_connection.close()
 
     def create_server_dirs_if_not_exists(self):
+        logger.debug("Make necessary directories")
         config = ConfigParser.RawConfigParser()
         config.read(self._config_filename)
         if not os.path.isdir(config.get('Server', 'directory')):
