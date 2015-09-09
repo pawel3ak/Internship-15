@@ -294,8 +294,8 @@ class SuperVisor(Jenkins):
 
     def parse_output_and_set_job_failed_tests(self):
         job_filenames_failed_tests=[]
-        # regex = r'\=\s(.*)\s\=\W*.*FAIL'
-        regex = '({}.*)\|.FAIL'.format(self.get_suitname())
+        regex = r'({}.*)\s\=\W*.*FAIL'.format(self.get_suitname())
+        # regex = '({}.*)\|.FAIL'.format(self.get_suitname())
         try:
             matches = re.findall(regex, self.get_job_output())
             self.set_are_any_failed_tests(True)
