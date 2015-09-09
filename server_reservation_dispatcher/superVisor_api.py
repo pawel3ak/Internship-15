@@ -31,10 +31,11 @@ from utilities.logger_messages import LOGGER_INFO
 logger = logging.getLogger("server." + __name__)
 #######################################################################################
 # temporary
-'''
+
 from utilities.logger_config import config_logger
+logger.setLevel(logging.DEBUG)
 config_logger(logger,'server_config.cfg')
-'''
+
 ########################################################################################
 
 class SuperVisor(Jenkins):
@@ -243,7 +244,7 @@ class SuperVisor(Jenkins):
             self.set_failure_status(127)
             self.set_test_end_status("JenkinsError")
             self.finish_with_failure()
-        elif job_status == "SUCCESSFUL":
+        elif job_status == "SUCCESS":
             pass
 
 
@@ -286,7 +287,7 @@ class SuperVisor(Jenkins):
     def parse_output_and_set_job_failed_tests(self):
         job_filenames_failed_tests=[]
         # regex = r'\=\s(.*)\s\=\W*.*FAIL'
-        regex = '*({}.*)\|.FAIL'.format(self.get_suitname())
+        regex = '({}.*)\|.FAIL'.format(self.get_suitname())
         try:
             matches = re.findall(regex, self.get_job_output())
             self.set_are_any_failed_tests(True)
@@ -295,15 +296,15 @@ class SuperVisor(Jenkins):
                 if match[-3:] == '...': match = match[:-3]  #cutting last "..."
                 elif match[-1:] == '_': match = match[:-1]    #cutting last "_"
                 try:
-                    match = re.search('\w*\.Tests\.{}.*\.(.*)'.format(self.get_suitname()), match).group(1)
+                    match = re.search('\w*\.Tests\.{}.*\.({}.*)'.format(self.get_suitname()), match).group(1)
                     job_filenames_failed_tests.append(match)
                 except:
                     try:
-                        match = re.search('\w*\.Tests\.(.*)', match).group(1)
+                        match = re.search('\w*\.Tests\.({}.*)'.format(self.get_suitname()), match).group(1)
                         job_filenames_failed_tests.append(match)
                     except:
                         try:
-                            match = re.search('\w*\.(.*)', match).group(1)
+                            match = re.search('\w*\.({}.*)'.format(self.get_suitname()), match).group(1)
                             job_filenames_failed_tests.append(match)
                         except:
                             pass
@@ -323,7 +324,8 @@ class SuperVisor(Jenkins):
         output = output.split('\n')
         for line in output:
             if re.findall('\[.ERROR.\].*no tests.*', line):
-                ###mozna zapisac, ze tag ciagle nie zmieniony i wysylac ponownie mail do testerow
+                self.write_suitename_to_testsWithoutTag_file_if_no_enable_tag_in_suite()
+                logger.debug("y")
                 continue
             if not line.find('[ ERROR ]') == -1:
                 logger.debug("Found 'ERROR' in output of {}".format(self.get_jobname()))
@@ -331,18 +333,52 @@ class SuperVisor(Jenkins):
         return False
 
 
-    # def write_tag_to_file_if_not_enabled(self):
-    #     with open(os.path.join('.','files','SuperVisor','tests_without_tag.txt'), 'rb+') as test_without_tag_file:
+    def remove_tag_from_testsWithoutTag_file_if_is_tag_in_suite(self):
+        path = os.path.join('.','files','SuperVisor','testsWithoutTag.txt')
+        if not os.path.exists(path):
+            os.mknod(path)
+        with open(path, 'rb+') as test_without_tag_file:
+            lines = test_without_tag_file.readlines()
+            test_without_tag_file.seek(0)
+            test_without_tag_file.truncate(0)
+            for line in lines:
+                if self.get_suitname() in json.loads(line):
+                    lines.remove(line)
+            [test_without_tag_file.writelines('{}\n'.format(json.dumps(json.loads(line)))) for line in lines]
 
 
-
+    def write_suitename_to_testsWithoutTag_file_if_no_enable_tag_in_suite(self):
+        path = os.path.join('.','files','SuperVisor','testsWithoutTag.txt')
+        if not os.path.exists(path):
+            os.mknod(path)
+        with open(path, 'rb+') as test_without_tag_file:
+            _found = False
+            to_write = []
+            for line in test_without_tag_file.readlines():
+                line = json.loads(line.strip())
+                if self.get_suitname() in line:
+                    _found = True
+                    line[self.get_suitname()] += 1
+                    if line[self.get_suitname()]%5 == 0:
+                        self.set_test_end_status("Tester slacking")
+                    to_write.append(line)
+                else:
+                    to_write.append(line)
+            if not _found:
+                to_write.append({self.get_suitname() : 1})
+            test_without_tag_file.seek(0)
+            test_without_tag_file.truncate(0)
+            [test_without_tag_file.writelines('{}\n'.format(json.dumps(line))) for line in to_write]
 
 
     def check_output_for_other_fails_or_errors_and_set_test_end_status(self):
         if self.get_are_any_failed_tests() == False:
             if self.check_for_fails() == False:
-                self.set_test_end_status("SUCCESSFUL")
-                logger.info("Test {} was successful".format(self.get_jobname()))
+                if self.get_test_end_status() == "Tester slacking":
+                    logger.debug("Test {} was not launched - no specific TAG in suite".format(self.get_jobname()))
+                else:
+                    self.set_test_end_status("SUCCESSFUL")
+                    logger.debug("Test {} was successful".format(self.get_jobname()))
             else:
                 self.set_test_end_status("UNKNOWN_ERROR/FAIL")
                 self.set_are_any_failed_tests(True)
@@ -420,7 +456,7 @@ class SuperVisor(Jenkins):
                         try:
                             lines_in_file[lines_in_file.index(line)] = re.sub(old_tag, new_tag, line)
                             __found = True
-                            logger.debug("Changed tag in file: {} from {} to {}".format(os.path.join(filename_and_path['path'], filename_and_path['name']), old_tag, new_tag))
+                            logger.debug("Changed tag in file: {} from {} to {}".format(os.path.join(filename_and_path['path'], filename_and_path['filename']), old_tag, new_tag))
                         except:
                             self.set_failure_status(129)
                             logger.warning('"{}" {}'.format(old_tag, LOGGER_INFO[self.get_failure_status()]))
@@ -454,8 +490,9 @@ class SuperVisor(Jenkins):
         test_end_status = self.get_test_end_status()
         messages = []
 
-        if test_end_status == "PASS":
+        if test_end_status == "SUCCESSFUL":
             return 0
+
 
         elif test_end_status == "GOT_FAILS":
             t = self.get_job_handler().get_last_build().get_timestamp()
@@ -490,12 +527,14 @@ class SuperVisor(Jenkins):
             messages.append({'message' : _message})
             subject = "Tests status update - finished with unknown fail"
 
+
         elif test_end_status == 'JenkinsError':
             _message = "Dear Admin! \n\n" \
                        "There is some problems with Jenkins. Please check it.\n\n" \
                        "Have a nice day!"
             messages.append({'message' : _message})
             subject = "Tests status update - JenkinsError"
+
 
         elif test_end_status == 'SSH_Connection_Failure':
             _message = "Dear Admin! \n\n" \
@@ -504,12 +543,16 @@ class SuperVisor(Jenkins):
             messages.append({'message' : _message})
             subject = "Tests status update - SSHError"
 
-        elif test_end_status == 'NO_TAG':
-            _message = "Dear Admin! \n\n" \
-                       "I couldn't find TAG in files from testsuite '{}'. Please check it.\n\n" \
+
+        elif test_end_status == 'Tester slacking':
+            _message = "Dear Tester! \n\n" \
+                       "You still didn't checked your test!\n" \
+                       "Testsuite = '{}'. Please check it.\n\n" \
                        "Have a nice day!".format(self.get_suitname())
-            messages.append({'message' : _message})
-            subject = "Tests status update - JenkinsError"
+            messages.append({'message' : _message,
+                             'feature' : self.get_suitname()})
+            subject = "Tests status update - You are slacking"
+
 
         if 'feature' in messages[0]:
             for message in messages:
