@@ -25,7 +25,7 @@ import sys
 import copy
 
 
-logger = logging.getLogger("server" + __name__)
+logger = logging.getLogger("server." + __name__)
 
 #######################################################################################
 # temporary

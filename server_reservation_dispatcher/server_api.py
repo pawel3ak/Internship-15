@@ -12,7 +12,7 @@ import os
 import multiprocessing
 from job_manager import job_manager
 
-logger = logging.getLogger("server" + __name__)
+logger = logging.getLogger("server." + __name__)
 
 
 class MainServerApi(object):

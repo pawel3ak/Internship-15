@@ -27,6 +27,8 @@ def config_logger(logger, config_filename):
     config = ConfigParser.RawConfigParser()
     config.read(config_filename)
 
+    logger.setLevel(logging.DEBUG)
+
     # create formatter
     formatter = logging.Formatter(config.get('Logger', 'formatter'),
                                   datefmt=config.get('Logger', 'date_fmt'))

@@ -99,7 +99,7 @@ class JobManagerApi(ReservationQueue):
     def stop_reservation_manager(self):
         self._reservation_manager_handler.join()
 
-    def __send_request_to_reservation_manager(self, request):
+    def __send_request_to_reservation_manager_and_get_response(self, request):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((self._reservation_manager_ip, self._reservation_manager_port))
         sock.send(request)
@@ -108,10 +108,10 @@ class JobManagerApi(ReservationQueue):
         return response
 
     def check_reservation_manager_status(self):
-        return self.__send_request_to_reservation_manager("request/manager_status")
+        return self.__send_request_to_reservation_manager_and_get_response("request/manager_status")
 
     def get_tl_name_from_reservation_manager(self):
-        return self.__send_request_to_reservation_manager("request/get_testline")
+        return self.__send_request_to_reservation_manager_and_get_response("request/get_testline")
 
     def get_tl_status_from_reservation_manager(self, tl_name):
         '''
@@ -125,10 +125,10 @@ class JobManagerApi(ReservationQueue):
         :param tl_name: string
         :return: string
         '''
-        return self.__send_request_to_reservation_manager(("request/status_of_=" + tl_name))
+        return self.__send_request_to_reservation_manager_and_get_response(("request/status_of_=" + tl_name))
 
     def free_testline_in_reservation_manager(self, tl_name):
-        return self.__send_request_to_reservation_manager(("request/free_testline=" + tl_name))
+        return self.__send_request_to_reservation_manager_and_get_response(("request/free_testline=" + tl_name))
 
     @staticmethod
     def update_local_git_repository():
