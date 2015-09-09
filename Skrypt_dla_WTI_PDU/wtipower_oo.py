@@ -13,7 +13,7 @@ def get_scripts_options():
     requiredArguments.add_argument(type=str, dest="circuit_status", help='<on/off>')
     requiredArguments.add_argument(dest="n", help='required CKT name or number')
     args = parser.parse_args()
-    return (args.hostname, args.username, args.password, args.circuit_status, args.n)
+    return (args.hostname, args.password, args.circuit_status, args.n)
 
 
 def convert_circuit_status(circuit_status):
@@ -27,7 +27,8 @@ def convert_circuit_status(circuit_status):
 
 
 class Circuit_Turner():
-    telnet_session=""
+    def __init__(self):
+        self.telnet_session = ""
 
     def check_status(self):
         self.telnet_session.read_until(">")
@@ -40,7 +41,7 @@ class Circuit_Turner():
         self.telnet_session.read_until(">")
         self.telnet_session.write(circuit_status + " "+ckt_name_or_number + "\r\n")
 
-    def set_telnet_session(self,hostname, password):
+    def set_telnet_session(self, hostname, password):
         self.telnet_session = telnetlib.Telnet(hostname, 23, 3)
         self.telnet_session.read_until("Enter Password:")
         self.telnet_session.write(password + "\r\n")
@@ -53,10 +54,10 @@ class Circuit_Turner():
         self.telnet_session.read_until(">")
         self.telnet_session.close()
 if __name__ == "__main__":
-    (hostname, username, password, circuit_status, ckt_name_or_number) = get_scripts_options()
+    (hostname, password, circuit_status, ckt_name_or_number) = get_scripts_options()
     circuit_status_command = convert_circuit_status(circuit_status)
 
-    rcp_circuit_turner=Circuit_Turner()
+    rcp_circuit_turner = Circuit_Turner()
     rcp_circuit_turner.set_telnet_session(hostname, password)
     rcp_circuit_turner.turn_on_or_off_circuit(circuit_status_command, ckt_name_or_number)
     rcp_circuit_turner.confirm_command()
