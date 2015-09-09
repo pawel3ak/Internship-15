@@ -66,9 +66,9 @@ class JobManagerApi(ReservationQueue):
         directory_list = []
         [directory_list.append(x) for x in os.listdir(self._directory_with_testsuites)
             if os.path.isdir(os.path.join(self._directory_with_testsuites, x))]
+        logger.debug("Write new queue to file")
         for directory in directory_list:
             jenkins_info = {'parameters': {'name': directory}}
-            logger.debug("Write new queue to file")
             self.write_new_record_to_queue(jenkins_info)
 
     def start_new_supervisor(self, tl_name, jenkins_info, user_info=None):
