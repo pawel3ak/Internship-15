@@ -27,8 +27,13 @@ import copy
 
 logger = logging.getLogger("server" + __name__)
 
+#######################################################################################
+# temporary
+'''
 from utilities.logger_config import config_logger
 config_logger(logger,'server_config.cfg')
+'''
+########################################################################################
 
 
 class ReservationManager(CloudReservationApi):
@@ -78,7 +83,7 @@ class ReservationManager(CloudReservationApi):
     def request_get_testline(self):
         TLname = self.find_first_free_TL()
         if not TLname == -1:
-            self.set_jobname_for_TL_in_dictionary(TLname,jobname='busy')
+            self.set_jobname_for_TL_in_dictionary(TLname,jobname=True)
             self.make_backup_file()
             return TLname
         else:
@@ -89,7 +94,7 @@ class ReservationManager(CloudReservationApi):
         TLname = re.search("request\/free_testline=(.*)", client_request).group(1)
         if not TLname in self.get_reservation_dictionary():
             return "Testline is not reserved"
-        elif self.get_reservation_dictionary()[TLname]['job'] == '':
+        elif not self.get_reservation_dictionary()[TLname]['job'] :
             return "Testline is already free"
         else:
             print "Freeing TL {}".format(TLname)
@@ -120,7 +125,7 @@ class ReservationManager(CloudReservationApi):
         #TLend_date = datetime.datetime.strptime(TLinfo['end_date'].split('.')[0],"%Y-%m-%d %H:%M:%S")
         TLend_date = TLadd_date.replace(hour=TLadd_date.hour + 8)
         self.__reservations_dictionary[TLname] = {'id' : ID,
-                                                  'job' : '',
+                                                  'job' : False,
                                                   'add_date' : TLadd_date,
                                                   'end_date' : TLend_date,
                                                   'was_extended' : False
@@ -141,7 +146,7 @@ class ReservationManager(CloudReservationApi):
         return self.__reservations_dictionary
 
 
-    def set_jobname_for_TL_in_dictionary(self,TLname, jobname=''):
+    def set_jobname_for_TL_in_dictionary(self,TLname, jobname=False):
         self.__reservations_dictionary[TLname]['job'] = jobname
 
 
