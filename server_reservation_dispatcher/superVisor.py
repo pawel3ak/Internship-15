@@ -39,5 +39,10 @@ if __name__ == '__main__':
                 'name' : 'LTEXYZ'
             }
     }
-    supervise('tl99_test', jenkins_job_info)
+    user_info = {
+        'first_name' : 'Pawel',
+        'last_name' : 'Nogiec',
+        'mail' : 'pawel.nogiec@nokia.com'
+    }
+    supervise('tl99_test', jenkins_job_info, user_info)
 

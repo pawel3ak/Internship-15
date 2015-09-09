@@ -44,12 +44,20 @@ class SuperVisor(Jenkins):
         self.__user_info = user_info          #dict:{first_name : "", last_name : "", mail :""}
         self.__TLname = TLname
         self.__suitname = jenkins_job_info['parameters']['name']
-        super(SuperVisor, self).__init__('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
+
         self.__TLaddress = self.set_TLaddress_from_map()
         self.__failureStatus = None
         self.__are_any_failed_tests = False
         self.__test_end_status = None
         self.__filenames_of_failed_tests = None
+
+        try:
+            super(SuperVisor, self).__init__('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
+        except:
+            self.set_failure_status(124)
+            logger.critical('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+            sys.exit(1)
+
 
         logger.debug("Created new Supervisor object with args: "
                      "jenkins_info = {}, user_info = {}, TLname = {}".format(self.__jenkins_info,
@@ -241,7 +249,7 @@ class SuperVisor(Jenkins):
             self.set_are_any_failed_tests(False)
             self.check_output_for_other_fails_or_errors_and_set_test_end_status()
         elif job_status == "UNKNOWN":
-            self.set_failure_status(127)
+            self.set_failure_status(124)
             self.set_test_end_status("JenkinsError")
             self.finish_with_failure()
         elif job_status == "SUCCESS":
@@ -482,8 +490,31 @@ class SuperVisor(Jenkins):
                 SSHClient.close()
         if not __found:
             self.set_failure_status(111)
-            self.set_test_end_status("NO_TAG")
             logger.warning('{} : {}'.format(LOGGER_INFO[self.get_failure_status()], old_tag))
+
+
+    def get_logs_link(self):
+        if self.get_job_status() == "SUCCESS":
+            t = self.get_job_handler().get_last_build().get_timestamp()
+            build_time = '{}-{:02g}-{:02g}_{:02g}-{:02g}-{:02g}'.format(t.year, t.month, t.day, (t.hour-(time.altzone/3600)), t.minute, t.second)
+            logs_url_address = 'http://10.83.200.35/~ltebox/logs/{}_{}/log.html'.format(self.__TLname, build_time)
+        else:
+            logs_url_address = '{url}/job/{job_name}/{bn}/console'.format(url= 'http://plkraaa-jenkins.emea.nsn-net.net:8080',
+                                                                  job_name=self.get_jobname(),
+                                                                  bn=self.get_job_handler().get_last_buildnumber())
+        return logs_url_address
+
+
+    def choose_recipent_name(self):
+        if self.get_user_info():
+            recipent_name = "{} {}".format(self.get_user_info()['first_name'],
+                                           self.get_user_info()['last_name'])
+        else:
+            if self.get_test_end_status() == "GOT_FAIL" or self.get_test_end_status() == "Tester slacking":
+                recipent_name = "Tester"
+            else:
+                recipent_name = "Admin"
+        return recipent_name
 
 
     def set_mail_message_and_subject(self):
@@ -492,14 +523,17 @@ class SuperVisor(Jenkins):
 
         if test_end_status == "SUCCESSFUL":
             if self.get_user_info():
-                _message = "Dear {} {}!\n\n" \
-                           "Your test '{}' was successful\n\n" \
-                           "Have a nice day!".format(self.get_user_info()['first_name'],
-                                                     self.get_user_info()['last_name'])
+                _message = "Dear {}!\n\n" \
+                           "Your test '{}' status is {}\n" \
+                           "Logs are available at {}\n\n" \
+                           "Have a nice day!".format(self.choose_recipent_name(),
+                                                     self.get_suitname(),
+                                                     self.get_job_status(),
+                                                     self.get_logs_link())
                 messages.append({'message' : _message})
-                subject = "Test status update - Success"
+                subject = "Test status update"
             else:
-                return 0
+                return (0, 0)
 
         elif test_end_status == "GOT_FAILS":
             t = self.get_job_handler().get_last_build().get_timestamp()
@@ -511,11 +545,12 @@ class SuperVisor(Jenkins):
                 failed_tests_information += "{test_name}.{filename}\n".format(
                     test_name=self.get_suitname(),
                     filename=filename)
-            _message = "Dear tester! \n\n" \
+            _message = "Dear {}! \n\n" \
                         "Your test have failed: \n\n" \
                         "{test_info}\n\n" \
                         "Logs are available at: {logs_link}\n\n" \
-                        "Have a nice day!".format(test_info=failed_tests_information,
+                        "Have a nice day!".format(self.choose_recipent_name(),
+                                                  test_info=failed_tests_information,
                                                   logs_link=logs_url_address)
             messages.append({'message' : _message,
                             'feature' : self.get_suitname()})
@@ -526,44 +561,47 @@ class SuperVisor(Jenkins):
             logs_url_address = '{url}/job/{job_name}/{bn}/console'.format(url= 'http://plkraaa-jenkins.emea.nsn-net.net:8080',
                                                                   job_name=self.get_jobname(),
                                                                   bn=self.get_job_handler().get_last_buildnumber())
-            _message = "Dear Admin! \n\n" \
+            _message = "Dear {}! \n\n" \
                        "Tests on {tl_name} occured unknown fail.\n" \
                        "Please check logs available at: {logs_link} \n\n" \
-                       "Have a nice day!".format(tl_name=self.get_TLname(),
+                       "Have a nice day!".format(self.choose_recipent_name(),
+                                                 tl_name=self.get_TLname(),
                                                  logs_link=logs_url_address)
             messages.append({'message' : _message})
             subject = "Tests status update - finished with unknown fail"
 
 
         elif test_end_status == 'JenkinsError':
-            _message = "Dear Admin! \n\n" \
+            _message = "Dear {}! \n\n" \
                        "There is some problems with Jenkins. Please check it.\n\n" \
-                       "Have a nice day!"
+                       "Have a nice day!".format(self.choose_recipent_name())
             messages.append({'message' : _message})
             subject = "Tests status update - JenkinsError"
 
 
         elif test_end_status == 'SSH_Connection_Failure':
-            _message = "Dear Admin! \n\n" \
+            _message = "Dear {}! \n\n" \
                        "There is some problems with SSH connection to Belvedere. Please check it.\n\n" \
-                       "Have a nice day!"
+                       "Have a nice day!".format(self.choose_recipent_name())
             messages.append({'message' : _message})
             subject = "Tests status update - SSHError"
 
 
         elif test_end_status == 'Tester slacking':
-            _message = "Dear Tester! \n\n" \
+            _message = "Dear {}! \n\n" \
                        "You still didn't checked your test!\n" \
                        "Testsuite = '{}'. Please check it.\n\n" \
-                       "Have a nice day!".format(self.get_suitname())
+                       "Have a nice day!".format(self.choose_recipent_name(),
+                                                 self.get_suitname())
             messages.append({'message' : _message,
                              'feature' : self.get_suitname()})
             subject = "Tests status update - You are slacking"
-
         return messages, subject
 
     def send_information_about_executed_job(self):
-        messages, subject = self.set_mail_message_and_subject()
+        (messages, subject) = self.set_mail_message_and_subject()
+        if messages == 0 and subject == 0:
+            return 0
 
         if self.get_user_info():
             recipents = self.get_user_info()['mail']
@@ -579,14 +617,3 @@ class SuperVisor(Jenkins):
         send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
         send.connect()
         send.send(mail)
-
-        # else:
-        #     mail = ute_mail.mail.Mail(subject=subject,message=messages[0]['message'],
-        #                                   recipients=admin['mail'],  #Bartek Kukla (?) mail here
-        #                                   name_from="Reservation Api")          #We need to figure out better name
-        #     send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
-        #     send.connect()
-        #     send.send(mail)
-
-    # def git_launch(self, file_info=None, pull_only=None):
-    #     return git_launch(TL_address=self.TLaddress, file_info=file_info, pull_only=pull_only)

@@ -13,7 +13,11 @@ LOGGER_INFO = {
     112: "Opening file to change tag failed (probably wrong file name)",
     113: "No duration in reseration_data",
     114: "Git error",
+    124: "Problems with connecting to Jenkins",
     128: "SSH Connection Failure",
     129: "TAG not found in proper line",
-    1103: "User max reservation count exceeded"
+    1102: "Reservation already exists",
+    1103: "User max reservation count exceeded",
+    1104: "Connecting to cloud_ute failure",
+    1105: "SMPT server failure"
 }
