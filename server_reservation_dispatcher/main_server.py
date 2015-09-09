@@ -16,7 +16,6 @@ CONFIG_FILE = 'server_config.cfg'
 
 # create logger
 logger = logging.getLogger("server")
-logger.setLevel(logging.DEBUG)
 config_logger(logger, CONFIG_FILE)
 
 
