@@ -27,6 +27,10 @@ import copy
 
 logger = logging.getLogger("server" + __name__)
 
+from utilities.logger_config import config_logger
+config_logger(logger,'server_config.cfg')
+
+
 class ReservationManager(CloudReservationApi):
     def __init__(self):
         super(ReservationManager, self).__init__(api_token='99e66a269e648c9c1a3fb896bec34cd04f50a7d2', api_address='http://cloud.ute.inside.nsn.com')
@@ -97,15 +101,8 @@ class ReservationManager(CloudReservationApi):
     def __create_reservation(self):
         try:
             ID = (super(ReservationManager, self).create_reservation(testline_type = "CLOUD_F", duration = 480))
-            if ID == 102:
-                logger.warning('{}'.format(LOGGER_INFO[1102]))
-                return 102
-            elif ID == 103:
-                logger.warning('{}'.format(LOGGER_INFO[1103]))
-                return 103
-            else:
-                return ID
-        except ApiMaxReservationCountExceededException:
+            return ID
+        except:
             return -103  # User max reservation count exceeded
 
 
@@ -117,6 +114,7 @@ class ReservationManager(CloudReservationApi):
                 time.sleep(5)
             else:
                 TLname = TLinfo['testline']['name']
+                print TLname
                 break
         TLadd_date = datetime.datetime.strptime(TLinfo['add_date'].split('.')[0],"%Y-%m-%d %H:%M:%S")
         #TLend_date = datetime.datetime.strptime(TLinfo['end_date'].split('.')[0],"%Y-%m-%d %H:%M:%S")
@@ -150,12 +148,13 @@ class ReservationManager(CloudReservationApi):
     def create_reservation_and_set_TL_info(self):
         try:
             ID = self.__create_reservation()
-            if ID ==102 or ID ==103:
-                pass
             print ID
             self.__set_TLinfo(ID)
         except:
-            logger.error('{}'.format(LOGGER_INFO[1104]))
+            if ID == -102:
+                logger.warning('{}'.format(LOGGER_INFO[1102]))
+            elif ID == -103:
+                logger.warning('{}'.format(LOGGER_INFO[1103]))
 
 
     def release_reservation(self, TLname):
@@ -220,11 +219,11 @@ class ReservationManager(CloudReservationApi):
 
 
     def remove_TL_from_reservations_dictionary(self,TLname):
-        del self.__reservations_dictionary[TLname]
+        self.__reservations_dictionary.pop(TLname)
 
 
     def check_if_TL_reservation_didnt_expire_during_breakdown(self):
-        for TLname in self.get_reservation_dictionary():
+        for TLname in self.get_reservation_dictionary().keys():
             status = self.get_reservation_status(TLname)
             if status > 3:
                 self.release_reservation(TLname)
@@ -236,26 +235,24 @@ class ReservationManager(CloudReservationApi):
         if True:
             for TLname in self.get_reservation_dictionary():
                 TLinfo = self.get_reservation_dictionary()[TLname]
-                # print TLinfo['end_date']
-                # print TLinfo
                 if TLinfo['job']:
-                            #and (TLinfo['end_date'] - datetime.datetime.utcnow()).total_seconds() < 60*30:
-                    # self.extend_reservation(TLname,30)    #not yet
-                    #self.set_end_date(TLname) #extend by 120min
+                            # and (TLinfo['end_date'] - datetime.datetime.utcnow()).total_seconds() < 60*30:
+                    # self.extend_reservation(TLname,30)    ##not yet implemented
+                    # self.set_end_date(TLname) ##extend by 120min
                     pass
                 elif (not TLinfo['job'] and no_free_TL == True) or \
                         (not TLinfo['job'] and
                                  (datetime.datetime.utcnow() -
                                       TLinfo['add_date']).total_seconds() > 60*60*24):
-                    #no active job and less than <delta> available TL
-                    #or
-                    #no active job and reservation is longer than 24h (60s*60m*24h)
+                    ##no active job and less than <delta> available TL
+                    ##or
+                    ##no active job and reservation is longer than 24h (60s*60m*24h)
                     self.release_reservation(TLname)
                     self.remove_TL_from_reservations_dictionary()
                     self.make_backup_file()
                 elif (TLinfo['end_date'] - datetime.datetime.utcnow()).total_seconds() < 60*30:
                     # self.extend_reservation(TLname,120)    #not yet
-                    #self.set_end_date(TLname) #extend by 120min
+                    # self.set_end_date(TLname) #extend by 120min
                     pass
 
 
@@ -338,15 +335,13 @@ def managing_reservations():
         print "MAXTL = {}".format(ReservManager.MAXTL)
         if ReservManager.get_available_tl_count_group_by_type()['CLOUD_F'] > ReservManager.FREETL:
             if len(ReservManager.get_reservation_dictionary()) < ReservManager.MAXTL:
-                print "no wzialbym cos..."
                 ReservManager.create_reservation_and_set_TL_info()
                 ReservManager.make_backup_file()
-                print "zarezerwowalem"
             else:
                 pass
         ReservManager.periodically_check_all_TL_for_extending_or_releasing(no_free_TL=False)
         print ReservManager.get_reservation_dictionary()
-        time.sleep(10)
+        time.sleep(30)
 
 
 if __name__ == "__main__":
