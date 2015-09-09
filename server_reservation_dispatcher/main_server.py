@@ -31,7 +31,6 @@ def main_server():
     server.set_up_server()
     logger.info("Start server loop - waiting for request")
     while True:
-        print "hehe"
         [connection, data] = server.get_request_from_client()
         server.response_for_client_request(connection, data)
     server.stop_server()
