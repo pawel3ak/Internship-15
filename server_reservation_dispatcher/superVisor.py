@@ -15,12 +15,12 @@ def supervise(TLname, jenkins_job_info, user_info = None):
     superVisor_api.make_file_with_specific_info()
     superVisor_api.set_jenkins_connection()
     superVisor_api.set_job_handler()
-    if superVisor_api.is_queued_or_running():
-        superVisor_api.set_job_status()
-        superVisor_api.check_job_status()
-    superVisor_api.set_node_for_job()
-    superVisor_api.build_job()
+    if not superVisor_api.is_queued_or_running(once = True):
+        superVisor_api.set_node_for_job()
+        superVisor_api.build_job()
     superVisor_api.is_queued_or_running()
+    superVisor_api.set_job_status()
+    superVisor_api.check_job_status()
     superVisor_api.set_job_status()
     superVisor_api.check_job_status()
     if superVisor_api.get_job_status() == "SUCCESS":
@@ -36,7 +36,7 @@ def supervise(TLname, jenkins_job_info, user_info = None):
 if __name__ == '__main__':
     jenkins_job_info = {
             'parameters' : {
-                'name' : 'LTEXYZ'
+                'name' : 'LTE2351'
             }
     }
     user_info = {

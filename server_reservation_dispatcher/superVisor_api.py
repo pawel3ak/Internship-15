@@ -133,6 +133,14 @@ class SuperVisor(Jenkins):
         self.__jenkins_info['jobname'] = 'test_on_{}'.format(self.get_TLname())
 
 
+    def get_job_build_number(self):
+        return self.__jenkins_info['build_number']
+
+
+    def set_job_build_number(self, build_number):
+        self.__jenkins_info['build_number'] = build_number
+
+
     def get_jobname(self):
         if 'jobname' in self.get_jenkins_info():
             return self.__jenkins_info['jobname']
@@ -231,7 +239,7 @@ class SuperVisor(Jenkins):
 
     def set_job_status(self):
         try:
-            self.__jenkins_info['job_status'] = self.get_job_handler().get_last_build().get_status()
+            self.__jenkins_info['job_status'] = self.get_job_handler().get_build(self.get_job_build_number()).get_status()
         except:
             self.__jenkins_info['job_status'] = "UNKNOWN"
             self.set_failure_status(105)
@@ -256,12 +264,21 @@ class SuperVisor(Jenkins):
             pass
 
 
-    def is_queued_or_running(self):
+    def is_queued_or_running(self, once=False):
+        while True:
+            if self.get_job_handler().is_queued():
+                time.sleep(3)
+            else:
+                break
+        self.set_job_build_number(self.get_job_handler().get_last_buildnumber())
+        if once:
+            return self.get_job_handler().is_queued_or_running()
         try:
             while True:
                 if self.get_job_handler().is_queued_or_running():
                     time.sleep(3)       #TODO LONGER SLEEP LATER
-                else:   break
+                else:
+                    return False
         except:
             self.set_failure_status(124)
             self.set_test_end_status("JenkinsError")
@@ -283,7 +300,7 @@ class SuperVisor(Jenkins):
 
     def set_jenkins_console_output(self):
         try:
-            self.set_job_output(self.get_job_handler().get_last_build().get_console())
+            self.set_job_output(self.get_job_handler().get_build(self.get_job_build_number()).get_console())
             logger.debug("Console output retrieved from {}".format(self.get_jobname()))
         except:
             self.set_failure_status(108)
@@ -304,7 +321,9 @@ class SuperVisor(Jenkins):
                 if match[-3:] == '...': match = match[:-3]  #cutting last "..."
                 elif match[-1:] == '_': match = match[:-1]    #cutting last "_"
                 try:
-                    match = re.search('\w*\.Tests\.{}.*\.({}.*)'.format(self.get_suitname()), match).group(1)
+                    match = re.search('\w*\.Tests\.{}.*\.({}.*)'.format(self.get_suitname(),
+                                                                        self.get_suitname()),
+                                      match).group(1)
                     job_filenames_failed_tests.append(match)
                 except:
                     try:
@@ -484,7 +503,6 @@ class SuperVisor(Jenkins):
 
             except:
                 self.set_failure_status(112)
-                self.set_test_end_status("SSH_Connection_Failure")
                 logger.warning('{}'.format(LOGGER_INFO[self.get_failure_status()]))
             finally:
                 SSHClient.close()
@@ -560,7 +578,7 @@ class SuperVisor(Jenkins):
         elif test_end_status == 'UNKNOWN_ERROR/FAIL':
             logs_url_address = '{url}/job/{job_name}/{bn}/console'.format(url= 'http://plkraaa-jenkins.emea.nsn-net.net:8080',
                                                                   job_name=self.get_jobname(),
-                                                                  bn=self.get_job_handler().get_last_buildnumber())
+                                                                  bn=self.get_job_build_number())
             _message = "Dear {}! \n\n" \
                        "Tests on {tl_name} occured unknown fail.\n" \
                        "Please check logs available at: {logs_link} \n\n" \
