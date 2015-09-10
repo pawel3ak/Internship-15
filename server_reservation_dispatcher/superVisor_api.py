@@ -270,7 +270,13 @@ class SuperVisor(Jenkins):
                 time.sleep(3)
             else:
                 break
-        self.set_job_build_number(self.get_job_handler().get_last_buildnumber())
+        try:
+            self.set_job_build_number(self.get_job_handler().get_last_buildnumber())
+        except:
+            self.set_failure_status(124)
+            logger.critical(LOGGER_INFO[self.get_failure_status()])
+            self.set_test_end_status("JenkinsError")
+            self.finish_with_failure()
         if once:
             return self.get_job_handler().is_queued_or_running()
         try:
