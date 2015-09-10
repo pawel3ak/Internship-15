@@ -194,3 +194,17 @@ drwxr-xr-x  2 ute ute 4096 Sep  9 07:59 pddb
 drwxr-xr-x  4 ute ute 4096 Aug 12 15:00 server_Internship-14
 drwxr-xr-x  4 ute ute 4096 Sep 10 14:05 server_reservation_dispatcher
 drwxr-xr-x  3 ute ute 4096 Sep  9 09:55 Skrypt_dla_WTI_PDU
+total 60
+drwxr-xr-x 11 ute ute 4096 Sep 10 13:03 .
+drwxr-xr-x  3 ute ute 4096 Aug  5 15:43 ..
+-rw-r--r--  1 ute ute 9338 Sep 10 14:06 cos
+drwxr-xr-x  8 ute ute 4096 Sep 10 14:14 .git
+drwxr-xr-x  3 ute ute 4096 Aug 19 11:21 .idea
+-rw-r--r--  1 ute ute   19 Aug 19 11:21 __init__.py
+drwxr-xr-x  5 ute ute 4096 Sep  2 17:35 _jenkins
+drwxr-xr-x  2 ute ute 4096 Aug 31 14:50 LMTS_init
+drwxr-xr-x  3 ute ute 4096 Sep  3 17:39 Logs_parser
+drwxr-xr-x  2 ute ute 4096 Sep  9 07:59 pddb
+drwxr-xr-x  4 ute ute 4096 Aug 12 15:00 server_Internship-14
+drwxr-xr-x  4 ute ute 4096 Sep 10 14:14 server_reservation_dispatcher
+drwxr-xr-x  3 ute ute 4096 Sep  9 09:55 Skrypt_dla_WTI_PDU
