@@ -33,7 +33,7 @@ def git_action(ssh_process, command, comment = None):
                              pexpect.TIMEOUT]#9
     ssh_process.sendline(command)
     while True:
-        match = ssh_process.expect(exepcted_matches_list, timeout=1)
+        match = ssh_process.expect(exepcted_matches_list, timeout=5)
         print "command = {}\n".format(command)
         print ssh_process
         print "\n"
