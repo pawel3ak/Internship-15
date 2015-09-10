@@ -16,7 +16,10 @@ config_logger(logger, 'server_config.cfg')
 path = '/home/ute/PycharmProjects/projekty/Internship-15'
 
 
-def git_action(ssh_process, command):
+def git_action(ssh_process, command, comment = None):
+    if comment:
+        command = '{} -m "{}"'.format(command,comment)
+
     exepcted_matches_list = ['Writing objects:.*done',#0
                              'Unpacking objects:.*done',#1
                              'no changes added to commit',#2
@@ -24,8 +27,10 @@ def git_action(ssh_process, command):
                              'fatal',#4
                              '.*up-to-date',#5
                              'Password.*:',#6
-                             pexpect.EOF,#7
-                             pexpect.TIMEOUT]#8
+                             '.*~//PycharmProjects/projekty/Internship-15.*',#7
+                             '.*{}.*'.format(comment),#8
+                             pexpect.EOF,#8
+                             pexpect.TIMEOUT]#9
     ssh_process.sendline(command)
     while True:
         match = ssh_process.expect(exepcted_matches_list, timeout=1)
@@ -60,6 +65,9 @@ def git_action(ssh_process, command):
             print ssh_process.after
             return True
         elif match == 8:
+            print ssh_process.after
+            return True
+        elif match == 9:
             pass
 
 
