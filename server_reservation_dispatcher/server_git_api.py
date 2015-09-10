@@ -90,7 +90,7 @@ def git_launch(TL_address, path, pull_only=True):
     # if not result:
     #     return False
     #git commit
-    result = git_action(ssh_process, 'git commit -m "Testing git_api"')
+    result = git_action(ssh_process, 'git commit', 'Testing git_api')
     if not result:
         return False
     # git push
