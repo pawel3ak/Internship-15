@@ -3,8 +3,19 @@ import pexpect
 import re
 import paramiko
 import time
+import logging
+
+# create logger
+logger = logging.getLogger("server." + __name__)
+#################################################
+################ temporary ######################
+from utilities.logger_config import config_logger
+config_logger(logger, 'server_config.cfg')
+#################################################
 
 path = '/home/ute/PycharmProjects/projekty/Internship-15'
+
+
 def git_action(ssh_process, command):
     exepcted_matches_list = ['Writing objects:.*done', 'Unpacking objects:.*done', 'no changes added to commit',
                'Aborting commit', 'fatal', '.*up-to-date', 'Password.*:', pexpect.EOF, pexpect.TIMEOUT]
@@ -20,11 +31,16 @@ def git_action(ssh_process, command):
         elif match == 1:
             return True
         elif match == 2:
-            return "Commit failure - no changes"
+            logger.error("Commit failure - no changes")
+            # non empty string bool value is True and we cannot break git_launch function
+            # if something goes wrong
+            return False
         elif match == 3:
-            return "Commit failure - aborting"
+            logger.error("Commit failure - aborting")
+            return False
         elif match == 4:
-            return "Fatal failure - no file to add"
+            logger.error("Fatal failure - no file to add")
+            return False
         elif match == 5:
             return True
         elif match == 6:
@@ -32,26 +48,31 @@ def git_action(ssh_process, command):
             passwd = ""
             ssh_process.sendline(passwd)
         elif match == 7:
-            return "Unknown failure"
+            logger.error("Unknown failure")
+            return False
         else:
-            return ssh_process.before
+            logger.error("I don't know what's happened")
+            print ssh_process.before
+            return None
 
 
-def git_launch(TL_address, file_info, pull_only):
-    if not pull_only:
-        pull_only = False
-    print "pull only = ", pull_only
+def git_launch(TL_address, file_info, pull_only=True):
+    print "pull only = ", pull_only # TODO remove
     ssh_process = ssh_for_git(TL_address)
-    print "ssh_process = ", ssh_process
+    logger.debug("ssh_process = {}".format(ssh_process))
+
     # git pull
     result = git_action(ssh_process, 'git pull')
     print "result = ", result
-    if not result == True: return result
-    if pull_only == True: return True
+    if not result:
+        return False
+    if pull_only:
+        return True
     # print 'git add {}'.format(os.path.join(file_info[0],file_info[1]))
     # print 'git commit "Removing tag from file "{}""'.format(file_info[1])
     #git add
-    # result = git_action('git add {}'.format(os.path.join(file_info[0],file_info[1])))
+    # result = git_action('git add {}'.format(os.path.
+    # join(file_info[0],file_info[1])))
     # if not result == True: return result
     # git commit
     # result = git_action('git commit "Removing tag from file "{}""'.format(file_info[1]))
@@ -64,7 +85,7 @@ def git_launch(TL_address, file_info, pull_only):
 
 def ssh_for_git(TL_address):
     ssh_command = "ssh {user}@{host}".format(user="ute", host=TL_address)
-    print ssh_command
+    logger.info(ssh_command)
     ssh_process = pexpect.spawn(ssh_command)
     match = ssh_process.expect(["password:", pexpect.EOF, pexpect.TIMEOUT], timeout=3)
     if match == 0:
@@ -96,5 +117,5 @@ def ssh_for_git(TL_address):
     # client.connect(TL_address, username='ute', password='ute')
     # return client
 
-if __name__ is "__main__":
-    git_launch('wmp-tl99.lab0.krk-lab.nsn-rdnet.net', file_info=None, pull_only=True)
+if __name__ == "__main__":
+    git_launch('localhost', file_info=None, pull_only=True)
