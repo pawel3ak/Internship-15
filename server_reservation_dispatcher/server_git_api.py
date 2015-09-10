@@ -35,10 +35,10 @@ def git_action(ssh_process, command, comment = None):
     while True:
         match = ssh_process.expect(exepcted_matches_list, timeout=1)
         if match == 0:
-            print ssh_process.after
+            # print ssh_process.after
             return True
         elif match == 1:
-            print ssh_process.after
+            # print ssh_process.after
             return True
         elif match == 2:
             logger.error("Commit failure - no changes")
@@ -52,17 +52,17 @@ def git_action(ssh_process, command, comment = None):
             logger.error("Fatal failure - no file to add")
             return False
         elif match == 5:
-            print ssh_process.after
+            # print ssh_process.after
             return True
         elif match == 6:
             # passwd = "Flexi1234"
             passwd = "pawel879a!"
             ssh_process.sendline(passwd)
         elif match == 7:
-            print ssh_process.after
+            # print ssh_process.after
             return True
         elif match == 8:
-            print ssh_process.after
+            # print ssh_process.after
             return True
         elif match == 9:
             pass
@@ -75,7 +75,7 @@ def git_launch(TL_address, path, pull_only=True):
 
     # git pull
     result = git_action(ssh_process, 'git pull')
-    print "result = ", result
+    # print "result = ", result
     if not result:
         return False
     if pull_only:
