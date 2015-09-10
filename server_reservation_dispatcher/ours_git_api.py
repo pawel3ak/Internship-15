@@ -36,7 +36,9 @@ def git_action(ssh_process, command, comment = None):
 
     while True:
         match = ssh_process.expect(exepcted_matches_list, timeout=3)
-        logger.info('{}'.format(exepcted_matches_list.index(match)))
+        print match
+        print command
+        logger.info('{}'.format(exepcted_matches_list[match]))
         if match == 0:
             continue
         elif match == 1:

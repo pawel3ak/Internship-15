@@ -77,14 +77,12 @@ class MainServerApi(object):
         logger.debug("Make necessary directories")
         config = ConfigParser.RawConfigParser()
         config.read(self._config_filename)
-        if not os.path.isdir(config.get('Server', 'directory')):
-            os.makedirs(config.get('Server', 'directory'))
-        if not os.path.isdir(config.get('ReservationManager', 'directory')):
-            os.makedirs(config.get('ReservationManager', 'directory'))
-        if not os.path.isdir(config.get('JobManager', 'directory')):
-            os.makedirs(config.get('JobManager', 'directory'))
-        if not os.path.isdir(config.get('SuperVisor', 'directory')):
-            os.makedirs(config.get('SuperVisor', 'directory'))
+        for section in config.sections():
+            try:
+                if not os.path.isdir(config.get(section, 'directory')):
+                    os.makedirs(config.get(section, 'directory'))
+            except ConfigParser.NoOptionError, err:
+                logger.warning(err)
 
     def start_job_manager(self):
         self._job_manager_handler = multiprocessing.Process(target=job_manager, args=(self._config_filename,))

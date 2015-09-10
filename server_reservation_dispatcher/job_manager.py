@@ -24,10 +24,9 @@ def start_suites_from_job_manager_dictionary(manager):
         if status == "Active":
             manager.start_new_supervisor(key, dictionary[key])
         elif not status:
-            logger.debug("Connection error")
+            logger.debug("Connection error\\Wrong request")
         else:
             manager.remove_record_from_job_manager_dictionary(key)
-
     manager.write_job_manager_dictionary_to_file()
 
 
@@ -72,11 +71,14 @@ def job_manager(config_filename='server_config.cfg'):
                 logger.debug("No available TL")
                 break
             if not tl_name:
-                logger.debug("Connection error")
+                logger.debug("Connection error\\Wrong request")
                 break
             else:
                 if manager.get_queue_length() == 0:
-                    manager.update_local_git_repository()
+                    try:
+                        manager.update_local_git_repository()
+                    except Exception, err:
+                        print err
                     manager.make_tests_queue_from_testsuites_dir()
                 next_suite = manager.read_next_reservation_record_and_delete_from_queue()
                 manager.start_new_supervisor(tl_name, next_suite)

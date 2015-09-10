@@ -15,7 +15,7 @@ import socket
 from time import sleep
 from utilities.reservation_queue import ReservationQueue
 from superVisor import supervise
-from server_git_api import git_launch
+from ours_git_api import git_launch
 from reservation_manager_api import managing_reservations
 
 # create logger
@@ -56,7 +56,7 @@ class JobManagerApi(ReservationQueue):
         for key in self._supervisors_handlers_dictionary.keys():
             # check if job is finished
             if not self._supervisors_handlers_dictionary[key].is_alive():
-                logger.debug("Delete from dictionaries: {}".format(key))
+                logger.debug("Free in RM and delete from dictionaries: {}".format(key))
                 self.free_testline_in_reservation_manager(key)
                 del self._supervisors_handlers_dictionary[key]
                 del self._job_manager_dictionary[key]
@@ -120,6 +120,9 @@ class JobManagerApi(ReservationQueue):
             response = sock.recv(1024)
             logger.debug("Receive from RM: {}".format(response))
             sock.close()
+            if response == "Unknown command":
+                logger.warning("Response from RM = \"Unknown command\"")
+                return False
             return response
         except socket.error, err:
             print err
@@ -129,8 +132,8 @@ class JobManagerApi(ReservationQueue):
     def check_reservation_manager_status(self):
         return self.__send_request_to_rm_and_get_response("request/manager_status")
 
-    def get_tl_name_from_reservation_manager(self):
-        return self.__send_request_to_rm_and_get_response("request/get_testline")
+    def get_tl_name_from_reservation_manager(self, cloud_type="CLOUD_F"):
+        return self.__send_request_to_rm_and_get_response("request/get_testline&cloud={}".format(cloud_type))
 
     def get_tl_status_from_reservation_manager(self, tl_name):
         '''
@@ -149,13 +152,10 @@ class JobManagerApi(ReservationQueue):
     def free_testline_in_reservation_manager(self, tl_name):
         return self.__send_request_to_rm_and_get_response(("request/free_testline=" + tl_name))
 
-    @staticmethod
-    def update_local_git_repository():
+    def update_local_git_repository(self):
         logger.debug("Update local git repository")
-        git_launch('localhost', file_info=None, pull_only=True)
+        git_launch('localhost', self._directory_with_testsuites, pull_only=True)
 
 
 if __name__ == "__main__":
-    job_manager = JobManagerApi()
-    job_manager.start_reservation_manager()
     pass
