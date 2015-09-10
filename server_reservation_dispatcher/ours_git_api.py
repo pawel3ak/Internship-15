@@ -1,19 +1,19 @@
-import os
+# -*- coding: utf-8 -*-
+"""
+:created on: '11/08/15'
+
+:copyright: Nokia
+:author: Pawel Nogiec
+:contact: pawel.nogiec@nokia.com
+"""
+
 import pexpect
-import re
 import time
 import logging
 
 
 # create logger
 logger = logging.getLogger("server." + __name__)
-#################################################
-################ temporary ######################
-from utilities.logger_config import config_logger
-config_logger(logger, 'server_config.cfg')
-#################################################
-
-path = '/home/ute/PycharmProjects/projekty/Internship-15'
 
 
 def git_action(ssh_process, command, comment = None):
@@ -35,15 +35,11 @@ def git_action(ssh_process, command, comment = None):
     while True:
         match = ssh_process.expect(exepcted_matches_list, timeout=1)
         if match == 0:
-            # print ssh_process.after
             return True
         elif match == 1:
-            # print ssh_process.after
             return True
         elif match == 2:
             logger.error("Commit failure - no changes")
-            # non empty string bool value is True and we cannot break git_launch function
-            # if something goes wrong
             return False
         elif match == 3:
             logger.error("Commit failure - aborting")
@@ -52,30 +48,22 @@ def git_action(ssh_process, command, comment = None):
             logger.error("Fatal failure - no file to add")
             return False
         elif match == 5:
-            # print ssh_process.after
             return True
         elif match == 6:
-            # passwd = "Flexi1234"
-            passwd = "pawel879a!"
+            passwd = "Flexi1234"
             ssh_process.sendline(passwd)
         elif match == 7:
-            # print ssh_process.after
             return True
         elif match == 8:
-            # print ssh_process.after
             return True
         elif match == 9:
             pass
 
 
-
 def git_launch(TL_address, path, pull_only=True):
     ssh_process = ssh_for_git(TL_address, path)
-    logger.debug("ssh_process = {}".format(ssh_process))
-
     # git pull
     result = git_action(ssh_process, 'git pull')
-    # print "result = ", result
     if not result:
         return False
     if pull_only:
@@ -112,7 +100,6 @@ def ssh_for_git(TL_address, path):
             return ssh_process
 
 
-if __name__ == "__main__":
-    path = "/home/ute/PycharmProjects/projekty/Internship-15"
-    # path = "/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/LTEtest"
-    print git_launch('localhost', path, pull_only=False)
+# if __name__ == "__main__":
+#     path = "/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/LTEtest"
+#     print git_launch('localhost', path, pull_only=False)
