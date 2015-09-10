@@ -68,7 +68,7 @@ def git_action(ssh_process, command, comment = None):
             print ssh_process.after
             return True
         elif match == 9:
-            pass
+            return True
 
 
 
