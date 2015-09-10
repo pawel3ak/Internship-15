@@ -1,0 +1,162 @@
+2015-08-26,09:42:37     INFO:                     Dispatcher -                    main_server:     Start new thread with checking loop
+2015-08-26,09:42:37     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Start processes for existing reservations
+2015-08-26,09:42:37     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:42:58     INFO:                     Dispatcher -                    main_server:     Start new thread with checking loop
+2015-08-26,09:42:58     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Start processes for existing reservations
+2015-08-26,09:42:58     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:42:59     INFO:       Dispatcher.checking_loop -     checking_reservation_queue:     Start new job from queue
+2015-08-26,09:43:18     INFO:                     Dispatcher -                    main_server:     Start server loop - waiting for request
+2015-08-26,09:43:32     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:44:03     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:44:39     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:45:09     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:45:40     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:46:11     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:46:41     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:47:11     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:47:42     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:48:12     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:48:42     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:48:43     INFO:       Dispatcher.checking_loop -     checking_reservation_queue:     Start new job from queue
+2015-08-26,09:49:16     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:49:46     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:50:16     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:50:46     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:51:17     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:51:47     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:52:17     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:52:47     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:53:18     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:53:48     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:54:18     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:54:49     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:55:19     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:55:49     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:56:20     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:56:50     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:57:20     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:57:51     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:58:21     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:58:51     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:59:21     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,09:59:52     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:00:22     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:00:52     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:01:23     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:01:53     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:02:24     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:02:54     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:03:24     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:03:24     INFO:       Dispatcher.checking_loop -               end_finished_job:     End reservation with ID: 68915
+2015-08-26,10:03:55     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:04:25     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:04:55     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:05:26     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:05:26     INFO:       Dispatcher.checking_loop -     checking_reservation_queue:     Start new job from queue
+2015-08-26,10:05:59     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:06:29     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:07:00     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:07:30     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:08:00     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:08:31     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:09:01     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:09:31     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:10:02     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:10:32     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:11:02     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:11:32     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:12:03     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:12:33     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:12:33     INFO:       Dispatcher.checking_loop -               end_finished_job:     End reservation with ID: 68916
+2015-08-26,10:13:03     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:13:34     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:14:04     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:14:34     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:14:35     INFO:       Dispatcher.checking_loop -     checking_reservation_queue:     Start new job from queue
+2015-08-26,10:15:08     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:15:38     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:16:08     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:16:38     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:17:09     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:17:40     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:18:10     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:18:41     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:19:11     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:19:41     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:20:11     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:20:42     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:21:13     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:21:43     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:22:13     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:22:44     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:22:44     INFO:       Dispatcher.checking_loop -               end_finished_job:     End reservation with ID: 68919
+2015-08-26,10:23:16     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:23:46     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:24:18     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:24:48     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:24:49     INFO:       Dispatcher.checking_loop -     checking_reservation_queue:     Start new job from queue
+2015-08-26,10:25:22     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:25:52     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:26:22     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:26:52     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:27:23     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:27:53     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:28:23     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:28:54     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:29:24     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:29:54     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:30:25     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:30:55     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:31:26     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:31:26     INFO:       Dispatcher.checking_loop -               end_finished_job:     End reservation with ID: 68922
+2015-08-26,10:31:57     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:32:27     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:32:57     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:33:28     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:33:58     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:34:28     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:34:59     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:35:29     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:36:00     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:36:30     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:37:00     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:37:30     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:38:01     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:38:31     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:39:01     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:41:49     INFO:                     Dispatcher -                    main_server:     Start new thread with checking loop
+2015-08-26,10:41:49     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Start processes for existing reservations
+2015-08-26,10:41:49     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:42:09     INFO:                     Dispatcher -                    main_server:     Start server loop - waiting for request
+2015-08-26,10:42:19     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:42:50     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:42:50     INFO:       Dispatcher.checking_loop -               end_finished_job:     End reservation with ID: 68923
+2015-08-26,10:43:22     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:43:52     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:44:23     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:44:54     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:45:24     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:45:58     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:46:29     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:47:00     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:47:31     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:48:03     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:48:33     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:50:02     INFO:                     Dispatcher -                    main_server:     Start new thread with checking loop
+2015-08-26,10:50:02     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Start processes for existing reservations
+2015-08-26,10:50:02     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:50:03     INFO:       Dispatcher.checking_loop -     checking_reservation_queue:     Start new job from queue
+2015-08-26,10:50:22     INFO:                     Dispatcher -                    main_server:     Start server loop - waiting for request
+2015-08-26,10:50:36     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:50:36     INFO:       Dispatcher.checking_loop -     checking_reservation_queue:     Start new job from queue
+2015-08-26,10:51:09     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:51:39     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:52:10     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:52:40     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:53:10     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:53:40     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:54:11     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:54:41     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:55:11     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:55:42     INFO:       Dispatcher.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-26,10:55:42     INFO:       Dispatcher.checking_loop -               end_finished_job:     End reservation with ID: 68920

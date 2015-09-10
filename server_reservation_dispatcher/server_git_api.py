@@ -1,9 +1,9 @@
 import os
 import pexpect
 import re
-import paramiko
 import time
 import logging
+
 
 # create logger
 logger = logging.getLogger("server." + __name__)
@@ -17,18 +17,26 @@ path = '/home/ute/PycharmProjects/projekty/Internship-15'
 
 
 def git_action(ssh_process, command):
-    exepcted_matches_list = ['Writing objects:.*done', 'Unpacking objects:.*done', 'no changes added to commit',
-               'Aborting commit', 'fatal', '.*up-to-date', 'Password.*:', pexpect.EOF, pexpect.TIMEOUT]
-    # ssh_process.expect(['\r\n',pexpect.EOF,pexpect.TIMEOUT], timeout=10)
-    # ssh_process.sendline('pwd')
-    # print ssh_process.before
-    # print ssh_process.after
-    # print ssh_process
+    exepcted_matches_list = ['Writing objects:.*done',#0
+                             'Unpacking objects:.*done',#1
+                             'no changes added to commit',#2
+                             'Aborting commit',#3
+                             'fatal',#4
+                             '.*up-to-date',#5
+                             'Password.*:',#6
+                             pexpect.EOF,#7
+                             pexpect.TIMEOUT]#8
+    ssh_process.sendline(command)
     while True:
         match = ssh_process.expect(exepcted_matches_list, timeout=1)
+        print "command = {}\n".format(command)
+        print ssh_process
+        print "\n"
         if match == 0:
+            print ssh_process.after
             return True
         elif match == 1:
+            print ssh_process.after
             return True
         elif match == 2:
             logger.error("Commit failure - no changes")
@@ -42,23 +50,22 @@ def git_action(ssh_process, command):
             logger.error("Fatal failure - no file to add")
             return False
         elif match == 5:
+            print ssh_process.after
             return True
         elif match == 6:
-            # passwd =raw_input("Enter password\n")
-            passwd = ""
+            # passwd = "Flexi1234"
+            passwd = "pawel879a!"
             ssh_process.sendline(passwd)
         elif match == 7:
-            logger.error("Unknown failure")
-            return False
-        else:
-            logger.error("I don't know what's happened")
-            print ssh_process.before
-            return None
+            print ssh_process.after
+            return True
+        elif match == 8:
+            pass
+        
 
 
-def git_launch(TL_address, file_info, pull_only=True):
-    print "pull only = ", pull_only # TODO remove
-    ssh_process = ssh_for_git(TL_address)
+def git_launch(TL_address, path, pull_only=True):
+    ssh_process = ssh_for_git(TL_address, path)
     logger.debug("ssh_process = {}".format(ssh_process))
 
     # git pull
@@ -68,54 +75,43 @@ def git_launch(TL_address, file_info, pull_only=True):
         return False
     if pull_only:
         return True
-    # print 'git add {}'.format(os.path.join(file_info[0],file_info[1]))
-    # print 'git commit "Removing tag from file "{}""'.format(file_info[1])
     #git add
-    # result = git_action('git add {}'.format(os.path.
-    # join(file_info[0],file_info[1])))
-    # if not result == True: return result
-    # git commit
-    # result = git_action('git commit "Removing tag from file "{}""'.format(file_info[1]))
-    # if not result == True: return result
+    ssh_process.sendline('git add {}'.format(path))
+    # result = git_action(ssh_process, 'git add {}'.format(path))
+
+    # if not result:
+    #     return False
+    #git commit
+    result = git_action(ssh_process, 'git commit -m "Testing git_api"')
+    if not result:
+        return False
     # git push
-    # result = git_action('git push')
-    # if not result == True: return result
+    result = git_action(ssh_process, 'git push')
+    if not result:
+        return False
     return True
 
 
-def ssh_for_git(TL_address):
+def ssh_for_git(TL_address, path):
     ssh_command = "ssh {user}@{host}".format(user="ute", host=TL_address)
     logger.info(ssh_command)
     ssh_process = pexpect.spawn(ssh_command)
-    match = ssh_process.expect(["password:", pexpect.EOF, pexpect.TIMEOUT], timeout=3)
-    if match == 0:
-        time.sleep(0.1)
-        ssh_process.sendline('ute')
-        time.sleep(2)
-    # print ssh_process.before
-    # print ssh_process.after
-    ssh_process.sendline('cd /home/ute/auto/ruff_scripts/')
-    match = ssh_process.expect(['.*cd.*',pexpect.EOF, pexpect.TIMEOUT])
-    if match == 0:
-        print ssh_process.before
-        # print ssh_process.after
-    # elif match == 1:
-    #     print ssh_process.before
-    #     print ssh_process.after
-    # elif match == 2:
-    #     print ssh_process.before
-    #     print ssh_process.after
-    # ssh_process.sendline("ls")
-    # print ssh_process.before
-    # print ssh_process.after
-    return ssh_process
+    while True:
+        match = ssh_process.expect(["password:", pexpect.EOF, pexpect.TIMEOUT], timeout=1)
+        if match == 0:
+            time.sleep(0.2)
+            ssh_process.sendline('ute')
+            time.sleep(2)
+        else:
+            break
+    ssh_process.sendline('cd {}'.format(path))
+    while True:
+        match = ssh_process.expect(['.*cd.*',pexpect.EOF, pexpect.TIMEOUT], timeout=1)
+        if match == 0:
+            return ssh_process
 
-
-    # client = paramiko.SSHClient()
-    # client.load_system_host_keys()
-    # client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    # client.connect(TL_address, username='ute', password='ute')
-    # return client
 
 if __name__ == "__main__":
-    git_launch('localhost', file_info=None, pull_only=True)
+    path = "/home/ute/PycharmProjects/projekty/Internship-15"
+    # path = "/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/LTEtest"
+    print git_launch('localhost', path, pull_only=False)

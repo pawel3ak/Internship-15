@@ -40,12 +40,12 @@ def git_action(ssh_process, command):
 def git_launch(TL_address, file_info, pull_only):
     if not pull_only:
         pull_only = False
-    print "pull only = ", pull_only
+    # print "pull only = ", pull_only
     ssh_process = ssh_for_git(TL_address)
-    print "ssh_process = ", ssh_process
+    # print "ssh_process = ", ssh_process
     # git pull
     result = git_action(ssh_process, 'git pull')
-    print "result = ", result
+    # print "result = ", result
     if not result == True: return result
     if pull_only == True: return True
     # print 'git add {}'.format(os.path.join(file_info[0],file_info[1]))
@@ -64,7 +64,7 @@ def git_launch(TL_address, file_info, pull_only):
 
 def ssh_for_git(TL_address):
     ssh_command = "ssh {user}@{host}".format(user="ute", host=TL_address)
-    print ssh_command
+    # print ssh_command
     ssh_process = pexpect.spawn(ssh_command)
     match = ssh_process.expect(["password:", pexpect.EOF, pexpect.TIMEOUT], timeout=3)
     if match == 0:
@@ -76,7 +76,8 @@ def ssh_for_git(TL_address):
     ssh_process.sendline('cd /home/ute/auto/ruff_scripts/')
     match = ssh_process.expect(['.*cd.*',pexpect.EOF, pexpect.TIMEOUT])
     if match == 0:
-        print ssh_process.before
+        pass
+        # print ssh_process.before
         # print ssh_process.after
     # elif match == 1:
     #     print ssh_process.before

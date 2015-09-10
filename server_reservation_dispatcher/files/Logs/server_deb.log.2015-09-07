@@ -1,0 +1,35 @@
+2015-09-07,05:42:41  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Opening file to change tag failed (probably wrong file name)
+2015-09-07,05:42:41  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,05:44:17  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Opening file to change tag failed (probably wrong file name)
+2015-09-07,05:44:17  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,05:45:01  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,05:48:21  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,05:48:39  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,05:49:31  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,05:49:54  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,05:50:12  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,05:51:06  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,05:51:30  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,05:52:26  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,05:54:42  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,05:55:02  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,06:00:06  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,06:00:34  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,06:01:13  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,06:01:26  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,06:01:39  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,06:01:48  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,06:04:29  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Opening file to change tag failed (probably wrong file name)
+2015-09-07,06:04:29  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,06:08:25  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Opening file to change tag failed (probably wrong file name)
+2015-09-07,06:11:12  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,06:11:31  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Finding tag in file error : enable
+2015-09-07,06:25:15  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Opening file to change tag failed (probably wrong file name)
+2015-09-07,06:29:19  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Opening file to change tag failed (probably wrong file name)
+2015-09-07,06:29:37  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Opening file to change tag failed (probably wrong file name)
+2015-09-07,06:30:01  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     Opening file to change tag failed (probably wrong file name)
+2015-09-07,06:43:14  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     "enable" 129
+2015-09-07,06:43:40  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     "enable" TAG not found in proper line
+2015-09-07,07:31:03  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     "enable" TAG not found in proper line
+2015-09-07,07:33:07  WARNING:          server.superVisor_api -   remove_tag_from_robots_tests:     "enable" TAG not found in proper line
+2015-09-07,07:34:43    ERROR:          server.superVisor_api -                      build_job:     Jenkins build job error

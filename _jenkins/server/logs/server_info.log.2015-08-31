@@ -1,0 +1,83 @@
+2015-08-31,12:10:02     INFO:                         server -                    main_server:     Start server configuration
+2015-08-31,12:10:02     INFO:                         server -                    main_server:     Start new thread with checking loop
+2015-08-31,12:10:02     INFO:           server.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-31,12:10:02     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 257 reservationID: None
+2015-08-31,12:10:02     INFO:          server.supervisor_api -             create_reservation:     Reservation created. ID: 70216
+2015-08-31,12:10:22     INFO:                         server -                    main_server:     Start server loop - waiting for request
+2015-08-31,12:10:35     INFO:           server.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-31,12:10:36     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 258 reservationID: None
+2015-08-31,12:10:36     INFO:          server.supervisor_api -             create_reservation:     Reservation created. ID: 70217
+2015-08-31,12:11:09     INFO:           server.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-31,12:11:09     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 259 reservationID: None
+2015-08-31,12:11:09     INFO:          server.supervisor_api -             create_reservation:     Reservation created. ID: 70218
+2015-08-31,12:11:35     INFO:                         server -                    main_server:     Start server configuration
+2015-08-31,12:11:35     INFO:                         server -                    main_server:     Start new thread with checking loop
+2015-08-31,12:11:35     INFO:           server.checking_loop -             main_checking_loop:     Start processes for existing reservations
+2015-08-31,12:11:36     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 257 reservationID: 70216
+2015-08-31,12:11:36     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 258 reservationID: 70217
+2015-08-31,12:11:36     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 259 reservationID: 70218
+2015-08-31,12:11:36     INFO:           server.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-31,12:11:55     INFO:                         server -                    main_server:     Start server loop - waiting for request
+2015-08-31,12:12:06     INFO:           server.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-31,12:14:57     INFO:                         server -                    main_server:     Start server configuration
+2015-08-31,12:14:58     INFO:                         server -                    main_server:     Start new thread with checking loop
+2015-08-31,12:14:58     INFO:           server.checking_loop -             main_checking_loop:     Start processes for existing reservations
+2015-08-31,12:14:58     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 257 reservationID: 70216
+2015-08-31,12:14:58     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 258 reservationID: 70217
+2015-08-31,12:14:58     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 259 reservationID: 70218
+2015-08-31,12:14:58     INFO:           server.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-31,12:15:18     INFO:                         server -                    main_server:     Start server loop - waiting for request
+2015-08-31,12:15:33     INFO:                         server -                    main_server:     Start server configuration
+2015-08-31,12:15:33     INFO:                         server -                    main_server:     Start new thread with checking loop
+2015-08-31,12:15:33     INFO:           server.checking_loop -             main_checking_loop:     Start processes for existing reservations
+2015-08-31,12:15:33     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 257 reservationID: 70216
+2015-08-31,12:15:33     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 258 reservationID: 70217
+2015-08-31,12:15:33     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 259 reservationID: 70218
+2015-08-31,12:15:33     INFO:           server.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-31,12:15:50     INFO:          server.supervisor_api -           _build_job:     Job test_on_tl99_test was built
+2015-08-31,12:15:51     INFO:          server.supervisor_api -           _build_job:     Job test_on_tl99_test was built
+2015-08-31,12:15:51     INFO:          server.supervisor_api -           _build_job:     Job test_on_tl99_test was built
+2015-08-31,12:15:53     INFO:                         server -                    main_server:     Start server loop - waiting for request
+2015-08-31,12:16:03     INFO:           server.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-31,12:16:04     INFO:          server.supervisor_api -                         ending:     Test test_on_tl99_test was successful
+2015-08-31,12:16:04     INFO:          server.supervisor_api -           get_job_tests_status:     Regex found fails in output of test_on_tl99_test
+2015-08-31,12:16:04     INFO:          server.supervisor_api -                         ending:     Test test_on_tl99_test was successful
+2015-08-31,12:16:04     INFO:          server.supervisor_api -                         ending:     Test test_on_tl99_test was successful
+2015-08-31,12:16:04     INFO:          server.supervisor_api -           get_job_tests_status:     Regex found fails in output of test_on_tl99_test
+2015-08-31,12:16:04     INFO:          server.supervisor_api -                         ending:     Test test_on_tl99_test was successful
+2015-08-31,12:16:04     INFO:          server.supervisor_api -                         ending:     Test test_on_tl99_test was successful
+2015-08-31,12:16:04     INFO:          server.supervisor_api -           get_job_tests_status:     Regex found fails in output of test_on_tl99_test
+2015-08-31,12:16:04     INFO:          server.supervisor_api -                         ending:     Test test_on_tl99_test was successful
+2015-08-31,12:17:37     INFO:                         server -                    main_server:     Start server configuration
+2015-08-31,12:17:37     INFO:                         server -                    main_server:     Start new thread with checking loop
+2015-08-31,12:17:37     INFO:           server.checking_loop -             main_checking_loop:     Start processes for existing reservations
+2015-08-31,12:17:42     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 257 reservationID: 70216
+2015-08-31,12:17:42     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 258 reservationID: 70217
+2015-08-31,12:17:42     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 259 reservationID: 70218
+2015-08-31,12:17:42     INFO:           server.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-31,12:17:57     INFO:                         server -                    main_server:     Start server loop - waiting for request
+2015-08-31,12:18:13     INFO:           server.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-31,12:18:28     INFO:                         server -                    main_server:     Start server configuration
+2015-08-31,12:18:28     INFO:                         server -                    main_server:     Start new thread with checking loop
+2015-08-31,12:18:28     INFO:           server.checking_loop -             main_checking_loop:     Start processes for existing reservations
+2015-08-31,12:18:29     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 257 reservationID: 70216
+2015-08-31,12:18:29     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 258 reservationID: 70217
+2015-08-31,12:18:29     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 259 reservationID: 70218
+2015-08-31,12:18:29     INFO:           server.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-31,12:19:22     INFO:                         server -                    main_server:     Start server configuration
+2015-08-31,12:19:22     INFO:                         server -                    main_server:     Start new thread with checking loop
+2015-08-31,12:19:22     INFO:           server.checking_loop -             main_checking_loop:     Start processes for existing reservations
+2015-08-31,12:19:22     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 257 reservationID: 70216
+2015-08-31,12:19:22     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 258 reservationID: 70217
+2015-08-31,12:19:22     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 259 reservationID: 70218
+2015-08-31,12:19:22     INFO:           server.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-31,12:19:42     INFO:                         server -                    main_server:     Start server loop - waiting for request
+2015-08-31,12:19:53     INFO:           server.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-31,12:20:09     INFO:                         server -                    main_server:     Start server configuration
+2015-08-31,12:20:09     INFO:                         server -                    main_server:     Start new thread with checking loop
+2015-08-31,12:20:09     INFO:           server.checking_loop -             main_checking_loop:     Start processes for existing reservations
+2015-08-31,12:20:10     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 257 reservationID: 70216
+2015-08-31,12:20:10     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 258 reservationID: 70217
+2015-08-31,12:20:10     INFO:           server.checking_loop -                  start_new_job:     Start new thread supervisor.main for serverID: 259 reservationID: 70218
+2015-08-31,12:20:10     INFO:           server.checking_loop -             main_checking_loop:     Main checking loop
+2015-08-31,12:20:29     INFO:                         server -                    main_server:     Start server loop - waiting for request

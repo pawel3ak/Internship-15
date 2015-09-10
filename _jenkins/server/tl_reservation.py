@@ -9,7 +9,7 @@
 
 from ute_cloud_reservation_api.api import CloudReservationApi
 from ute_cloud_reservation_api.exception import ApiMaxReservationCountExceededException
-
+import datetime
 
 class TestLineReservation(CloudReservationApi):
     def __init__(self, id=None, address=None, api_token='99e66a269e648c9c1a3fb896bec34cd04f50a7d2', api_address='http://cloud.ute.inside.nsn.com'):
@@ -71,24 +71,41 @@ class TestLineReservation(CloudReservationApi):
         return super(TestLineReservation, self).cancel_reservation(self.reservation_data['id'])
 
 
+    def extend_reservation(self):
+        if self.reservation_data['id'] is None:
+            print 'Reservation is not created'
+            return -101
+        return super(TestLineReservation, self).extend_reservation(self.reservation_data['id'], 180)
+
 if __name__ == '__main__':
     print 'abc'
     #9:47 (11:47)
-    # for i in range(68600,69200):
-    reservation = TestLineReservation(70210)
+    # for i in range(75891,75963):
+    #75891
+    #75924
+    #75962
+    if True:
+        # i = 75891
+
+        reservation = TestLineReservation(75979)
     # print reservation.get_available_tl_count_group_by_type()
     # reservation = TestLineReservation(66567)
     # reservation = TestLineReservation(66626)
-    # id = reservation.create_reservation(testline_type="CLOUD_F", duration=600)
+    #     id = reservation.create_reservation(testline_type="CLOUD_L", duration=120)
     # if id == -103:
     #     print "max user"
     # if not isinstance(id, int):
     #     print "max user"
-    #     if reservation.get_reservation_details()['user'] == 'app_lmts':
+        if reservation.get_reservation_details()['user'] == 'app_lmts':
     # print reservation.get_address()
-    print reservation.get_reservation_status()
-    # print reservation.get_reservation_details()
-    print reservation.release_reservation()
+            print reservation.get_reservation_status()
+            # print i
+            print reservation.get_reservation_details()
+
+                # reservation.extend_reservation()
+        # print reservation.get_reservation_details()
+    # now = datetime.datetime.utcnow()
+    #         print reservation.release_reservation()
     # print reservation.get_address()
-    print reservation.get_reservation_status()
+    # print reservation.get_reservation_status()
     # print reservation.get_reservation_details()
