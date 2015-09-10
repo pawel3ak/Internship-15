@@ -61,7 +61,7 @@ def git_action(ssh_process, command):
             return True
         elif match == 8:
             pass
-        
+
 
 
 def git_launch(TL_address, path, pull_only=True):
