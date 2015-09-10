@@ -1481,3 +1481,30 @@ searchwindowsize: None
 delaybeforesend: 0.05
 delayafterclose: 0.1
 delayafterterminate: 0.1
+2015-09-10,11:24:14     INFO:                     server.__main__ -                                                       ssh_for_git:     ssh ute@localhost
+2015-09-10,11:24:15    DEBUG:                     server.__main__ -                                                        git_launch:     ssh_process = <pexpect.spawn object at 0x1403d90>
+version: 3.2
+command: /usr/bin/ssh
+args: ['/usr/bin/ssh', 'ute@localhost']
+searcher: <pexpect.searcher_re object at 0x140e0d0>
+buffer (last 100 chars): ''
+before (last 100 chars): ''
+after: 'Linux ute-image 3.2.0-4-amd64 #1 SMP Debian 3.2.65-1 x86_64\r\n\r\nThe programs included with the Debian GNU/Linux system are free software;\r\nthe exact distribution terms for each program are described in the\r\nindividual files in /usr/share/doc/*/copyright.\r\n\r\nDebian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent\r\npermitted by applicable law.\r\nLast login: Thu Sep 10 13:22:57 2015 from ::1\r\r\nute@ute-image:~$ cd /home/ute/PycharmProjects/projekty/Internship-15'
+match: <_sre.SRE_Match object at 0x1390f38>
+match_index: 0
+exitstatus: None
+flag_eof: False
+pid: 22139
+child_fd: 6
+closed: False
+timeout: 30
+delimiter: <class 'pexpect.EOF'>
+logfile: None
+logfile_read: None
+logfile_send: None
+maxread: 2000
+ignorecase: False
+searchwindowsize: None
+delaybeforesend: 0.05
+delayafterclose: 0.1
+delayafterterminate: 0.1
