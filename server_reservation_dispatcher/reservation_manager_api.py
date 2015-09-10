@@ -46,32 +46,46 @@ class ReservationManager(CloudReservationApi):
         self.socket.bind(('127.0.0.1', 50010))
         self.socket.listen(5)
         self.outputs = []
-        self.MAXTL = 2
-        self.FREETL = -1
+        self.MAXTL = 3
+        self.FREETL = 1
 
 
     def handle_client_request_and_response(self, client_socket):
         client_request = client_socket.recv(1024).strip()
-        if client_request == "request/get_testline":
-            client_socket.send(self.request_get_testline())
+        if re.search("request\/get_testline&cloud=(.*).*", client_request):
+            client_socket.send(self.request_get_testline(client_request))
         elif re.search("request\/status_of_=(.*)", client_request):
             client_socket.send(self.get_reserved_TL_status(client_request))
         elif re.search("request\/free_testline\=(.*).*", client_request):
             client_socket.send(self.request_free_testline(client_request))
         elif client_request == "request/manager_status":
             client_socket.send(self.check_if_I_am_working())
+        elif re.search("request\/get_end_date_of_=(.*)", client_request):
+            client_socket.send(self.request_get_end_date(client_request))
         else:
             client_socket.send("Unknown command")
+
+
+    def request_get_end_date(self, client_request):
+        TLname = re.search("request\/get_end_date_of_=(.*)", client_request).group(1)
+        if not TLname in self.get_reservation_dictionary():
+            return "Wrong TLname"
+        if self.get_reservation_status(TLname) == 3:
+            return self.get_end_date(TLname, convert=False)
+        else:
+            return "TL preparing"
 
 
     def get_reserved_TL_status(self, client_request):
         TLname = re.search("request\/status_of_\=(.*)", client_request).group(1)
         try:
             status = self.get_reservation_status(TLname)
-            if status == 3:
-                return "Active"
+            if status <3:
+                return "Preparing"
+            elif status > 3:
+                return "Finished"
             else:
-                return "Not active"
+                return "Active"
         except:
             return "Wrong TL name"
 
@@ -80,10 +94,13 @@ class ReservationManager(CloudReservationApi):
         return "YES!"
 
 
-    def request_get_testline(self):
-        TLname = self.find_first_free_TL()
+    def request_get_testline(self, client_request):
+        cloud = re.search("request\/get_testline&cloud=(.*).*", client_request).group(1)
+        print cloud
+        TLname = self.find_first_free_TL(cloud)
+        print "TLname = {}".format(TLname)
         if not TLname == -1:
-            self.set_jobname_for_TL_in_dictionary(TLname,jobname=True)
+            self.set_jobname_for_TL_in_dictionary(TLname, jobname=True)
             self.make_backup_file()
             return TLname
         else:
@@ -114,32 +131,23 @@ class ReservationManager(CloudReservationApi):
     def __set_TLinfo(self, ID):
         while True:
             TLinfo = self.get_reservation_details(ID)
-            # print TLinfo
             if not TLinfo['testline']['name']:
-                time.sleep(5)
+                time.sleep(10)
             else:
                 TLname = TLinfo['testline']['name']
-                print TLname
                 break
-        TLadd_date = datetime.datetime.strptime(TLinfo['add_date'].split('.')[0],"%Y-%m-%d %H:%M:%S")
-        #TLend_date = datetime.datetime.strptime(TLinfo['end_date'].split('.')[0],"%Y-%m-%d %H:%M:%S")
-        TLend_date = TLadd_date.replace(hour=TLadd_date.hour + 8)
         self.__reservations_dictionary[TLname] = {'id' : ID,
                                                   'job' : False,
-                                                  'add_date' : TLadd_date,
-                                                  'end_date' : TLend_date,
-                                                  'was_extended' : False
+                                                  'cloud' : self.get_testline_type(TLname)
                                                   }
 
 
+    def get_testline_type(self, TLname):
+        return super(ReservationManager, self).get_reservation_details(self.get_reservation_dictionary()[TLname]['id'])['testline_type']
+
+
     def set_reservations_dictionary(self, dictionary):
-        self.__reservations_dictionary = dictionary.copy()
-
-
-    def set_end_date(self, TLname):
-        self.__reservations_dictionary[TLname]['end_date'] = \
-            self.__reservations_dictionary[TLname]['end_date'].replace\
-                (hour=self.__reservations_dictionary[TLname]['end_date'].hour + 2)
+        self.__reservations_dictionary = copy.deepcopy(dictionary)
 
 
     def get_reservation_dictionary(self):
@@ -176,18 +184,17 @@ class ReservationManager(CloudReservationApi):
             logger.error('{}'.format(LOGGER_INFO[1104]))
 
 
-    def find_first_free_TL(self):
+    def find_first_free_TL(self, cloud):
         _TLname = None
         try:
             for TLname in self.get_reservation_dictionary():
-                if not self.get_reservation_dictionary()[TLname]['job']:
+                print TLname
+                if not self.get_reservation_dictionary()[TLname]['job'] and self.get_reservation_dictionary()[TLname]['cloud'] == cloud:
                     status = self.get_reservation_status(TLname)
                     if status !=3:
                         continue
                     else:
                         _TLname = TLname
-        except:
-            pass
         finally:
             if not _TLname:
                 return -1
@@ -199,17 +206,16 @@ class ReservationManager(CloudReservationApi):
         return super(ReservationManager, self).get_reservation_details(self.get_reservation_dictionary()[TLname]['id'])['status']
 
 
-    def extend_reservation(self,TLname, duration = 30):
-        ############### function not yet implemented by WRO
+    def extend_reservation(self,TLname, duration = 180):
         return super(ReservationManager, self).extend_reservation(
             self.get_reservation_dictionary()[TLname]['id'],
             duration = duration)
 
 
     def add_to_blacklist(self, TLname):
-        #since we can't actually block TL, we're extending reservation by one month (60min*24h*30days)
+        #since we can't actually block TL, we're extending reservation by max_time == 180min
         #and sending e-mail to admin
-        self.extend_reservation(TLname, (60*24*30))
+        self.extend_reservation(TLname, 180)
         try:
             message = "TL {} added to blacklist. Please check it".format(TLname)
             subject = "TL blacklisted"
@@ -236,70 +242,82 @@ class ReservationManager(CloudReservationApi):
                 self.make_backup_file()
 
 
-    def periodically_check_all_TL_for_extending_or_releasing(self, no_free_TL):
-        if True:
-            for TLname in self.get_reservation_dictionary():
-                TLinfo = self.get_reservation_dictionary()[TLname]
-                if TLinfo['job']:
-                            # and (TLinfo['end_date'] - datetime.datetime.utcnow()).total_seconds() < 60*30:
-                    # self.extend_reservation(TLname,30)    ##not yet implemented
-                    # self.set_end_date(TLname) ##extend by 120min
-                    pass
-                elif (not TLinfo['job'] and no_free_TL == True) or \
-                        (not TLinfo['job'] and
-                                 (datetime.datetime.utcnow() -
-                                      TLinfo['add_date']).total_seconds() > 60*60*24):
-                    ##no active job and less than <delta> available TL
-                    ##or
-                    ##no active job and reservation is longer than 24h (60s*60m*24h)
+    def from_unicode_to_datetime(self,unicode):
+        date = datetime.datetime.strptime(unicode.split('.')[0],"%Y-%m-%d %H:%M:%S")
+        return date
+
+
+    def from_datetime_to_unicode(self,date):
+        unicode = u'{}'.format(date.strftime("%Y-%m-%d %H:%M:%S"))
+        return unicode
+
+
+    def get_add_date(self, TLname, convert=True):
+        add_date = super(ReservationManager, self).get_reservation_details(self.get_reservation_dictionary()[TLname]['id'])['add_date']
+        if convert:
+            return self.from_unicode_to_datetime(add_date)
+        else:
+            return add_date
+
+
+    def get_end_date(self, TLname, convert=True):
+        end_date = super(ReservationManager, self).get_reservation_details(self.get_reservation_dictionary()[TLname]['id'])['end_date']
+        if convert:
+            return self.from_unicode_to_datetime(end_date)
+        else:
+            return end_date
+
+
+
+    def get_job_from_reservation_dictionary(self, TLname):
+        return self.get_reservation_dictionary()[TLname]['job']
+
+
+    def check_all_TL_for_extending_or_releasing(self, release=False):
+        for TLname in self.get_reservation_dictionary():
+            if self.get_reservation_status(TLname) < 3:      #TL not yet prepared
+                continue
+            elif self.get_reservation_status(TLname) > 3:
+                self.release_reservation(TLname)
+                self.remove_TL_from_reservations_dictionary(TLname)
+                self.make_backup_file()
+            else:
+                if (self.get_end_date(TLname) -
+                        datetime.datetime.utcnow()).total_seconds() < 60*30:
+                    self.extend_reservation(TLname)
+
+                elif not self.get_job_from_reservation_dictionary(TLname) and\
+                                (datetime.datetime.utcnow() -
+                                self.get_add_date(TLname)).total_seconds() > 60*60*24:
                     self.release_reservation(TLname)
-                    self.remove_TL_from_reservations_dictionary()
+                    self.remove_TL_from_reservations_dictionary(TLname)
                     self.make_backup_file()
-                elif (TLinfo['end_date'] - datetime.datetime.utcnow()).total_seconds() < 60*30:
-                    # self.extend_reservation(TLname,120)    #not yet
-                    # self.set_end_date(TLname) #extend by 120min
-                    pass
 
-
-    def prepare_dictionary_to_write_to_file(self):
-        tmp_dictionary = copy.deepcopy(self.get_reservation_dictionary())
-        for TLname in tmp_dictionary:
-            try:
-                tmp_dictionary[TLname]['add_date'] = tmp_dictionary[TLname]['add_date'].strftime("%Y-%m-%d %H:%M:%S")
-                tmp_dictionary[TLname]['end_date'] = tmp_dictionary[TLname]['end_date'].strftime("%Y-%m-%d %H:%M:%S")
-            except:
-                pass
-        return tmp_dictionary
-
-
-    def prepare_dictionary_to_read_to_memory(self, tmp_dictionary):
-        for TLname in tmp_dictionary:
-            tmp_dictionary[TLname]['add_date'] = \
-                datetime.datetime.strptime(tmp_dictionary[TLname]['add_date'],"%Y-%m-%d %H:%M:%S")
-            tmp_dictionary[TLname]['end_date'] = \
-                datetime.datetime.strptime(tmp_dictionary[TLname]['end_date'],"%Y-%m-%d %H:%M:%S")
-        return tmp_dictionary
+                if release:
+                    if not self.get_job_from_reservation_dictionary(TLname):
+                        print "powinienem zwolnic, ale nie"
+                        # self.release_reservation(TLname)
+                        # self.remove_TL_from_reservations_dictionary(TLname)
+                        # self.make_backup_file()
 
 
     def make_backup_file(self):
         if not os.path.exists(self.backup_file_path):
             os.mknod(self.backup_file_path)
         with open(self.backup_file_path, 'wb') as backup_file:
-            tmp_dictionary = self.prepare_dictionary_to_write_to_file()
-            for TLname in tmp_dictionary:
-                backup_file.writelines(json.dumps({TLname : tmp_dictionary[TLname]}) + "\n")
+            for TLname in self.get_reservation_dictionary():
+                backup_file.writelines(json.dumps({TLname : self.get_reservation_dictionary()[TLname]}) + "\n")
 
 
     def read_backup_file(self):
         if not os.path.exists(self.backup_file_path):
-            return 0
+            pass
         else:
             if not os.path.getsize(self.backup_file_path) == 0:
                 with open(self.backup_file_path, 'rb') as backup_file:
                     tmp_dictionary = {}
                     for line in backup_file.readlines():
                         tmp_dictionary.update(json.loads(line))
-                    tmp_dictionary = self.prepare_dictionary_to_read_to_memory(tmp_dictionary)
                     self.set_reservations_dictionary(tmp_dictionary)
 
 
@@ -308,7 +326,7 @@ class ReservationManager(CloudReservationApi):
         while True:
             try:
                 inputready, outputready, exceptready = select.select(inputs, [], [])
-            except select.error, e:
+            except select.error:
                 self.make_backup_file()
                 break
 
@@ -338,17 +356,17 @@ def managing_reservations():
     t.setDaemon(True)
     t.start()
     while True:
+        release = True
         print "Available TL on Cloud F = {}".format(ReservManager.get_available_tl_count_group_by_type()['CLOUD_F'])
         print "FreeTL = {}".format(ReservManager.FREETL)
         print "Len of dict = {}".format(len(ReservManager.get_reservation_dictionary()))
         print "MAXTL = {}".format(ReservManager.MAXTL)
         if ReservManager.get_available_tl_count_group_by_type()['CLOUD_F'] > ReservManager.FREETL:
+            release = False
             if len(ReservManager.get_reservation_dictionary()) < ReservManager.MAXTL:
                 ReservManager.create_reservation_and_set_TL_info()
                 ReservManager.make_backup_file()
-            else:
-                pass
-        ReservManager.periodically_check_all_TL_for_extending_or_releasing(no_free_TL=False)
+        ReservManager.check_all_TL_for_extending_or_releasing(release)
         print ReservManager.get_reservation_dictionary()
         time.sleep(30)
 

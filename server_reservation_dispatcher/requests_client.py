@@ -49,8 +49,8 @@ def get_info(sock, id):
         #     break
     sock.close()
 
-def get_tlname(sock):
-    sock.send("request/get_testline")
+def get_tlname(sock, cloud):
+    sock.send("request/get_testline&cloud={}".format(cloud))
     try:
         response = sock.recv(1024)
         if response != "": print response
@@ -85,6 +85,15 @@ def get_status(sock, status):
             pass
 
 
+def get_end_date(sock, TLname):
+    sock.send("request/get_end_date_of_={}".format(TLname))
+    try:
+        response = sock.recv(1024)
+        if response != "": print response
+    except:
+        pass
+
+
 def main():
     parser = argparse.ArgumentParser(argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-a', '--host', default=HOST_IP,
@@ -93,19 +102,23 @@ def main():
                         help='set port number for server')
     parser.add_argument('--info', default='',
                         help='check informations about given ID')
-    parser.add_argument('--tl', default='',
+    parser.add_argument('--gettl', default='',
                         help='check informations about given ID')
     parser.add_argument('--freetl', default='',
-                        help='not yet')
+                        help='free tl')
     parser.add_argument('-s', '--status', type=str, default='',
                         help='ask for status')
+    parser.add_argument('-d', '--date', type=str, default='',
+                        help='ask for end_date')
+
     args = parser.parse_args()
     host = args.host
     port = args.port
     info = args.info
-    tl = args.tl
+    cloud = args.gettl
     freetl = args.freetl
     status = args.status
+    TLname = args.date
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((host, port))
@@ -118,12 +131,18 @@ def main():
                 get_info(sock,info)
             except:
                 pass
-    elif tl != '':
-        get_tlname(sock)
+
+    elif cloud != '':
+        get_tlname(sock, cloud)
+
     elif freetl !='':
         set_freetl(sock, freetl)
+
     elif status !='':
         get_status(sock, status)
+
+    elif TLname !='':
+        get_end_date(sock, TLname)
     # elif len(sys.argv) == 3:
     #     if sys.argv[1] == "info":
     #         get_info(sock,sys.argv[2])
