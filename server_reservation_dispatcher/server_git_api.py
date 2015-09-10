@@ -33,10 +33,7 @@ def git_action(ssh_process, command, comment = None):
                              pexpect.TIMEOUT]#9
     ssh_process.sendline(command)
     while True:
-        match = ssh_process.expect(exepcted_matches_list, timeout=5)
-        print "command = {}\n".format(command)
-        print ssh_process
-        print "\n"
+        match = ssh_process.expect(exepcted_matches_list, timeout=1)
         if match == 0:
             print ssh_process.after
             return True
@@ -68,7 +65,7 @@ def git_action(ssh_process, command, comment = None):
             print ssh_process.after
             return True
         elif match == 9:
-            return True
+            pass
 
 
 
@@ -85,10 +82,6 @@ def git_launch(TL_address, path, pull_only=True):
         return True
     #git add
     ssh_process.sendline('git add {}'.format(path))
-    # result = git_action(ssh_process, 'git add {}'.format(path))
-
-    # if not result:
-    #     return False
     #git commit
     result = git_action(ssh_process, 'git commit', 'Testing git_api')
     if not result:
