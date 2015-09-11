@@ -31,7 +31,7 @@ def start_suites_from_job_manager_dictionary(manager):
 
 
 def fast_supervisors_start(manager):
-    # TODO check
+    # TODO do it right and chceck
     # not used
     queue_list = manager.read_all_records_from_queue()
     while True:
@@ -65,7 +65,10 @@ def managing_loop(manager, loop_interval):
             else:
                 if manager.get_queue_length() == 0:
                     manager.update_local_git_repository()
-                    manager.make_tests_queue_from_testsuites_dir()
+                    if not manager.make_tests_queue_from_testsuites_dir():
+                        logger.debug("No suites to run - free TL in RM: {}".format(tl_name))
+                        manager.free_testline_in_reservation_manager(tl_name)
+                        break
                 next_suite = manager.read_next_reservation_record_and_delete_from_queue()
                 manager.start_new_supervisor(tl_name, next_suite)
         manager.write_job_manager_dictionary_to_file()

@@ -9,7 +9,6 @@
 import json
 import logging
 import os
-import string
 
 # create logger
 logger = logging.getLogger("server." + __name__)
@@ -31,6 +30,13 @@ class ReservationQueue(object):
             json.dump(record, queue_file)
             queue_file.write("\n")
             self._queue_length += 1
+
+    def write_new_record_list_to_queue(self, record_list):
+        with open(self._queue_file_path, "ab") as queue_file:
+            for record in record_list:
+                json.dump(record, queue_file)
+                queue_file.write("\n")
+                self._queue_length += 1
 
     def read_next_reservation_record_and_delete_from_queue(self):
         with open(self._queue_file_path, "rb+") as queue_file:
@@ -54,31 +60,6 @@ class ReservationQueue(object):
     def __check_queue_length(self):
         with open(self._queue_file_path, "rb") as queue_file:
             return len(queue_file.readlines())
-
-    @staticmethod
-    def __get_record_id_number():
-        id_file = os.path.join("files", "temp_id")
-        with open(id_file, "ab+") as opened_file:
-            lines = opened_file.readlines()
-            if len(lines) == 1:
-                id_number = json.loads(lines[0]) + 1
-            else:
-                id_number = 1
-            opened_file.seek(0)
-            opened_file.truncate()
-            json.dump(id_number, opened_file)
-            return id_number
-
-    @staticmethod
-    def __generate_password(passw_length=4):
-        import random
-        alphabet = string.letters+string.digits
-        ''.join(random.choice(alphabet) for _ in range(3))
-        password = ""
-        for i in range(passw_length):
-            next_sign = random.randrange(len(alphabet))
-            password += alphabet[next_sign]
-        return password
 
 
 if __name__ == "__main__":

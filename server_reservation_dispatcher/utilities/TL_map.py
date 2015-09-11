@@ -8,7 +8,7 @@
 """
 
 TL_map = {
-    'tl99_test' : 'wmp-tl99.lab0.krk-lab.nsn-rdnet.net',
+    'tl99_test' : '10.83.204.201',
     'TL63' : 'wmp-tl63.lab0.krk-lab.nsn-rdnet.net',
     'TL88' : 'iav-kra-tl088.lab0.krk-lab.nsn-rdnet.net'
 }

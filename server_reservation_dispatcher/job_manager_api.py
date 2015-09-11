@@ -72,10 +72,15 @@ class JobManagerApi(ReservationQueue):
         directory_list = []
         [directory_list.append(x) for x in os.listdir(self._directory_with_testsuites)
             if os.path.isdir(os.path.join(self._directory_with_testsuites, x))]
+        if len(directory_list) < 1:
+            logger.warning("No suites to add to queue")
+            return False
         logger.debug("Write new queue to file")
+        jenkins_info_list = []
         for directory in directory_list:
-            jenkins_info = {'parameters': {'name': directory}}
-            self.write_new_record_to_queue(jenkins_info)
+            jenkins_info_list.append({'parameters': {'name': directory}})
+        self.write_new_record_list_to_queue(jenkins_info_list)
+        return True
 
     def start_new_supervisor(self, tl_name, jenkins_info, user_info=None):
         logger.info("Start new supervisor with suite {} at TL name: {}".format(jenkins_info['parameters']['name'], tl_name))
@@ -141,7 +146,7 @@ class JobManagerApi(ReservationQueue):
         return self.__send_request_to_rm_and_get_response("request/get_testline&cloud={}".format(cloud_type))
 
     def get_tl_status_from_reservation_manager(self, tl_name):
-        '''
+        """
         Get testline status as string.
 
         Status list:
@@ -151,7 +156,7 @@ class JobManagerApi(ReservationQueue):
 
         :param tl_name: string
         :return: string
-        '''
+        """
         return self.__send_request_to_rm_and_get_response(("request/status_of_=" + tl_name))
 
     def free_testline_in_reservation_manager(self, tl_name):
