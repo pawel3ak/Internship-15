@@ -27,19 +27,22 @@ class JobManagerApi(ReservationQueue):
         self._config_filename = config_filename
         config = ConfigParser.RawConfigParser()
         config.read(config_filename)
-        ReservationQueue.__init__(self, os.path.join(config.get('JobManager', 'directory'),
-                                                     config.get('JobManager', 'queue_filename')))
-        self._supervisors_handlers_dictionary = {}      # {reservation_ID: handler}
-        self._job_manager_dictionary = {}               # {reservation_ID: suite_name}
-        self._job_manager_dictionary_file_path = os.path.join(config.get('JobManager', 'directory'),
-                                                              config.get('JobManager', 'JM_dictionary_filename'))
-        if not os.path.exists(self._job_manager_dictionary_file_path):
-            logger.debug("Make directory: {}".format(self._job_manager_dictionary_file_path))
-            os.mknod(self._job_manager_dictionary_file_path)
-        self._directory_with_testsuites = config.get('JobManager', 'directory_with_testsuites')
-        self._reservation_manager_ip = config.get('ReservationManager', 'host_ip')
-        self._reservation_manager_port = config.getint('ReservationManager', 'host_port')
-        self._reservation_manager_handler = None
+        try:
+            ReservationQueue.__init__(self, os.path.join(config.get('JobManager', 'directory'),
+                                                         config.get('JobManager', 'queue_filename')))
+            self._supervisors_handlers_dictionary = {}      # {reservation_ID: handler}
+            self._job_manager_dictionary = {}               # {reservation_ID: suite_name}
+            self._job_manager_dictionary_file_path = os.path.join(config.get('JobManager', 'directory'),
+                                                                  config.get('JobManager', 'JM_dictionary_filename'))
+            if not os.path.exists(self._job_manager_dictionary_file_path):
+                logger.debug("Make directory: {}".format(self._job_manager_dictionary_file_path))
+                os.mknod(self._job_manager_dictionary_file_path)
+            self._directory_with_testsuites = config.get('JobManager', 'directory_with_testsuites')
+            self._reservation_manager_ip = config.get('ReservationManager', 'host_ip')
+            self._reservation_manager_port = config.getint('ReservationManager', 'host_port')
+            self._reservation_manager_handler = None
+        except ConfigParser.NoOptionError, err:
+            logger.warning(err)
 
     def get_job_manager_dictionary(self):
         return self._job_manager_dictionary
@@ -50,7 +53,10 @@ class JobManagerApi(ReservationQueue):
     def get_parameters_from_config_file(self):
         config = ConfigParser.RawConfigParser()
         config.read(self._config_filename)
-        self._directory_with_testsuites = config.get('JobManager', 'directory_with_testsuites')
+        try:
+            self._directory_with_testsuites = config.get('JobManager', 'directory_with_testsuites')
+        except ConfigParser.NoOptionError, err:
+            logger.warning(err)
 
     def delete_done_jobs_from_dictionaries(self):
         for key in self._supervisors_handlers_dictionary.keys():
@@ -72,12 +78,11 @@ class JobManagerApi(ReservationQueue):
             self.write_new_record_to_queue(jenkins_info)
 
     def start_new_supervisor(self, tl_name, jenkins_info, user_info=None):
-        logger.info("Start new supervisor wit suite {} at TL name: {}".format(jenkins_info['parameters']['name'], tl_name))
+        logger.info("Start new supervisor with suite {} at TL name: {}".format(jenkins_info['parameters']['name'], tl_name))
         # TODO remove temp
         handle = multiprocessing.Process(target=supervise, args=('tl99_test', jenkins_info, user_info,))
         # handle = multiprocessing.Process(target=supervise, args=(tl_name, jenkins_info, user_info,))
         handle.start()
-        print "start"
         logger.debug("Add process to dictionaries")
         self._supervisors_handlers_dictionary[tl_name] = handle
         self._job_manager_dictionary[tl_name] = jenkins_info

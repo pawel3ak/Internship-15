@@ -48,8 +48,11 @@ class MainServerApi(object):
         logger.debug("Get server configuration from file")
         config = ConfigParser.RawConfigParser()
         config.read(self._config_filename)
-        self._host_ip = config.get('Server', 'host_ip')
-        self._host_port = config.getint('Server', 'host_port')
+        try:
+            self._host_ip = config.get('Server', 'host_ip')
+            self._host_port = config.getint('Server', 'host_port')
+        except ConfigParser.NoOptionError, err:
+            logger.warning(err)
 
     def set_up_server(self):
         logger.debug("Set up server config")

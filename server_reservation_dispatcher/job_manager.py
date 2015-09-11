@@ -48,18 +48,7 @@ def fast_supervisors_start(manager):
             manager.start_new_supervisor(tl_name, next_suite)
 
 
-def job_manager(config_filename='server_config.cfg'):
-    manager = JobManagerApi(config_filename)
-    config = ConfigParser.RawConfigParser()
-    config.read(config_filename)
-    loop_interval = config.getfloat('JobManager', 'loop_interval')
-
-    if not manager.start_reservation_manager():
-        logger.critical("RM does not work")
-        return None
-
-    start_suites_from_job_manager_dictionary(manager)
-
+def managing_loop(manager, loop_interval):
     while True:
         logger.debug("Main JM loop")
         manager.delete_done_jobs_from_dictionaries()
@@ -75,15 +64,27 @@ def job_manager(config_filename='server_config.cfg'):
                 break
             else:
                 if manager.get_queue_length() == 0:
-                    try:
-                        manager.update_local_git_repository()
-                    except Exception, err:
-                        print err
+                    manager.update_local_git_repository()
                     manager.make_tests_queue_from_testsuites_dir()
                 next_suite = manager.read_next_reservation_record_and_delete_from_queue()
                 manager.start_new_supervisor(tl_name, next_suite)
         manager.write_job_manager_dictionary_to_file()
         sleep(loop_interval*60)
+
+
+def job_manager(config_filename='server_config.cfg'):
+    manager = JobManagerApi(config_filename)
+    config = ConfigParser.RawConfigParser()
+    config.read(config_filename)
+    loop_interval = config.getfloat('JobManager', 'loop_interval')
+
+    if not manager.start_reservation_manager():
+        logger.critical("RM does not work")
+        return None
+
+    start_suites_from_job_manager_dictionary(manager)
+
+    managing_loop(manager, loop_interval)
 
 
 if __name__ == "__main__":
