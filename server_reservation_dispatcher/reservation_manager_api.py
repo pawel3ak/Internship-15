@@ -41,6 +41,8 @@ class ReservationManager(CloudReservationApi):
         super(ReservationManager, self).__init__(api_token='99e66a269e648c9c1a3fb896bec34cd04f50a7d2', api_address='http://cloud.ute.inside.nsn.com')
         self.__reservations_dictionary = {}
         self.backup_file_path = os.path.join('.','files','ReservationManager','backup.data')
+        self.TL_map_file_path = os.path.join('.','utilities','TL_name_to_address_map.data')
+        self.TL_blacklist_file_path = os.path.join('.','files','ReservationManager','blacklist.data')
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.bind(('127.0.0.1', 50010))
@@ -52,16 +54,18 @@ class ReservationManager(CloudReservationApi):
 
     def handle_client_request_and_response(self, client_socket):
         client_request = client_socket.recv(1024).strip()
-        if re.search("request\/get_testline&cloud=(.*).*", client_request):
+        if re.search("request\/get_testline&cloud=(.*)", client_request):
             client_socket.send(self.request_get_testline(client_request))
         elif re.search("request\/status_of_=(.*)", client_request):
             client_socket.send(self.get_reserved_TL_status(client_request))
-        elif re.search("request\/free_testline\=(.*).*", client_request):
+        elif re.search("request\/free_testline\=(.*)", client_request):
             client_socket.send(self.request_free_testline(client_request))
         elif client_request == "request/manager_status":
             client_socket.send(self.check_if_I_am_working())
         elif re.search("request\/get_end_date_of_=(.*)", client_request):
             client_socket.send(self.request_get_end_date(client_request))
+        elif re.search("request\/blacklist_remove_TL=(.*)", client_request):
+            client_socket.send(self.delete_TL_from_blacklist_file(client_request))
         else:
             client_socket.send("Unknown command")
 
@@ -140,6 +144,7 @@ class ReservationManager(CloudReservationApi):
                                                   'job' : False,
                                                   'cloud' : self.get_testline_type(ID)
                                                   }
+        self.write_TL_address_to_TL_map_file(TLname)
 
 
     def get_testline_type(self, ID):
@@ -170,6 +175,10 @@ class ReservationManager(CloudReservationApi):
                 logger.warning('{}'.format(LOGGER_INFO[1103]))
 
 
+    def get_TL_address_from_ute_reservation_api(self, TLname):
+        return super(ReservationManager, self).get_reservation_details(self.get_reservation_dictionary()[TLname]['id'])['testline']['address']
+
+
     def release_reservation(self, TLname):
         try:
             return super(ReservationManager, self).release_reservation(self.get_reservation_dictionary()[TLname]['id'])
@@ -188,10 +197,11 @@ class ReservationManager(CloudReservationApi):
         _TLname = None
         try:
             for TLname in self.get_reservation_dictionary():
-                print TLname
-                if not self.get_reservation_dictionary()[TLname]['job'] and self.get_reservation_dictionary()[TLname]['cloud'] == cloud:
+                if not self.get_reservation_dictionary()[TLname]['job'] and \
+                        self.get_reservation_dictionary()[TLname]['cloud'] == cloud and \
+                        self.check_if_TL_not_in_blacklist_file(TLname):
                     status = self.get_reservation_status(TLname)
-                    if status !=3:
+                    if not status == 3:
                         continue
                     else:
                         _TLname = TLname
@@ -214,8 +224,9 @@ class ReservationManager(CloudReservationApi):
 
     def add_to_blacklist(self, TLname):
         #since we can't actually block TL, we're extending reservation by max_time == 180min
-        #and sending e-mail to admin
+        #sending e-mail to admin and adding_to_our_blacklist_file
         self.extend_reservation(TLname, 180)
+        self.write_TLname_to_blacklist_file(TLname)
         try:
             message = "TL {} added to blacklist. Please check it".format(TLname)
             subject = "TL blacklisted"
@@ -268,6 +279,10 @@ class ReservationManager(CloudReservationApi):
             return end_date
 
 
+    def get_start_date(self, TLname):
+        start_date = super(ReservationManager, self).get_reservation_details(self.get_reservation_dictionary()[TLname]['id'])['start_date']
+        return self.from_unicode_to_datetime(start_date)
+
 
     def get_job_from_reservation_dictionary(self, TLname):
         return self.get_reservation_dictionary()[TLname]['job']
@@ -281,6 +296,7 @@ class ReservationManager(CloudReservationApi):
                 self.release_reservation(TLname)
                 self.remove_TL_from_reservations_dictionary(TLname)
                 self.make_backup_file()
+                self.delete_TL_address_from_TL_map_file(TLname)
             else:
                 if (self.get_end_date(TLname) -
                         datetime.datetime.utcnow()).total_seconds() < 60*30:
@@ -292,6 +308,7 @@ class ReservationManager(CloudReservationApi):
                     self.release_reservation(TLname)
                     self.remove_TL_from_reservations_dictionary(TLname)
                     self.make_backup_file()
+                    self.delete_TL_address_from_TL_map_file(TLname)
 
                 if release:
                     if not self.get_job_from_reservation_dictionary(TLname):
@@ -299,27 +316,82 @@ class ReservationManager(CloudReservationApi):
                         # self.release_reservation(TLname)
                         # self.remove_TL_from_reservations_dictionary(TLname)
                         # self.make_backup_file()
+                        # self.delete_TL_address_from_TL_map_file(TLname)
+
+
+    def check_if_file_exists_and_create_if_not(self, path):
+        if not os.path.exists(path):
+            os.mknod(path)
 
 
     def make_backup_file(self):
-        if not os.path.exists(self.backup_file_path):
-            os.mknod(self.backup_file_path)
+        self.check_if_file_exists_and_create_if_not(self.backup_file_path)
         with open(self.backup_file_path, 'wb') as backup_file:
             for TLname in self.get_reservation_dictionary():
                 backup_file.writelines(json.dumps({TLname : self.get_reservation_dictionary()[TLname]}) + "\n")
 
 
     def read_backup_file(self):
-        if not os.path.exists(self.backup_file_path):
-            pass
-        else:
-            if not os.path.getsize(self.backup_file_path) == 0:
-                with open(self.backup_file_path, 'rb') as backup_file:
-                    tmp_dictionary = {}
-                    for line in backup_file.readlines():
-                        tmp_dictionary.update(json.loads(line))
-                    self.set_reservations_dictionary(tmp_dictionary)
+        self.check_if_file_exists_and_create_if_not(self.backup_file_path)
+        with open(self.backup_file_path, 'rb') as backup_file:
+            tmp_dictionary = {}
+            [tmp_dictionary.update(json.loads(line)) for line in backup_file.readlines() if not line == '']
+            self.set_reservations_dictionary(tmp_dictionary)
 
+
+    def create_TL_name_to_address_map_from_file_output(self, TL_map_file):
+        TL_map = {}
+        [TL_map.update(json.loads(line)) for line in TL_map_file.readlines() if not line == '']
+        return TL_map
+
+
+    def clear_file(self, fd):
+        fd.seek(0)
+        fd.truncate()
+
+
+    def write_TL_address_to_TL_map_file(self, TLname):
+        self.check_if_file_exists_and_create_if_not(self.TL_map_file_path)
+        with open(self.TL_map_file_path, 'rb+') as TL_map_file:
+            TL_map = self.create_TL_name_to_address_map_from_file_output(TL_map_file)
+            if not TLname in TL_map:
+                TL_map[TLname] = self.get_TL_address_from_ute_reservation_api(TLname)
+            self.clear_file(fd = TL_map_file)
+            [TL_map_file.writelines(json.dumps({TLname : TL_map[TLname]}) + "\n") for TLname in TL_map]
+
+
+    def delete_TL_address_from_TL_map_file(self, TLname):
+        self.check_if_file_exists_and_create_if_not(self.TL_map_file_path)
+        with open(self.TL_map_file_path, 'rb+') as TL_map_file:
+            TL_map = self.create_TL_name_to_address_map_from_file_output(TL_map_file)
+            if TLname in TL_map:
+                TL_map.pop(TLname)
+            self.clear_file(fd = TL_map_file)
+            [TL_map_file.writelines(json.dumps({TLname : TL_map[TLname]}) + "\n") for TLname in TL_map]
+
+
+    def write_TLname_to_blacklist_file(self, TLname):
+        with open(self.TL_blacklist_file_path, "ab") as TL_blacklist_file:
+            TL_blacklist_file.write('{}\n'.format(TLname))
+
+
+    def check_if_TL_not_in_blacklist_file(self, TLname):
+        self.check_if_file_exists_and_create_if_not(self.TL_blacklist_file_path)
+        with open(self.TL_blacklist_file_path, "rb") as TL_blacklist_file:
+            if [line.strip for line in TL_blacklist_file.readlines() if line.strip() == TLname]:
+                return True
+            else:
+                return False
+
+
+    def delete_TL_from_blacklist_file(self, client_request):
+        TLname = re.search("request\/blacklist_remove_TL=(.*)", client_request).group(1)
+        self.check_if_file_exists_and_create_if_not(self.TL_blacklist_file_path)
+        with open(self.TL_blacklist_file_path, "rb+") as TL_blacklist_file:
+            blacklist = TL_blacklist_file.readlines()
+            self.clear_file(TL_blacklist_file)
+            [TL_blacklist_file.writelines(_TLname) for _TLname in blacklist if not _TLname == TLname]
+        return TLname
 
     def serve(self):
         inputs = [self.socket, sys.stdin]
@@ -370,6 +442,7 @@ def managing_reservations():
                 # print ReservManager.get_reservation_dictionary()
         ReservManager.check_all_TL_for_extending_or_releasing(release)
         print ReservManager.get_reservation_dictionary()
+
         time.sleep(30)
 
 
