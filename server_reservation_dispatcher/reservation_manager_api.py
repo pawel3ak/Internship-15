@@ -132,18 +132,18 @@ class ReservationManager(CloudReservationApi):
         while True:
             TLinfo = self.get_reservation_details(ID)
             if not TLinfo['testline']['name']:
-                time.sleep(10)
+                time.sleep(5)
             else:
                 TLname = TLinfo['testline']['name']
                 break
         self.__reservations_dictionary[TLname] = {'id' : ID,
                                                   'job' : False,
-                                                  'cloud' : self.get_testline_type(TLname)
+                                                  'cloud' : self.get_testline_type(ID)
                                                   }
 
 
-    def get_testline_type(self, TLname):
-        return super(ReservationManager, self).get_reservation_details(self.get_reservation_dictionary()[TLname]['id'])['testline_type']
+    def get_testline_type(self, ID):
+        return super(ReservationManager, self).get_reservation_details(ID)['testline_type']
 
 
     def set_reservations_dictionary(self, dictionary):
@@ -161,7 +161,7 @@ class ReservationManager(CloudReservationApi):
     def create_reservation_and_set_TL_info(self):
         try:
             ID = self.__create_reservation()
-            print ID
+            logger.info('{} : {}'.format(LOGGER_INFO[115], ID))
             self.__set_TLinfo(ID)
         except:
             if ID == -102:
@@ -365,7 +365,9 @@ def managing_reservations():
             release = False
             if len(ReservManager.get_reservation_dictionary()) < ReservManager.MAXTL:
                 ReservManager.create_reservation_and_set_TL_info()
+                print ReservManager.get_reservation_dictionary()
                 ReservManager.make_backup_file()
+                # print ReservManager.get_reservation_dictionary()
         ReservManager.check_all_TL_for_extending_or_releasing(release)
         print ReservManager.get_reservation_dictionary()
         time.sleep(30)

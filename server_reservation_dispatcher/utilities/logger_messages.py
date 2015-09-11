@@ -13,6 +13,7 @@ LOGGER_INFO = {
     112: "Opening file to change tag failed (probably wrong file name)",
     113: "No duration in reseration_data",
     114: "Git error",
+    115: "Reservation created with ID",
     124: "Problems with connecting to Jenkins",
     128: "SSH Connection Failure",
     129: "TAG not found in proper line",
