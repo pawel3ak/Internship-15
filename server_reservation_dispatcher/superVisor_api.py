@@ -44,6 +44,7 @@ class SuperVisor(Jenkins):
         self.__user_info = user_info          #dict:{first_name : "", last_name : "", mail :""}
         self.__TLname = TLname
         self.__suitname = jenkins_job_info['parameters']['name']
+        self.TL_name_to_address_map_path = os.path.join('.','utilities','TL_name_to_address_map.data')
 
         self.__TLaddress = self.set_TLaddress_from_map()
         self.__failureStatus = None
@@ -89,8 +90,22 @@ class SuperVisor(Jenkins):
 
 
     def set_TLaddress_from_map(self):
-        self.__TLaddress = TL_map[self.__TLname]
-        return self.__TLaddress
+        if not os.path.exists(self.TL_name_to_address_map_path):
+            logger.critical("Cannot get TL address!")
+            self.set_test_end_status("No_TLaddress")
+            self.finish_with_failure()
+        else:
+            with open(self.TL_name_to_address_map_path, "rb") as TL_map_file:
+                TL_map = [json.loads(line.strip()) for line in TL_map_file.readlines()]
+                TLaddress = [address[self.get_TLname()] for address in TL_map if self.get_TLname() in address]
+                if not TLaddress:
+                    logger.critical("Cannot get TL address!")
+                    self.set_test_end_status("No_TLaddress")
+                    self.finish_with_failure()
+                else:
+                    self.__TLaddress = TLaddress[0]
+        # self.__TLaddress = TL_map[self.__TLname]
+        # return self.__TLaddress
 
 
     def get_failure_status(self):

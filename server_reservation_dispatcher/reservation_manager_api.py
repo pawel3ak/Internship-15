@@ -393,6 +393,10 @@ class ReservationManager(CloudReservationApi):
             [TL_blacklist_file.writelines(_TLname) for _TLname in blacklist if not _TLname == TLname]
         return TLname
 
+    def check_if_TLaddresses_in_file(self):
+        [self. write_TL_address_to_TL_map_file(TLname) for TLname in self.get_reservation_dictionary()]
+
+
     def serve(self):
         inputs = [self.socket, sys.stdin]
         while True:
@@ -424,6 +428,7 @@ def managing_reservations():
         return None
     ReservManager.read_backup_file()
     ReservManager.check_if_TL_reservation_didnt_expire_during_breakdown()
+    ReservManager.check_if_TLaddresses_in_file()
     t = threading.Thread(target=ReservManager.serve)
     t.setDaemon(True)
     t.start()
