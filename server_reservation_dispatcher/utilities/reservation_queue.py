@@ -12,12 +12,13 @@ import os
 
 # create logger
 logger = logging.getLogger("server." + __name__)
+logger_adapter = logging.LoggerAdapter(logger, {'custom_name': None})
 
 
 class ReservationQueue(object):
     def __init__(self, queue_file_path):
         self._queue_file_path = queue_file_path
-        logger.debug("Create new queue object: {}".format(self._queue_file_path))
+        logger_adapter.debug("Create new queue object: {}".format(self._queue_file_path))
         if not os.path.exists(self._queue_file_path):
             os.mknod(self._queue_file_path)
         self._queue_length = self.__check_queue_length()

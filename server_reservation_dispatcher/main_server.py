@@ -17,6 +17,7 @@ CONFIG_FILE = 'server_config.cfg'
 # create logger
 logger = logging.getLogger("server")
 config_logger(logger, CONFIG_FILE)
+logger_adapter = logging.LoggerAdapter(logger, {'custom_name': None})
 
 
 def main_server():
@@ -25,19 +26,19 @@ def main_server():
     server.create_server_dirs_if_not_exists()
 
     # start JobManager
-    logger.info("Start new thread with job manager")
+    logger_adapter.info("Start new thread with job manager")
     server.start_job_manager()
 
     server.set_up_server()
-    logger.info("Start server loop - waiting for request")
+    logger_adapter.info("Start server loop - waiting for request")
     while True:
         [connection, data] = server.get_request_from_client()
         server.response_for_client_request(connection, data)
         if not server.check_if_job_manager_is_alive():
-            logger.info("Job manager is not alive")
+            logger_adapter.info("Job manager is not alive")
             break
     server.stop_server()
-    logger.info("Server stopped")
+    logger_adapter.info("Server stopped")
 
 
 if __name__ == "__main__":

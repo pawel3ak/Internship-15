@@ -13,6 +13,7 @@ from job_manager_api import JobManagerApi
 
 # create logger
 logger = logging.getLogger("server." + __name__)
+logger_adapter = logging.LoggerAdapter(logger, {'custom_name': None})
 
 
 def start_suites_from_job_manager_dictionary(manager):
@@ -24,7 +25,7 @@ def start_suites_from_job_manager_dictionary(manager):
         if status == "Active":
             manager.start_new_supervisor(key, dictionary[key])
         elif not status:
-            logger.debug("Connection error\\Wrong request")
+            logger_adapter.debug("Connection error\\Wrong request")
         else:
             manager.remove_record_from_job_manager_dictionary(key)
     manager.write_job_manager_dictionary_to_file()
@@ -50,23 +51,23 @@ def fast_supervisors_start(manager):
 
 def managing_loop(manager, loop_interval):
     while True:
-        logger.debug("Main JM loop")
+        logger_adapter.debug("Main JM loop")
         manager.delete_done_jobs_from_dictionaries()
         manager.write_job_manager_dictionary_to_file()
         while True:
             tl_name = manager.get_tl_name_from_reservation_manager()
             print tl_name
             if tl_name == "No available TL":
-                logger.debug("No available TL")
+                logger_adapter.debug("No available TL")
                 break
             if not tl_name:
-                logger.debug("Connection error\\Wrong request")
+                logger_adapter.debug("Connection error\\Wrong request")
                 break
             else:
                 if manager.get_queue_length() == 0:
                     manager.update_local_git_repository()
                     if not manager.make_tests_queue_from_testsuites_dir():
-                        logger.debug("No suites to run - free TL in RM: {}".format(tl_name))
+                        logger_adapter.debug("No suites to run - free TL in RM: {}".format(tl_name))
                         manager.free_testline_in_reservation_manager(tl_name)
                         break
                 next_suite = manager.read_next_reservation_record_and_delete_from_queue()
@@ -82,7 +83,7 @@ def job_manager(config_filename='server_config.cfg'):
     loop_interval = config.getfloat('JobManager', 'loop_interval')
 
     if not manager.start_reservation_manager():
-        logger.critical("RM does not work")
+        logger_adapter.critical("RM does not work")
         return None
 
     start_suites_from_job_manager_dictionary(manager)
