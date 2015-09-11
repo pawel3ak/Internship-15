@@ -94,6 +94,15 @@ def get_end_date(sock, TLname):
         pass
 
 
+def delete_from_blacklist(sock, TL_blacklist):
+    sock.send("request/blacklist_remove_TL={}".format(TL_blacklist))
+    try:
+        response = sock.recv(1024)
+        if response != "": print response
+    except:
+        pass
+
+
 def main():
     parser = argparse.ArgumentParser(argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-a', '--host', default=HOST_IP,
@@ -110,6 +119,8 @@ def main():
                         help='ask for status')
     parser.add_argument('-d', '--date', type=str, default='',
                         help='ask for end_date')
+    parser.add_argument('-r', '--remove')
+
 
     args = parser.parse_args()
     host = args.host
@@ -119,6 +130,7 @@ def main():
     freetl = args.freetl
     status = args.status
     TLname = args.date
+    TL_blacklist = args.remove
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((host, port))
@@ -143,6 +155,9 @@ def main():
 
     elif TLname !='':
         get_end_date(sock, TLname)
+
+    elif not TL_blacklist == '':
+        delete_from_blacklist(sock, TL_blacklist)
     # elif len(sys.argv) == 3:
     #     if sys.argv[1] == "info":
     #         get_info(sock,sys.argv[2])
