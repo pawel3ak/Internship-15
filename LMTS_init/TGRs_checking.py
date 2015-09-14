@@ -11,7 +11,7 @@ def is_tgrs_reachable():
 
 
 def parse_TGR_IPs_list_lmts_ini_file(path_to_lmts_ini_file="/usr/lmts/etc/lmts.ini",
-                                     first_line = "[tgr_\d]",
+                                     first_line = '\[tgr_*',
                                      second_line = "ip_addr.+= (\d+\.\d+\.\d+.\d+)"):
     """
     [tgr_1]
@@ -33,14 +33,15 @@ def parse_TGR_IPs_list_lmts_ini_file(path_to_lmts_ini_file="/usr/lmts/etc/lmts.i
     previous_line = None
 
     with open(path_to_lmts_ini_file, 'r') as lmts_configuration:
-        previous_line = lmts_configuration.readline()
-	print "First line: " + previous_line + "\n"
-        for line in lmts_configuration:
-            current_line = line
-            if re.match(first_line, previous_line):
-                _tgr_IP = re.search(second_line, current_line).group(0)
+        number_of_lines = sum(1 for line in lmts_configuration)
+        lmts_configuration.seek(0)
+        for number_of_line in range(0, number_of_lines):
+            line=lmts_configuration.readline()
+            if re.match(first_line, line):
+                line_with_ip_addr = lmts_configuration.readline()
+                number_of_line += 1
+                _tgr_IP = re.search(second_line, line_with_ip_addr).group(1)
                 TGR_IPs.append(_tgr_IP)
-	    previous_line = current_line
 
 
 def get_list_of_TGR_IPs():
