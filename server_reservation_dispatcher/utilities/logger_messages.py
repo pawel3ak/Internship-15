@@ -16,7 +16,7 @@ LOGGER_INFO = {
     115: "Reservation created with ID",
     124: "Problems with connecting to Jenkins",
     128: "SSH Connection Failure",
-    129: "TAG not found in proper line",
+    129: "TAG not found in file",
     130: "didn't run count was incremented",
     131: "failed to start - suitename added to file",
     132: "Changed tag in robot_file",
