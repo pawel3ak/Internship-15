@@ -87,7 +87,7 @@ if __name__ == '__main__':
     if True:
         # i = 75891
 
-        reservation = TestLineReservation(75979)
+        reservation = TestLineReservation(76563)
     # print reservation.get_available_tl_count_group_by_type()
     # reservation = TestLineReservation(66567)
     # reservation = TestLineReservation(66626)
@@ -105,7 +105,7 @@ if __name__ == '__main__':
                 # reservation.extend_reservation()
         # print reservation.get_reservation_details()
     # now = datetime.datetime.utcnow()
-    #         print reservation.release_reservation()
+            print reservation.release_reservation()
     # print reservation.get_address()
     # print reservation.get_reservation_status()
     # print reservation.get_reservation_details()

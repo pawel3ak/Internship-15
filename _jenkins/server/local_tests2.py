@@ -943,6 +943,81 @@ Finished: SUCCESS
 #         if suite in json.loads(line):
 #             lines.remove(line)
 #     [fff.writelines('{}\n'.format(json.dumps(json.loads(line)))) for line in lines]
+import json
+# from server_reservation_dispatcher.utilities.TL_map import TL_map
+TL_map = []
+TL_map.append({'tl99_test' : 'wmp-tl99.lab0.krk-lab.nsn-rdnet.net'})
+TL_map.append({'TL99' : 'wmp-tl99.lab0.krk-lab.nsn-rdnet.net'})
+TL_map.append({'TL63' : 'wmp-tl63.lab0.krk-lab.nsn-rdnet.net'})
+TL_map.append({'TL88' : 'iav-kra-tl088.lab0.krk-lab.nsn-rdnet.net'})
+
+path = os.path.join('.','utilities','TL_name_to_address_map')
+
+'''
+with open(path, 'wb') as fff:
+    for TL in TL_map:
+        fff.writelines('{}\n'.format(json.dumps(TL)))
+'''
+
+TLname = "TL1"
+with open("pliczek", 'wb') as output:
+    TL = ["TL15", "TL99", "TL33"]
+    for tl in TL:
+        output.write('{}\n'.format(tl))
+
+with open("/home/ute/PycharmProjects/projekty/Internship-15/_jenkins/server/pliczek", "rb+") as fff:
+    # blacklist = []
+    # a = [line.strip() for line in fff.readlines() if line.strip() == TLname]
+    lines = fff.readlines()
+    fff.seek(0)
+    fff.truncate(0)
+    [fff.writelines('{}'.format(line)) for line in lines if not line.strip() == TLname]
+    # [blacklist.append(line) for line in fff.readlines() if not line.strip() == TLname]
+
+    # [fff.writelines('{}'.format(line)) for line in blacklist]
+
+
+
+#
+# with open(path, 'rb+') as fff:
+#     TL_map = {}
+#     for lines in fff.readlines():
+#         if not lines == '':
+#             TL_map.update(json.loads(lines))
+#     if not TLname in TL_map:
+#         TL_map[TLname] = "jakis addr"
+#
+#     fff.seek(0)
+#     fff.truncate(0)
+#
+#     for TLname in TL_map:
+#         print TLname
+#         fff.writelines(json.dumps({TLname : TL_map[TLname]}) + "\n")
+    '''
+    _found = False
+    for v in lines:
+        if TLname in v:
+            _found = True
+    if not _found:
+            lines.append({TLname : 'addr'})
+
+    print [line for line in lines]
+    '''
+# if not os.path.exists(path):
+#     os.mknod(path)
+# TL_map = []
+
+# with open(path, "rb+") as TL_map_file:
+#     for line in TL_map_file:
+#         TL_map.append(json.loads(line))
+#     if not TLname in TL_map:
+#         print "tak"
+
+
+# TL_map.update({'TL99' : "jakis_addr"})
+# TL_map.
+# print TL_map
+
 
 """
 {"IAV_WRO_CLOUD1001": {"job": "", "id": 75891, "cloud": "CLOUD_F"}}
