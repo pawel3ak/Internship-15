@@ -6,7 +6,7 @@ import paramiko
 def check_path(path, ftp):
     try:
         ftp.chdir(path)
-    except:
+    except NameError:
         ftp.mkdir(path)
 
 
