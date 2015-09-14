@@ -20,6 +20,8 @@ LOGGER_INFO = {
     130: "didn't run count was incremented",
     131: "failed to start - suitename added to file",
     132: "Changed tag in robot_file",
+    133: "SSH Connection Error -can not execute 'git pull' command",
+    134: "Opening FETCH_HEAD file failed",
     1102: "Reservation already exists",
     1103: "User max reservation count exceeded",
     1104: "Connecting to cloud_ute failure",

@@ -16,7 +16,6 @@ import os
 import sys
 import logging
 import json
-from celery.worker import job
 
 from jenkinsapi.api import Jenkins
 import ute_mail.sender
@@ -25,7 +24,7 @@ import paramiko
 
 from utilities.mailing_list import mail_dict, admin
 from utilities.logger_messages import LOGGER_INFO
-# from server_git_api import git_launch
+from ours_git_api import git_launch
 
 
 # create logger
@@ -54,6 +53,7 @@ class SuperVisor(Jenkins):
         self.__are_any_failed_tests = False
         self.__test_end_status = None
         self.__filenames_of_failed_tests = None
+        self.__commit_version = self.set_commit_version_from_file()
 
         try:
             super(SuperVisor, self).__init__('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
@@ -67,6 +67,8 @@ class SuperVisor(Jenkins):
                      "jenkins_info = {}, user_info = {}, TLname = {}".format(self.__jenkins_info,
                                                                                       self.__user_info,
                                                                                       self.__TLname))
+        git_launch(self.get_TLaddress(), self.suitename_folder_path, pull_only=True)
+
 
     #########################################################################################
     #getters and setters
@@ -131,6 +133,14 @@ class SuperVisor(Jenkins):
 
     def set_filenames_of_failed_tests(self, failed_tests):
         self.__filenames_of_failed_tests = failed_tests
+
+
+    def get_commit_version(self):
+        return self.__commit_version
+
+
+    def set_commit_version_from_file(self, version):
+        self.__commit_version = version
 
 
     def get_job_parameters(self):
@@ -435,7 +445,7 @@ class SuperVisor(Jenkins):
             [testsWithoutTag_file.writelines('{}\n'.format(json.dumps(line))) for line in lines_in_file]
 
 
-    def __get_SSHClient_connection(self):
+    def get_SSHClient_connection(self):
         try:
             SSHClient = paramiko.SSHClient()
             SSHClient.load_system_host_keys()
@@ -456,7 +466,6 @@ class SuperVisor(Jenkins):
 
     def __match_filenames_and_paths(self, tmp_filenames_and_paths):
         filenames_and_paths = []
-        # filenames_and_paths_for_temporary_use = []
         for filename_from_output in self.get_filenames_of_failed_tests():
             matches = [(re.search('({}.*)'.format(filename_from_output), tmp_filename_and_path['filename']),
                         tmp_filename_and_path['path']) for tmp_filename_and_path in tmp_filenames_and_paths]
@@ -468,7 +477,7 @@ class SuperVisor(Jenkins):
     def remove_tag_from_robots_tests(self, old_tag = 'enable', new_tag = ''):
         tmp_filenames_and_paths = self.__get_robot_filenames_and_paths()
         filenames_and_paths = self.__match_filenames_and_paths(tmp_filenames_and_paths)
-        SSHClient = self.__get_SSHClient_connection()
+        SSHClient = self.get_SSHClient_connection()
         if SSHClient == None:
             logger.warning('{}'.format(128))
             self.set_test_end_status("SSH_Connection_Failure")
@@ -501,6 +510,18 @@ class SuperVisor(Jenkins):
             finally:
                 SSHClient.close()
 
+
+    def get_last_commit_from_file(self):
+        SSHClient = self.get_SSHClient_connection()
+        if SSHClient == None:
+            logger.warning('{}'.format(133))
+        else:
+            try:
+                SFTP = SSHClient.open_sftp()
+                file_with_last_commit = SFTP.file("/home/ute/auto/ruff_scripts/.git/FETCH_HEAD", "r")
+                self.set_commit_version_from_file(file_with_last_commit.read().split()[0])
+            except:
+                logger.warning('{}'.format(134))
 
     def get_logs_link(self):
         if self.get_job_status() == "SUCCESS":
@@ -557,9 +578,11 @@ class SuperVisor(Jenkins):
             _message = "Dear {}! \n\n" \
                         "Your test have failed: \n\n" \
                         "{test_info}\n\n" \
+                        "Git version = {commit_version}\n\n" \
                         "Logs are available at: {logs_link}\n\n" \
                         "Have a nice day!".format(self.choose_recipent_name(),
                                                   test_info=failed_tests_information,
+                                                  commit_version=self.get_commit_version(),
                                                   logs_link=logs_url_address)
             messages.append({'message' : _message,
                             'feature' : self.get_suitname()})
