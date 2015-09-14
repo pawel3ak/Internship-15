@@ -6,6 +6,8 @@
 :author: Pawel Nogiec
 :contact: pawel.nogiec@nokia.com
 """
+from audiodev import test
+from distutils.log import Log
 
 import time
 import xml.etree.ElementTree as ET
@@ -14,14 +16,13 @@ import os
 import sys
 import logging
 import json
-
+from celery.worker import job
 
 from jenkinsapi.api import Jenkins
 import ute_mail.sender
 import ute_mail.mail
 import paramiko
 
-from utilities.TL_map import TL_map
 from utilities.mailing_list import mail_dict, admin
 from utilities.logger_messages import LOGGER_INFO
 # from server_git_api import git_launch
@@ -31,11 +32,11 @@ from utilities.logger_messages import LOGGER_INFO
 logger = logging.getLogger("server." + __name__)
 #######################################################################################
 # temporary
-'''
+
 from utilities.logger_config import config_logger
 logger.setLevel(logging.DEBUG)
 config_logger(logger,'server_config.cfg')
-'''
+
 ########################################################################################
 
 class SuperVisor(Jenkins):
@@ -44,10 +45,11 @@ class SuperVisor(Jenkins):
         self.__user_info = user_info          #dict:{first_name : "", last_name : "", mail :""}
         self.__TLname = TLname
         self.__suitname = jenkins_job_info['parameters']['name']
-        self.TL_name_to_address_map_path = os.path.join('.','utilities','TL_name_to_address_map.data')
-
+        self.TL_name_to_address_map_path = os.path.join('.','utilities','TL_name_to_address_map.data') #full path after copy to belvedere
+        self.file_with_basic_info_path = os.path.join('.', 'files', 'SuperVisor', self.get_suitname())
+        self.testsWithoutTag_file_path = os.path.join('.', 'files', 'SuperVisor', 'testsWithoutTag.txt')
+        self.suitename_folder_path = os.path.join('/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN', self.get_suitname())
         self.__TLaddress = self.set_TLaddress_from_map()
-        self.__failureStatus = None
         self.__are_any_failed_tests = False
         self.__test_end_status = None
         self.__filenames_of_failed_tests = None
@@ -55,9 +57,9 @@ class SuperVisor(Jenkins):
         try:
             super(SuperVisor, self).__init__('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
         except:
-            self.set_failure_status(124)
-            logger.critical('{}'.format(LOGGER_INFO[self.get_failure_status()]))
-            sys.exit(1)
+            self.set_test_end_status("JenkinsError")
+            logger.critical('{}'.format(LOGGER_INFO[124]))
+            self.finish_with_failure()
 
 
         logger.debug("Created new Supervisor object with args: "
@@ -97,23 +99,13 @@ class SuperVisor(Jenkins):
         else:
             with open(self.TL_name_to_address_map_path, "rb") as TL_map_file:
                 TL_map = [json.loads(line.strip()) for line in TL_map_file.readlines()]
-                TLaddress = [address[self.get_TLname()] for address in TL_map if self.get_TLname() in address]
-                if not TLaddress:
+                try:
+                    TLaddress = [address[self.get_TLname()] for address in TL_map if self.get_TLname() in address][0]
+                    return TLaddress
+                except:
                     logger.critical("Cannot get TL address!")
                     self.set_test_end_status("No_TLaddress")
                     self.finish_with_failure()
-                else:
-                    self.__TLaddress = TLaddress[0]
-        # self.__TLaddress = TL_map[self.__TLname]
-        # return self.__TLaddress
-
-
-    def get_failure_status(self):
-        return self.__failureStatus
-
-
-    def set_failure_status(self,status):
-        self.__failureStatus = status
 
 
     def get_are_any_failed_tests(self):
@@ -170,9 +162,8 @@ class SuperVisor(Jenkins):
             self.__jenkins_info['connection'] = Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
             logger.debug("jenkins connection has been set")
         except:
-            self.set_failure_status(106)
             self.set_test_end_status("JenkinsError")
-            logger.critical('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+            logger.critical('{}'.format(LOGGER_INFO[106]))
             self.finish_with_failure()
 
 
@@ -184,9 +175,8 @@ class SuperVisor(Jenkins):
         try:
             self.__jenkins_info['job_handler'] = self.get_job(self.get_jobname())
         except:
-            self.set_failure_status(125)
             self.set_test_end_status("JenkinsError")
-            logger.critical('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+            logger.critical('{}'.format(LOGGER_INFO[125]))
             self.finish_with_failure()
 
 
@@ -211,31 +201,37 @@ class SuperVisor(Jenkins):
     #########################################################################################
 
 
-    def make_file_with_specific_info(self):
+    def make_file_with_basic_info(self):
+        '''
+        creates file with basic informations about this specific supervisor object
+        :return: nothing
+        '''
         info_to_save = {
             'TLname'    : self.get_TLname(),
             'suitname'  : self.get_suitname(),
             'job_params': self.get_job_parameters()
         }
-        path_with_filename = os.path.join('.','files','SuperVisor',self.get_suitname())
-        with open(path_with_filename, 'wb') as file_with_specific_info:
-            json.dump(info_to_save, file_with_specific_info)
+        with open(self.file_with_basic_info_path, 'wb') as file_with_basic_info:
+            json.dump(info_to_save, file_with_basic_info)
 
 
-    def delete_file_with_specific_info(self):
-        path_with_filename = os.path.join('.','files','SuperVisor',self.get_suitname())
-        for _ in range(10):
-            try:
-                os.remove(path_with_filename)
-                break
-            except:
-                time.sleep(0.1)
+    def delete_file_with_basic_info(self):
+        if not os.path.exists(self.file_with_basic_info_path):
+            pass
+        else:
+            for _ in range(10):
+                try:
+                    os.remove(self.file_with_basic_info_path)
+                    break
+                except:
+                    time.sleep(0.1)
 
 
     def finish_with_failure(self):
         self.send_information_about_executed_job()
-        self.delete_file_with_specific_info()
-        sys.exit()
+        self.delete_file_with_basic_info()
+        logger.critical('{} : {}'.format(LOGGER_INFO[130], self.get_test_end_status()))
+        sys.exit(1)
 
 
     def set_node_for_job(self):
@@ -246,9 +242,8 @@ class SuperVisor(Jenkins):
             self.get_job_handler().update_config(ET.tostring(job_config_xml))
             logger.debug("Updated TL name: {} in job {}".format(self.get_TLname(), self.get_jobname()))
         except:
-            self.set_failure_status(104)
             self.set_test_end_status("JenkinsError")
-            logger.warning('{} : {}'.format(self.get_TLname(), LOGGER_INFO[self.get_failure_status()]))
+            logger.critical('{} : {}'.format(self.get_TLname(), LOGGER_INFO[104]))
             self.finish_with_failure()
 
 
@@ -257,9 +252,8 @@ class SuperVisor(Jenkins):
             self.__jenkins_info['job_status'] = self.get_job_handler().get_build(self.get_job_build_number()).get_status()
         except:
             self.__jenkins_info['job_status'] = "UNKNOWN"
-            self.set_failure_status(105)
             self.set_test_end_status("JenkinsError")
-            logger.error('{} : {}'.format(self.get_jobname(),LOGGER_INFO[self.get_failure_status()]))
+            logger.critical('{} : {}'.format(self.get_jobname(),LOGGER_INFO[105]))
             self.finish_with_failure()
         finally:
             logger.debug("Job {} status = {}".format(self.get_jobname(), self.get_job_status()))
@@ -272,8 +266,8 @@ class SuperVisor(Jenkins):
             self.set_are_any_failed_tests(False)
             self.check_output_for_other_fails_or_errors_and_set_test_end_status()
         elif job_status == "UNKNOWN":
-            self.set_failure_status(124)
             self.set_test_end_status("JenkinsError")
+            logger.critical('{} : {}'.format(self.get_jobname(),LOGGER_INFO[124]))
             self.finish_with_failure()
         elif job_status == "SUCCESS":
             pass
@@ -288,8 +282,7 @@ class SuperVisor(Jenkins):
         try:
             self.set_job_build_number(self.get_job_handler().get_last_buildnumber())
         except:
-            self.set_failure_status(124)
-            logger.critical(LOGGER_INFO[self.get_failure_status()])
+            logger.critical(LOGGER_INFO[124])
             self.set_test_end_status("JenkinsError")
             self.finish_with_failure()
         if once:
@@ -301,9 +294,8 @@ class SuperVisor(Jenkins):
                 else:
                     return False
         except:
-            self.set_failure_status(124)
             self.set_test_end_status("JenkinsError")
-            logger.error('{} : {}'.format(self.get_jobname(),LOGGER_INFO[self.get_failure_status()]))
+            logger.critical('{} : {}'.format(self.get_jobname(),LOGGER_INFO[124]))
             self.finish_with_failure()
 
 
@@ -313,9 +305,8 @@ class SuperVisor(Jenkins):
                                                       params=self.get_job_parameters())
             logger.info("Job {} was built".format(self.get_jobname()))
         except:
-            self.set_failure_status(107)
             self.set_test_end_status("JenkinsError")
-            logger.error('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+            logger.critical('{}'.format(LOGGER_INFO[107]))
             self.finish_with_failure()
 
 
@@ -324,118 +315,140 @@ class SuperVisor(Jenkins):
             self.set_job_output(self.get_job_handler().get_build(self.get_job_build_number()).get_console())
             logger.debug("Console output retrieved from {}".format(self.get_jobname()))
         except:
-            self.set_failure_status(108)
             self.set_test_end_status("JenkinsError")
-            logger.error('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+            logger.error('{}'.format(LOGGER_INFO[108]))
             self.finish_with_failure()
+
+
+    def check_job_output_for_filenames(self, match, regex):
+        job_filenames_failed_tests = []
+        try:
+            job_filenames_failed_tests.append(re.search(regex, match).group(1))
+        except:
+            pass
+        finally:
+            if job_filenames_failed_tests:
+                return job_filenames_failed_tests
+
+
+    def findall_test_failes(self):
+        regex = r'({}.*)\s\=\W*.*FAIL'.format(self.get_suitname())
+        matches = re.findall(regex, self.get_job_output())
+        self.set_are_any_failed_tests(True)
+        return matches
+
+
+    def prepare_output_for_regex_matching(self, match):
+        match = re.sub(" +", "_", match)  #changing " " to "_" - pybot thinks it's the same, i don't
+        if match[-3:] == '...': match = match[:-3]  #cutting last "..."
+        elif match[-1:] == '_': match = match[:-1]    #cutting last "_"
+        return match
 
 
     def parse_output_and_set_job_failed_tests(self):
         job_filenames_failed_tests=[]
-        regex = r'({}.*)\s\=\W*.*FAIL'.format(self.get_suitname())
-        # regex = '({}.*)\|.FAIL'.format(self.get_suitname())
         try:
-            matches = re.findall(regex, self.get_job_output())
-            self.set_are_any_failed_tests(True)
+            matches = self.findall_test_failes()
             for match in matches:
-                match = re.sub(" +", "_", match)  #changing " " to "_" - pybot thinks it's the same, i don't
-                if match[-3:] == '...': match = match[:-3]  #cutting last "..."
-                elif match[-1:] == '_': match = match[:-1]    #cutting last "_"
+                match = self.prepare_output_for_regex_matching(match)
+                regexes = ['\w*\.Tests\.{}.*\.({}.*)'.format(self.get_suitname(), self.get_suitname()),
+                         '\w*\.Tests\.({}.*)'.format(self.get_suitname()),
+                         '\w*\.({}.*)'.format(self.get_suitname())]
                 try:
-                    match = re.search('\w*\.Tests\.{}.*\.({}.*)'.format(self.get_suitname(),
-                                                                        self.get_suitname()),
-                                      match).group(1)
-                    job_filenames_failed_tests.append(match)
+                    job_filenames_failed_tests = [self.check_job_output_for_filenames(match, regex)
+                                              for regex in regexes if self.check_job_output_for_filenames(match, regex)][0]
+                    logger.info("Regex found fails in output of {}".format(self.get_jobname()))
+                    self.set_test_end_status("GOT_FAILS")
                 except:
-                    try:
-                        match = re.search('\w*\.Tests\.({}.*)'.format(self.get_suitname()), match).group(1)
-                        job_filenames_failed_tests.append(match)
-                    except:
-                        try:
-                            match = re.search('\w*\.({}.*)'.format(self.get_suitname()), match).group(1)
-                            job_filenames_failed_tests.append(match)
-                        except:
-                            pass
+                    pass
         except:
             logger.debug("Regex did not find fails in output of {}".format(self.get_jobname()))
         finally:
-            if job_filenames_failed_tests:
-                logger.info("Regex found fails in output of {}".format(self.get_jobname()))
             self.set_filenames_of_failed_tests(job_filenames_failed_tests)
+            self.check_output_for_other_fails_or_errors_and_set_test_end_status()
 
 
-    def check_for_fails(self):
+    def check_output_for_fails(self):
         output = self.get_job_output()
         if not output.find('| FAIL |') == -1:
             logger.debug("Found 'FAIL' in output of {}".format(self.get_jobname()))
             return True
-        output = output.split('\n')
+        return False
+
+
+    def check_output_for_errors(self):
+        output = self.get_job_output().split('\n')
         for line in output:
             if re.findall('\[.ERROR.\].*no tests.*', line):
                 self.write_suitename_to_testsWithoutTag_file_if_no_enable_tag_in_suite()
-                logger.debug("y")
+                logger.info('"{}" {}'.format(self.get_suitname(), LOGGER_INFO[131]))
                 continue
             if not line.find('[ ERROR ]') == -1:
-                logger.debug("Found 'ERROR' in output of {}".format(self.get_jobname()))
+                logger.debug('{} "{}"'.format(LOGGER_INFO[132], self.get_jobname()))
                 return True
         return False
 
 
-    def remove_tag_from_testsWithoutTag_file_if_is_tag_in_suite(self):
-        path = os.path.join('.','files','SuperVisor','testsWithoutTag.txt')
+    def check_output_for_other_fails_or_errors_and_set_test_end_status(self):
+        if self.get_are_any_failed_tests() == False:
+            if not self.check_output_for_fails() and not self.check_output_for_errors():
+                self.set_test_end_status("SUCCESSFUL")
+                # logger.debug('"{}" {}'.format(self.get_suitname(), LOGGER_INFO[133]))
+            else:
+                self.set_test_end_status("NOT_CAUGHT_ERROR/FAIL")
+                self.set_are_any_failed_tests(True)
+                logger.error('{}'.format(LOGGER_INFO[109]))
+                self.finish_with_failure()
+
+    def check_if_file_exists_and_create_if_not(self, path):
         if not os.path.exists(path):
             os.mknod(path)
-        with open(path, 'rb+') as test_without_tag_file:
-            lines = test_without_tag_file.readlines()
-            test_without_tag_file.seek(0)
-            test_without_tag_file.truncate(0)
-            for line in lines:
-                if self.get_suitname() in json.loads(line):
-                    lines.remove(line)
-            [test_without_tag_file.writelines('{}\n'.format(json.dumps(json.loads(line)))) for line in lines]
+
+
+    def clear_file(self, fd):
+        fd.seek(0)
+        fd.truncate()
+
+
+    def remove_tag_from_testsWithoutTag_file_if_is_tag_in_suite(self):
+        self.check_if_file_exists_and_create_if_not(self.testsWithoutTag_file_path)
+        with open(self.testsWithoutTag_file_path, 'rb+') as testWithoutTag_file:
+            lines_in_file = testWithoutTag_file.readlines()
+            self.clear_file(testWithoutTag_file)
+            [testWithoutTag_file.writelines('{}\n'.format(line_in_file))
+             for line_in_file in lines_in_file if not json.loads(line_in_file) == self.get_suitname()]
 
 
     def write_suitename_to_testsWithoutTag_file_if_no_enable_tag_in_suite(self):
-        path = os.path.join('.','files','SuperVisor','testsWithoutTag.txt')
-        if not os.path.exists(path):
-            os.mknod(path)
-        with open(path, 'rb+') as test_without_tag_file:
-            _found = False
-            to_write = []
-            for line in test_without_tag_file.readlines():
-                line = json.loads(line.strip())
-                if self.get_suitname() in line:
-                    _found = True
-                    line[self.get_suitname()] += 1
-                    if line[self.get_suitname()]%5 == 0:
-                        self.set_test_end_status("Tester slacking")
-                    to_write.append(line)
-                else:
-                    to_write.append(line)
-            if not _found:
-                to_write.append({self.get_suitname() : 1})
-            test_without_tag_file.seek(0)
-            test_without_tag_file.truncate(0)
-            [test_without_tag_file.writelines('{}\n'.format(json.dumps(line))) for line in to_write]
+        self.check_if_file_exists_and_create_if_not(self.testsWithoutTag_file_path)
+        with open(self.testsWithoutTag_file_path, 'rb+') as testsWithoutTag_file:
+            lines_in_file = [json.loads(line) for line in testsWithoutTag_file.readlines()]
+            try:
+                suitename = [line for line in lines_in_file if line == self.get_suitname()][0]
+                lines_in_file[lines_in_file.index(suitename)] += 1
+                logger.info("'{}' {}".format(self.get_suitname(), LOGGER_INFO[130]))
+            except:
+                lines_in_file.append({self.get_suitname(): 1})
+                logger.info("'{}' - {}".format(self.get_suitname(), LOGGER_INFO[131]))
+            self.clear_file(testsWithoutTag_file)
+            [testsWithoutTag_file.writelines('{}\n'.format(json.dumps(line))) for line in lines_in_file]
+            # _found = False
+            # to_write = []
+            # for line in test_without_tag_file.readlines():
+            #     line = json.loads(line.strip())
+            #     if self.get_suitname() in line:
+            #         _found = True
+            #         line[self.get_suitname()] += 1
+            #         if line[self.get_suitname()]%5 == 0:
+            #             self.set_test_end_status("Tester slacking")
+            #         to_write.append(line)
+            #     else:
+            #         to_write.append(line)
+            # if not _found:
+            #     to_write.append({self.get_suitname() : 1})
+            # test_without_tag_file.seek(0)
+            # test_without_tag_file.truncate(0)
 
-
-    def check_output_for_other_fails_or_errors_and_set_test_end_status(self):
-        if self.get_are_any_failed_tests() == False:
-            if self.check_for_fails() == False:
-                if self.get_test_end_status() == "Tester slacking":
-                    logger.debug("Test {} was not launched - no specific TAG in suite".format(self.get_jobname()))
-                else:
-                    self.set_test_end_status("SUCCESSFUL")
-                    logger.debug("Test {} was successful".format(self.get_jobname()))
-            else:
-                self.set_test_end_status("UNKNOWN_ERROR/FAIL")
-                self.set_are_any_failed_tests(True)
-                self.set_failure_status(109)
-                logger.error('{}'.format(LOGGER_INFO[self.get_failure_status()]))
-                self.finish_with_failure()
-        else:
-            self.set_test_end_status("GOT_FAILS")
-            logger.info("Test {} has got some failures".format(self.get_jobname()))
 
 
     def __get_SSHClient_connection(self):
@@ -449,72 +462,82 @@ class SuperVisor(Jenkins):
             return None
 
 
-    def __get_robot_files_and_paths(self):
+    def __get_robot_filenames_and_paths(self):
         tmp_filenames_and_paths = []
-        for root, dirs, files in os.walk('/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/{}'.format(self.__suitname)):
-            for file in files:
-                if file.endswith('.robot') or file.endswith('.txt'):
-                    tmp_filenames_and_paths.append({'path' : root, 'filename' : file})
+        for root_path, directories, filenames in os.walk(self.suitename_folder_path):
+            [tmp_filenames_and_paths.append({'path' : root_path, 'filename' : filename})
+                                       for filename in filenames if filename.endswith('.robot') or filename.endswith('.txt')]
         return tmp_filenames_and_paths
 
 
     def __match_filenames_and_paths(self, tmp_filenames_and_paths):
         filenames_and_paths = []
-        filenames_and_paths_for_temporary_use = []
+        # filenames_and_paths_for_temporary_use = []
         for filename_from_output in self.get_filenames_of_failed_tests():
-            _found = False
-            for tmp_filename_and_path in tmp_filenames_and_paths:
-                try:
-                    re.search('({}.*)'.format(filename_from_output),tmp_filename_and_path['filename']).group(1)
-                    filenames_and_paths.append({'path' : tmp_filename_and_path['path'], 'filename' : tmp_filename_and_path['filename']})
-                    filenames_and_paths_for_temporary_use.append(tmp_filename_and_path['filename'])
-                    logger.debug("Found filename: {}".format(tmp_filename_and_path['filename']))
-                    _found = True
-                    break
-                except:
-                    pass
-            if not _found:
-                filenames_and_paths_for_temporary_use.append(filename_from_output)
-                self.set_failure_status(110)
-                logger.warning('{} {}'.format(LOGGER_INFO[self.get_failure_status()],filename_from_output))
-        self.set_filenames_of_failed_tests(filenames_and_paths_for_temporary_use)
+            matches = [(re.search('({}.*)'.format(filename_from_output), tmp_filename_and_path['filename']),
+                        tmp_filename_and_path['path']) for tmp_filename_and_path in tmp_filenames_and_paths]
+            [filenames_and_paths.append({'filename' : match[0].group(1), 'path' : match[1]}) for match in matches if match[0]]
+
+
+            # _found = False
+            # for tmp_filename_and_path in tmp_filenames_and_paths:
+            #     try:
+            #         re.search('({}.*)'.format(filename_from_output),tmp_filename_and_path['filename']).group(1)
+            #         filenames_and_paths.append({'path' : tmp_filename_and_path['path'], 'filename' : tmp_filename_and_path['filename']})
+            #         filenames_and_paths_for_temporary_use.append(tmp_filename_and_path['filename'])
+            #         logger.debug("Found filename: {}".format(tmp_filename_and_path['filename']))
+            #         _found = True
+            #         break
+            #     except:
+            #         pass
+            # if not _found:
+            #     filenames_and_paths_for_temporary_use.append(filename_from_output)
+            #     logger.warning('{} {}'.format(LOGGER_INFO[110],filename_from_output))
+        self.set_filenames_of_failed_tests([tmp_filename_and_path['filename'] for tmp_filename_and_path in tmp_filenames_and_paths])
         return filenames_and_paths
 
 
     def remove_tag_from_robots_tests(self, old_tag = 'enable', new_tag = ''):
-        tmp_filenames_and_paths = self.__get_robot_files_and_paths()
+        tmp_filenames_and_paths = self.__get_robot_filenames_and_paths()
         filenames_and_paths = self.__match_filenames_and_paths(tmp_filenames_and_paths)
-        SSHClient = None
-        try:
-            SSHClient = self.__get_SSHClient_connection()
-        except:
-            self.set_failure_status(128)
-            logger.warning('{}'.format(self.get_failure_status()))
+        SSHClient = self.__get_SSHClient_connection()
+        if SSHClient == None:
+            logger.warning('{}'.format(128))
             self.set_test_end_status("SSH_Connection_Failure")
             self.finish_with_failure()
-        __found = False
+        # __found = False
+        print filenames_and_paths
         for filename_and_path in filenames_and_paths:
             try:
                 SFTP = SSHClient.open_sftp()
-                file = SFTP.file(os.path.join(filename_and_path['path'], filename_and_path['filename']), 'r')
-                lines_in_file = file.readlines()
-                for line in lines_in_file:
-                    try:
-                        re.search('.*\[Tags](.*)', line).group(1)
-                        try:
-                            lines_in_file[lines_in_file.index(line)] = re.sub(old_tag, new_tag, line)
-                            __found = True
-                            logger.debug("Changed tag in file: {} from {} to {}".format(os.path.join(filename_and_path['path'], filename_and_path['filename']), old_tag, new_tag))
-                        except:
-                            self.set_failure_status(129)
-                            logger.warning('"{}" {}'.format(old_tag, LOGGER_INFO[self.get_failure_status()]))
-                    except:
-                        pass
-                file.close()
+                robot_file_path = os.path.join(filename_and_path['path'], filename_and_path['filename'])
+                robot_file = SFTP.file(robot_file_path, 'r')
+                print robot_file_path
+                lines_in_robot_file = robot_file.readlines()
+                matches = [re.search('(.*\[Tags].*)', line) for line in lines_in_robot_file]
+                match = [match.group(1) for match in matches if match]
+                print match[0]
+                if match[0]:
+                    lines_in_robot_file[lines_in_robot_file.index(match[0])] = re.sub(old_tag, new_tag, match[0])
+                    logger.debug("{} '{}' : '{}' -> '{}'".format(LOGGER_INFO[132], robot_file_path, old_tag, new_tag))
+                else:
+                    logger.warning('"{}" {}'.format(old_tag, LOGGER_INFO[129]))
+                # for line in lines_in_robot_file:
+                #     try:
+                #         re.search('.*\[Tags](.*)', line).group(1)
+                #         try:
+                #             lines_in_robot_file[lines_in_robot_file.index(line)] = re.sub(old_tag, new_tag, line)
+                #             __found = True
+                #             logger.debug("Changed tag in robot_file: {} from {} to {}".format(os.path.join(filename_and_path['path'], filename_and_path['filename']), old_tag, new_tag))
+                #         except:
+                #             logger.warning('"{}" {}'.format(old_tag, LOGGER_INFO[129]))
+                #     except:
+                #         pass
+                robot_file.close()
                 file2 = SFTP.file(os.path.join(filename_and_path['path'], filename_and_path['filename']), 'w')
-                file2.writelines(lines_in_file)
+                file2.writelines(lines_in_robot_file)
                 file2.close()
-                SSHClient.close()
+                # SSHClient.close()
 
             #   git_result = self.git_launch(file_info=[path, file_name])
             #   if not git_result == True:
@@ -523,13 +546,11 @@ class SuperVisor(Jenkins):
             #   logger.info("Git push successful on {}".format(self.TLname))
 
             except:
-                self.set_failure_status(112)
-                logger.warning('{}'.format(LOGGER_INFO[self.get_failure_status()]))
+                logger.warning('{}'.format(LOGGER_INFO[112]))
             finally:
                 SSHClient.close()
-        if not __found:
-            self.set_failure_status(111)
-            logger.warning('{} : {}'.format(LOGGER_INFO[self.get_failure_status()], old_tag))
+        # if not __found:
+        #     logger.warning('{} : {}'.format(LOGGER_INFO[111], old_tag))
 
 
     def get_logs_link(self):
@@ -596,7 +617,7 @@ class SuperVisor(Jenkins):
             subject = "Tests status update - finished with fail"
 
 
-        elif test_end_status == 'UNKNOWN_ERROR/FAIL':
+        elif test_end_status == 'NOT_CAUGHT_ERROR/FAIL':
             logs_url_address = '{url}/job/{job_name}/{bn}/console'.format(url= 'http://plkraaa-jenkins.emea.nsn-net.net:8080',
                                                                   job_name=self.get_jobname(),
                                                                   bn=self.get_job_build_number())

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-:created on: '11/08/15'
+:created on: '11/09/15'
 
 :copyright: Nokia
-:author: Damian Papiez, Paweł Nogieć
-:contact: damian.papiez@nokia.com, pawel.nogiec@nokia.com
+:author: Paweł Nogieć
+:contact: pawel.nogiec@nokia.com
 """
 
 from ute_cloud_reservation_api.api import CloudReservationApi
