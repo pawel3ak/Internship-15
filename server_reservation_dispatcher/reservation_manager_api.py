@@ -26,6 +26,7 @@ import copy
 
 
 logger = logging.getLogger("server." + __name__)
+logger_adapter = logging.LoggerAdapter(logger, {'custom_name': None})
 
 #######################################################################################
 # temporary
@@ -166,13 +167,13 @@ class ReservationManager(CloudReservationApi):
     def create_reservation_and_set_TL_info(self):
         try:
             ID = self.__create_reservation()
-            logger.info('{} : {}'.format(LOGGER_INFO[115], ID))
+            logger_adapter.info('{} : {}'.format(LOGGER_INFO[115], ID))
             self.__set_TLinfo(ID)
         except:
             if ID == -102:
-                logger.warning('{}'.format(LOGGER_INFO[1102]))
+                logger_adapter.warning('{}'.format(LOGGER_INFO[1102]))
             elif ID == -103:
-                logger.warning('{}'.format(LOGGER_INFO[1103]))
+                logger_adapter.warning('{}'.format(LOGGER_INFO[1103]))
 
 
     def get_TL_address_from_ute_reservation_api(self, TLname):
@@ -183,14 +184,14 @@ class ReservationManager(CloudReservationApi):
         try:
             return super(ReservationManager, self).release_reservation(self.get_reservation_dictionary()[TLname]['id'])
         except:
-            logger.error('{}'.format(LOGGER_INFO[1104]))
+            logger_adapter.error('{}'.format(LOGGER_INFO[1104]))
 
 
     def cancel_reservation(self, TLname):
         try:
             return super(ReservationManager, self).release_reservation(self.get_reservation_dictionary()[TLname]['id'])
         except:
-            logger.error('{}'.format(LOGGER_INFO[1104]))
+            logger_adapter.error('{}'.format(LOGGER_INFO[1104]))
 
 
     def find_first_free_TL(self, cloud):
@@ -237,7 +238,7 @@ class ReservationManager(CloudReservationApi):
             send.connect()
             send.send(mail)
         except:
-            logger.error('{}'.format(LOGGER_INFO[1105]))
+            logger_adapter.error('{}'.format(LOGGER_INFO[1105]))
 
 
     def remove_TL_from_reservations_dictionary(self,TLname):
@@ -424,7 +425,7 @@ def managing_reservations():
     try:
         ReservManager = ReservationManager()
     except socket.error, err:
-        logger.warning("Error while starting RM process: {}".format(err))
+        logger_adapter.warning("Error while starting RM process: {}".format(err))
         return None
     ReservManager.read_backup_file()
     ReservManager.check_if_TL_reservation_didnt_expire_during_breakdown()

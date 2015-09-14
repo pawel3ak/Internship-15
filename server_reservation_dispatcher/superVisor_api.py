@@ -32,11 +32,11 @@ from utilities.logger_messages import LOGGER_INFO
 logger = logging.getLogger("server." + __name__)
 #######################################################################################
 # temporary
-
+"""
 from utilities.logger_config import config_logger
 logger.setLevel(logging.DEBUG)
 config_logger(logger,'server_config.cfg')
-
+"""
 ########################################################################################
 
 class SuperVisor(Jenkins):
@@ -45,6 +45,7 @@ class SuperVisor(Jenkins):
         self.__user_info = user_info          #dict:{first_name : "", last_name : "", mail :""}
         self.__TLname = TLname
         self.__suitname = jenkins_job_info['parameters']['name']
+        self.__logger_adapter = logging.LoggerAdapter(logger, {'custom_name': self.__suitname})
         self.TL_name_to_address_map_path = os.path.join('.','utilities','TL_name_to_address_map.data') #full path after copy to belvedere
         self.file_with_basic_info_path = os.path.join('.', 'files', 'SuperVisor', self.get_suitname())
         self.testsWithoutTag_file_path = os.path.join('.', 'files', 'SuperVisor', 'testsWithoutTag.txt')
@@ -58,11 +59,11 @@ class SuperVisor(Jenkins):
             super(SuperVisor, self).__init__('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
         except:
             self.set_test_end_status("JenkinsError")
-            logger.critical('{}'.format(LOGGER_INFO[124]))
+            self.__logger_adapter.critical('{}'.format(LOGGER_INFO[124]))
             self.finish_with_failure()
 
 
-        logger.debug("Created new Supervisor object with args: "
+        self.__logger_adapter.debug("Created new Supervisor object with args: "
                      "jenkins_info = {}, user_info = {}, TLname = {}".format(self.__jenkins_info,
                                                                                       self.__user_info,
                                                                                       self.__TLname))
@@ -93,7 +94,7 @@ class SuperVisor(Jenkins):
 
     def set_TLaddress_from_map(self):
         if not os.path.exists(self.TL_name_to_address_map_path):
-            logger.critical("Cannot get TL address!")
+            self.__logger_adapter.critical("Cannot get TL address!")
             self.set_test_end_status("No_TLaddress")
             self.finish_with_failure()
         else:
@@ -103,7 +104,7 @@ class SuperVisor(Jenkins):
                     TLaddress = [address[self.get_TLname()] for address in TL_map if self.get_TLname() in address][0]
                     return TLaddress
                 except:
-                    logger.critical("Cannot get TL address!")
+                    self.__logger_adapter.critical("Cannot get TL address!")
                     self.set_test_end_status("No_TLaddress")
                     self.finish_with_failure()
 
@@ -160,10 +161,10 @@ class SuperVisor(Jenkins):
             self.set_default_jobname()
         try:
             self.__jenkins_info['connection'] = Jenkins('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
-            logger.debug("jenkins connection has been set")
+            self.__logger_adapter.debug("jenkins connection has been set")
         except:
             self.set_test_end_status("JenkinsError")
-            logger.critical('{}'.format(LOGGER_INFO[106]))
+            self.__logger_adapter.critical('{}'.format(LOGGER_INFO[106]))
             self.finish_with_failure()
 
 
@@ -176,7 +177,7 @@ class SuperVisor(Jenkins):
             self.__jenkins_info['job_handler'] = self.get_job(self.get_jobname())
         except:
             self.set_test_end_status("JenkinsError")
-            logger.critical('{}'.format(LOGGER_INFO[125]))
+            self.__logger_adapter.critical('{}'.format(LOGGER_INFO[125]))
             self.finish_with_failure()
 
 
@@ -230,7 +231,7 @@ class SuperVisor(Jenkins):
     def finish_with_failure(self):
         self.send_information_about_executed_job()
         self.delete_file_with_basic_info()
-        logger.critical('{} : {}'.format(LOGGER_INFO[130], self.get_test_end_status()))
+        self.__logger_adapter.critical('{} : {}'.format(LOGGER_INFO[130], self.get_test_end_status()))
         sys.exit(1)
 
 
@@ -240,10 +241,10 @@ class SuperVisor(Jenkins):
             assignedNode_tag = job_config_xml.find('assignedNode')
             assignedNode_tag.text = str(self.get_TLname())
             self.get_job_handler().update_config(ET.tostring(job_config_xml))
-            logger.debug("Updated TL name: {} in job {}".format(self.get_TLname(), self.get_jobname()))
+            self.__logger_adapter.debug("Updated TL name: {} in job {}".format(self.get_TLname(), self.get_jobname()))
         except:
             self.set_test_end_status("JenkinsError")
-            logger.critical('{} : {}'.format(self.get_TLname(), LOGGER_INFO[104]))
+            self.__logger_adapter.critical('{} : {}'.format(self.get_TLname(), LOGGER_INFO[104]))
             self.finish_with_failure()
 
 
@@ -253,10 +254,10 @@ class SuperVisor(Jenkins):
         except:
             self.__jenkins_info['job_status'] = "UNKNOWN"
             self.set_test_end_status("JenkinsError")
-            logger.critical('{} : {}'.format(self.get_jobname(),LOGGER_INFO[105]))
+            self.__logger_adapter.critical('{} : {}'.format(self.get_jobname(),LOGGER_INFO[105]))
             self.finish_with_failure()
         finally:
-            logger.debug("Job {} status = {}".format(self.get_jobname(), self.get_job_status()))
+            self.__logger_adapter.debug("Job {} status = {}".format(self.get_jobname(), self.get_job_status()))
 
 
     def check_job_status(self):
@@ -267,7 +268,7 @@ class SuperVisor(Jenkins):
             self.check_output_for_other_fails_or_errors_and_set_test_end_status()
         elif job_status == "UNKNOWN":
             self.set_test_end_status("JenkinsError")
-            logger.critical('{} : {}'.format(self.get_jobname(),LOGGER_INFO[124]))
+            self.__logger_adapter.critical('{} : {}'.format(self.get_jobname(),LOGGER_INFO[124]))
             self.finish_with_failure()
         elif job_status == "SUCCESS":
             pass
@@ -282,7 +283,7 @@ class SuperVisor(Jenkins):
         try:
             self.set_job_build_number(self.get_job_handler().get_last_buildnumber())
         except:
-            logger.critical(LOGGER_INFO[124])
+            self.__logger_adapter.critical(LOGGER_INFO[124])
             self.set_test_end_status("JenkinsError")
             self.finish_with_failure()
         if once:
@@ -295,7 +296,7 @@ class SuperVisor(Jenkins):
                     return False
         except:
             self.set_test_end_status("JenkinsError")
-            logger.critical('{} : {}'.format(self.get_jobname(),LOGGER_INFO[124]))
+            self.__logger_adapter.critical('{} : {}'.format(self.get_jobname(),LOGGER_INFO[124]))
             self.finish_with_failure()
 
 
@@ -303,20 +304,20 @@ class SuperVisor(Jenkins):
         try:
             super(SuperVisor, self).build_job(jobname=self.get_jobname(),
                                                       params=self.get_job_parameters())
-            logger.info("Job {} was built".format(self.get_jobname()))
+            self.__logger_adapter.info("Job {} was built".format(self.get_jobname()))
         except:
             self.set_test_end_status("JenkinsError")
-            logger.critical('{}'.format(LOGGER_INFO[107]))
+            self.__logger_adapter.critical('{}'.format(LOGGER_INFO[107]))
             self.finish_with_failure()
 
 
     def set_jenkins_console_output(self):
         try:
             self.set_job_output(self.get_job_handler().get_build(self.get_job_build_number()).get_console())
-            logger.debug("Console output retrieved from {}".format(self.get_jobname()))
+            self.__logger_adapter.debug("Console output retrieved from {}".format(self.get_jobname()))
         except:
             self.set_test_end_status("JenkinsError")
-            logger.error('{}'.format(LOGGER_INFO[108]))
+            self.__logger_adapter.error('{}'.format(LOGGER_INFO[108]))
             self.finish_with_failure()
 
 
@@ -357,12 +358,12 @@ class SuperVisor(Jenkins):
                 try:
                     job_filenames_failed_tests = [self.check_job_output_for_filenames(match, regex)
                                               for regex in regexes if self.check_job_output_for_filenames(match, regex)][0]
-                    logger.info("Regex found fails in output of {}".format(self.get_jobname()))
+                    self.__logger_adapter.info("Regex found fails in output of {}".format(self.get_jobname()))
                     self.set_test_end_status("GOT_FAILS")
                 except:
                     pass
         except:
-            logger.debug("Regex did not find fails in output of {}".format(self.get_jobname()))
+            self.__logger_adapter.debug("Regex did not find fails in output of {}".format(self.get_jobname()))
         finally:
             self.set_filenames_of_failed_tests(job_filenames_failed_tests)
             self.check_output_for_other_fails_or_errors_and_set_test_end_status()
@@ -371,7 +372,7 @@ class SuperVisor(Jenkins):
     def check_output_for_fails(self):
         output = self.get_job_output()
         if not output.find('| FAIL |') == -1:
-            logger.debug("Found 'FAIL' in output of {}".format(self.get_jobname()))
+            self.__logger_adapter.debug("Found 'FAIL' in output of {}".format(self.get_jobname()))
             return True
         return False
 
@@ -381,10 +382,10 @@ class SuperVisor(Jenkins):
         for line in output:
             if re.findall('\[.ERROR.\].*no tests.*', line):
                 self.write_suitename_to_testsWithoutTag_file_if_no_enable_tag_in_suite()
-                logger.info('"{}" {}'.format(self.get_suitname(), LOGGER_INFO[131]))
+                self.__logger_adapter.info('"{}" {}'.format(self.get_suitname(), LOGGER_INFO[131]))
                 continue
             if not line.find('[ ERROR ]') == -1:
-                logger.debug('{} "{}"'.format(LOGGER_INFO[132], self.get_jobname()))
+                self.__logger_adapter.debug('{} "{}"'.format(LOGGER_INFO[132], self.get_jobname()))
                 return True
         return False
 
@@ -397,7 +398,7 @@ class SuperVisor(Jenkins):
             else:
                 self.set_test_end_status("NOT_CAUGHT_ERROR/FAIL")
                 self.set_are_any_failed_tests(True)
-                logger.error('{}'.format(LOGGER_INFO[109]))
+                self.__logger_adapter.error('{}'.format(LOGGER_INFO[109]))
                 self.finish_with_failure()
 
     def check_if_file_exists_and_create_if_not(self, path):
@@ -426,10 +427,10 @@ class SuperVisor(Jenkins):
             try:
                 suitename = [line for line in lines_in_file if line == self.get_suitname()][0]
                 lines_in_file[lines_in_file.index(suitename)] += 1
-                logger.info("'{}' {}".format(self.get_suitname(), LOGGER_INFO[130]))
+                self.__logger_adapter.info("'{}' {}".format(self.get_suitname(), LOGGER_INFO[130]))
             except:
                 lines_in_file.append({self.get_suitname(): 1})
-                logger.info("'{}' - {}".format(self.get_suitname(), LOGGER_INFO[131]))
+                self.__logger_adapter.info("'{}' - {}".format(self.get_suitname(), LOGGER_INFO[131]))
             self.clear_file(testsWithoutTag_file)
             [testsWithoutTag_file.writelines('{}\n'.format(json.dumps(line))) for line in lines_in_file]
             # _found = False
@@ -502,7 +503,7 @@ class SuperVisor(Jenkins):
         filenames_and_paths = self.__match_filenames_and_paths(tmp_filenames_and_paths)
         SSHClient = self.__get_SSHClient_connection()
         if SSHClient == None:
-            logger.warning('{}'.format(128))
+            self.__logger_adapter.warning('{}'.format(128))
             self.set_test_end_status("SSH_Connection_Failure")
             self.finish_with_failure()
         # __found = False
@@ -519,9 +520,9 @@ class SuperVisor(Jenkins):
                 print match[0]
                 if match[0]:
                     lines_in_robot_file[lines_in_robot_file.index(match[0])] = re.sub(old_tag, new_tag, match[0])
-                    logger.debug("{} '{}' : '{}' -> '{}'".format(LOGGER_INFO[132], robot_file_path, old_tag, new_tag))
+                    self.__logger_adapter.debug("{} '{}' : '{}' -> '{}'".format(LOGGER_INFO[132], robot_file_path, old_tag, new_tag))
                 else:
-                    logger.warning('"{}" {}'.format(old_tag, LOGGER_INFO[129]))
+                    self.__logger_adapter.warning('"{}" {}'.format(old_tag, LOGGER_INFO[129]))
                 # for line in lines_in_robot_file:
                 #     try:
                 #         re.search('.*\[Tags](.*)', line).group(1)
@@ -546,7 +547,7 @@ class SuperVisor(Jenkins):
             #   logger.info("Git push successful on {}".format(self.TLname))
 
             except:
-                logger.warning('{}'.format(LOGGER_INFO[112]))
+                self.__logger_adapter.warning('{}'.format(LOGGER_INFO[112]))
             finally:
                 SSHClient.close()
         # if not __found:
