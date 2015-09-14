@@ -433,23 +433,6 @@ class SuperVisor(Jenkins):
                 self.__logger_adapter.info("'{}' - {}".format(self.get_suitname(), LOGGER_INFO[131]))
             self.clear_file(testsWithoutTag_file)
             [testsWithoutTag_file.writelines('{}\n'.format(json.dumps(line))) for line in lines_in_file]
-            # _found = False
-            # to_write = []
-            # for line in test_without_tag_file.readlines():
-            #     line = json.loads(line.strip())
-            #     if self.get_suitname() in line:
-            #         _found = True
-            #         line[self.get_suitname()] += 1
-            #         if line[self.get_suitname()]%5 == 0:
-            #             self.set_test_end_status("Tester slacking")
-            #         to_write.append(line)
-            #     else:
-            #         to_write.append(line)
-            # if not _found:
-            #     to_write.append({self.get_suitname() : 1})
-            # test_without_tag_file.seek(0)
-            # test_without_tag_file.truncate(0)
-
 
 
     def __get_SSHClient_connection(self):
@@ -478,22 +461,6 @@ class SuperVisor(Jenkins):
             matches = [(re.search('({}.*)'.format(filename_from_output), tmp_filename_and_path['filename']),
                         tmp_filename_and_path['path']) for tmp_filename_and_path in tmp_filenames_and_paths]
             [filenames_and_paths.append({'filename' : match[0].group(1), 'path' : match[1]}) for match in matches if match[0]]
-
-
-            # _found = False
-            # for tmp_filename_and_path in tmp_filenames_and_paths:
-            #     try:
-            #         re.search('({}.*)'.format(filename_from_output),tmp_filename_and_path['filename']).group(1)
-            #         filenames_and_paths.append({'path' : tmp_filename_and_path['path'], 'filename' : tmp_filename_and_path['filename']})
-            #         filenames_and_paths_for_temporary_use.append(tmp_filename_and_path['filename'])
-            #         logger.debug("Found filename: {}".format(tmp_filename_and_path['filename']))
-            #         _found = True
-            #         break
-            #     except:
-            #         pass
-            # if not _found:
-            #     filenames_and_paths_for_temporary_use.append(filename_from_output)
-            #     logger.warning('{} {}'.format(LOGGER_INFO[110],filename_from_output))
         self.set_filenames_of_failed_tests([tmp_filename_and_path['filename'] for tmp_filename_and_path in tmp_filenames_and_paths])
         return filenames_and_paths
 
@@ -503,43 +470,26 @@ class SuperVisor(Jenkins):
         filenames_and_paths = self.__match_filenames_and_paths(tmp_filenames_and_paths)
         SSHClient = self.__get_SSHClient_connection()
         if SSHClient == None:
-            self.__logger_adapter.warning('{}'.format(128))
+            logger.warning('{}'.format(128))
             self.set_test_end_status("SSH_Connection_Failure")
             self.finish_with_failure()
-        # __found = False
-        print filenames_and_paths
         for filename_and_path in filenames_and_paths:
             try:
                 SFTP = SSHClient.open_sftp()
                 robot_file_path = os.path.join(filename_and_path['path'], filename_and_path['filename'])
                 robot_file = SFTP.file(robot_file_path, 'r')
-                print robot_file_path
                 lines_in_robot_file = robot_file.readlines()
                 matches = [re.search('(.*\[Tags].*)', line) for line in lines_in_robot_file]
-                match = [match.group(1) for match in matches if match]
-                print match[0]
-                if match[0]:
-                    lines_in_robot_file[lines_in_robot_file.index(match[0])] = re.sub(old_tag, new_tag, match[0])
-                    self.__logger_adapter.debug("{} '{}' : '{}' -> '{}'".format(LOGGER_INFO[132], robot_file_path, old_tag, new_tag))
-                else:
-                    self.__logger_adapter.warning('"{}" {}'.format(old_tag, LOGGER_INFO[129]))
-                # for line in lines_in_robot_file:
-                #     try:
-                #         re.search('.*\[Tags](.*)', line).group(1)
-                #         try:
-                #             lines_in_robot_file[lines_in_robot_file.index(line)] = re.sub(old_tag, new_tag, line)
-                #             __found = True
-                #             logger.debug("Changed tag in robot_file: {} from {} to {}".format(os.path.join(filename_and_path['path'], filename_and_path['filename']), old_tag, new_tag))
-                #         except:
-                #             logger.warning('"{}" {}'.format(old_tag, LOGGER_INFO[129]))
-                #     except:
-                #         pass
+                try:
+                    match, index = ((match.group(1), matches.index(match)) for match in matches if match).next()
+                    lines_in_robot_file[index] = re.sub(old_tag, new_tag, match)
+                    logger.debug("{} '{}' : '{}' -> '{}'".format(LOGGER_INFO[132], robot_file_path, old_tag, new_tag))
+                except:
+                    logger.warning('"{}" {}'.format(old_tag, LOGGER_INFO[129]))
                 robot_file.close()
                 file2 = SFTP.file(os.path.join(filename_and_path['path'], filename_and_path['filename']), 'w')
                 file2.writelines(lines_in_robot_file)
                 file2.close()
-                # SSHClient.close()
-
             #   git_result = self.git_launch(file_info=[path, file_name])
             #   if not git_result == True:
             #         self.failureStatus = 114
@@ -547,11 +497,9 @@ class SuperVisor(Jenkins):
             #   logger.info("Git push successful on {}".format(self.TLname))
 
             except:
-                self.__logger_adapter.warning('{}'.format(LOGGER_INFO[112]))
+                logger.warning('{}'.format(LOGGER_INFO[112]))
             finally:
                 SSHClient.close()
-        # if not __found:
-        #     logger.warning('{} : {}'.format(LOGGER_INFO[111], old_tag))
 
 
     def get_logs_link(self):
