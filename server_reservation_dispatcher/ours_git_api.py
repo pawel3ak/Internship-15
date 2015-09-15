@@ -15,6 +15,9 @@ import logging
 # create logger
 logger = logging.getLogger("server." + __name__)
 
+########################################################temp
+logger_adapter = logging.LoggerAdapter(logger, {'custom_name': 'git_api'})
+
 
 def git_action(ssh_process, command, comment = None):
     if comment:
@@ -36,9 +39,7 @@ def git_action(ssh_process, command, comment = None):
 
     while True:
         match = ssh_process.expect(exepcted_matches_list, timeout=3)
-        print match
-        print command
-        logger.info('{}'.format(exepcted_matches_list[match]))
+        logger_adapter.info('Command = "{}", result = "{}"'.format(command, exepcted_matches_list[match]))
         if match == 0:
             continue
         elif match == 1:
@@ -88,7 +89,7 @@ def git_launch(TL_address, path, pull_only=True):
 
 def ssh_for_git(TL_address, path):
     ssh_command = "ssh {user}@{host}".format(user="ute", host=TL_address)
-    logger.info(ssh_command)
+    logger_adapter.info(ssh_command)
     ssh_process = pexpect.spawn(ssh_command)
     while True:
         match = ssh_process.expect(["password:", pexpect.EOF, pexpect.TIMEOUT], timeout=1)
