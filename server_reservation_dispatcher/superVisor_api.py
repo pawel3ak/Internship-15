@@ -427,10 +427,10 @@ class SuperVisor(Jenkins):
     def remove_tag_from_testsWithoutTag_file_if_tag_is_in_suite(self):
         self.check_if_file_exists_and_create_if_not(self.testsWithoutTag_file_path)
         with open(self.testsWithoutTag_file_path, 'rb+') as testWithoutTag_file:
-            lines_in_file = [line_in_file for line_in_file in testWithoutTag_file.readlines() if not line_in_file.strip() == '']
+            lines_in_file = [line_in_file for line_in_file in testWithoutTag_file.readlines()
+                             if not line_in_file.strip() == '' and self.get_suitname() not in line_in_file]
             self.clear_file(testWithoutTag_file)
-            [testWithoutTag_file.writelines('{}\n'.format(line_in_file))
-             for line_in_file in lines_in_file if not json.loads(line_in_file) == self.get_suitname()]
+            [testWithoutTag_file.writelines(line_in_file) for line_in_file in lines_in_file]
             self.logger_adapter.info("Tags written to file (from remove) {}")
 
 

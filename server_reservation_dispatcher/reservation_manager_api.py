@@ -49,8 +49,8 @@ class ReservationManager(CloudReservationApi):
         self.socket.bind(('127.0.0.1', 50010))
         self.socket.listen(5)
         self.outputs = []
-        self.MAXTL = 3
-        self.FREETL = 1
+        self.MAXTL = 1
+        self.FREETL = 0
 
 
     def handle_client_request_and_response(self, client_socket):
@@ -101,9 +101,7 @@ class ReservationManager(CloudReservationApi):
 
     def request_get_testline(self, client_request):
         cloud = re.search("request\/get_testline&cloud=(.*).*", client_request).group(1)
-        print cloud
         TLname = self.find_first_free_TL(cloud)
-        print "TLname = {}".format(TLname)
         if not TLname == -1:
             self.set_jobname_for_TL_in_dictionary(TLname, jobname=True)
             self.make_backup_file()
@@ -127,7 +125,7 @@ class ReservationManager(CloudReservationApi):
 
     def __create_reservation(self):
         try:
-            ID = (super(ReservationManager, self).create_reservation(testline_type = "CLOUD_L", duration = 480))
+            ID = (super(ReservationManager, self).create_reservation(enb_build="FL15A_ENB_0107_001116_000000", testline_type = "CLOUD_L", state="commissioned", duration = 480))
             return ID
         except:
             return -103  # User max reservation count exceeded
