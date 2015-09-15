@@ -26,14 +26,14 @@ class ReservationQueue(object):
     def get_queue_length(self):
         return self._queue_length
 
-    def write_new_record_to_queue(self, record):
+    def add_new_record_to_queue(self, record):
         with open(self._queue_file_path, "ab") as queue_file:
             json.dump(record, queue_file)
             queue_file.write("\n")
             self._queue_length += 1
 
     def write_new_record_list_to_queue(self, record_list):
-        with open(self._queue_file_path, "ab") as queue_file:
+        with open(self._queue_file_path, "wb") as queue_file:
             for record in record_list:
                 json.dump(record, queue_file)
                 queue_file.write("\n")

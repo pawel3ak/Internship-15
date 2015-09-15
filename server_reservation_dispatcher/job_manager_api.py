@@ -152,7 +152,7 @@ class JobManagerApi(ReservationQueue):
             'Active'
             'Not active'
             'Wrong TL name'
-
++
         :param tl_name: string
         :return: string
         """

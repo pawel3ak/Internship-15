@@ -32,7 +32,7 @@ def start_suites_from_job_manager_dictionary(manager):
 
 
 def fast_supervisors_start(manager):
-    # TODO do it right and chceck
+    # TODO do it right and check or delete
     # not used
     queue_list = manager.read_all_records_from_queue()
     while True:

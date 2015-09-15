@@ -26,7 +26,7 @@ def main_server():
     server.create_server_dirs_if_not_exists()
 
     # start JobManager
-    logger_adapter.info("Start new thread with job manager")
+    logger_adapter.info("Start new process with job manager")
     server.start_job_manager()
 
     server.set_up_server()
