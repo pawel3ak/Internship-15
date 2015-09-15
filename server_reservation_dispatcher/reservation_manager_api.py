@@ -49,8 +49,8 @@ class ReservationManager(CloudReservationApi):
         self.socket.bind(('127.0.0.1', 50010))
         self.socket.listen(5)
         self.outputs = []
-        self.MAXTL = 1
-        self.FREETL = 0
+        self.MAXTL = 2
+        self.FREETL = -1
 
 
     def handle_client_request_and_response(self, client_socket):
@@ -101,10 +101,13 @@ class ReservationManager(CloudReservationApi):
 
     def request_get_testline(self, client_request):
         cloud = re.search("request\/get_testline&cloud=(.*).*", client_request).group(1)
+        print cloud
         TLname = self.find_first_free_TL(cloud)
+        print TLname
         if not TLname == -1:
             self.set_jobname_for_TL_in_dictionary(TLname, jobname=True)
             self.make_backup_file()
+
             return TLname
         else:
             return "No available TL"
@@ -125,7 +128,8 @@ class ReservationManager(CloudReservationApi):
 
     def __create_reservation(self):
         try:
-            ID = (super(ReservationManager, self).create_reservation(enb_build="FL15A_ENB_0107_001116_000000", testline_type = "CLOUD_L", state="commissioned", duration = 480))
+            ID = (super(ReservationManager, self).create_reservation(testline_type = "CLOUD_F", duration = 480))
+            # ID = (super(ReservationManager, self).create_reservation(enb_build="FL15A_ENB_0107_001116_000000", testline_type = "CLOUD_L", state="commissioned", duration = 480))
             return ID
         except:
             return -103  # User max reservation count exceeded
@@ -196,6 +200,11 @@ class ReservationManager(CloudReservationApi):
         _TLname = None
         try:
             for TLname in self.get_reservation_dictionary():
+                print "reserv dict = \n{}".format(self.get_reservation_dictionary())
+                print "job = {}".format(self.get_job_from_reservation_dictionary(TLname))
+                print "tlname = {}".format(self.get_reservation_dictionary()[TLname])
+                print "cloud = {}".format(self.get_reservation_dictionary()[TLname]['cloud'])
+                print "Blacklist = {}".format(self.check_if_TL_not_in_blacklist_file(TLname))
                 if not self.get_reservation_dictionary()[TLname]['job'] and \
                         self.get_reservation_dictionary()[TLname]['cloud'] == cloud and \
                         self.check_if_TL_not_in_blacklist_file(TLname):
@@ -378,9 +387,9 @@ class ReservationManager(CloudReservationApi):
         self.check_if_file_exists_and_create_if_not(self.TL_blacklist_file_path)
         with open(self.TL_blacklist_file_path, "rb") as TL_blacklist_file:
             if [line.strip for line in TL_blacklist_file.readlines() if line.strip() == TLname]:
-                return True
-            else:
                 return False
+            else:
+                return True
 
 
     def delete_TL_from_blacklist_file(self, client_request):
@@ -433,11 +442,11 @@ def managing_reservations():
     t.start()
     while True:
         release = True
-        print "Available TL on Cloud F = {}".format(ReservManager.get_available_tl_count_group_by_type()['CLOUD_L'])
+        print "Available TL on Cloud F = {}".format(ReservManager.get_available_tl_count_group_by_type()['CLOUD_F'])
         print "FreeTL = {}".format(ReservManager.FREETL)
         print "Len of dict = {}".format(len(ReservManager.get_reservation_dictionary()))
         print "MAXTL = {}".format(ReservManager.MAXTL)
-        if ReservManager.get_available_tl_count_group_by_type()['CLOUD_L'] > ReservManager.FREETL:
+        if ReservManager.get_available_tl_count_group_by_type()['CLOUD_F'] > ReservManager.FREETL:
             release = False
             if len(ReservManager.get_reservation_dictionary()) < ReservManager.MAXTL:
                 ReservManager.create_reservation_and_set_TL_info()

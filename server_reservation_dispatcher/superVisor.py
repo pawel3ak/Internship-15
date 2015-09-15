@@ -53,10 +53,10 @@ if __name__ == '__main__':
         import multiprocessing
         jenkins_job_info = {
             'parameters' : {
-                'name' : dir
+                'name' : "LTEXYZ"
             }
         }
-        print dir
+        # print dir
         process = multiprocessing.Process(target=supervise, args=['tl99_test',jenkins_job_info, user_info])
         process.start()
         process.join()
