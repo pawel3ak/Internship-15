@@ -19,7 +19,7 @@ logger = logging.getLogger("server." + __name__)
 logger_adapter = logging.LoggerAdapter(logger, {'custom_name': 'git_api'})
 
 
-def git_action(ssh_process, command, comment = None):
+def perform_git_command(ssh_process, command, comment = None):
     if comment:
         command = '{} -m "{}"'.format(command,comment)
 
@@ -68,11 +68,11 @@ def git_action(ssh_process, command, comment = None):
             return True
 
 
-def git_launch(TL_address, path, pull_only=True):
+def perform_git_basic_command_to_update_repo(TL_address, path, pull_only=True):
     ssh_process = ssh_for_git(TL_address, path)
     # git pull
-    result = git_action(ssh_process, 'git pull')
-    if not result:
+    git_command_result = perform_git_command(ssh_process, 'git pull')
+    if not git_command_result:
         return False
     if pull_only:
         return True
@@ -80,9 +80,9 @@ def git_launch(TL_address, path, pull_only=True):
     #git add
     ssh_process.sendline('git add {}'.format(path))
     #git commit
-    git_action(ssh_process, 'git commit', 'Testing git_api8')
-    result = git_action(ssh_process, 'git push')
-    if not result:
+    perform_git_command(ssh_process, 'git commit', 'Testing git_api8')
+    git_command_result = perform_git_command(ssh_process, 'git push')
+    if not git_command_result:
         return False
     return True
 
@@ -108,4 +108,4 @@ def ssh_for_git(TL_address, path):
 
 # if __name__ == "__main__":
 #     path = "/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/LTEtest"
-#     print git_launch('localhost', path, pull_only=False)
+#     print perform_git_basic_command_to_update_repo('localhost', path, pull_only=False)

@@ -15,7 +15,7 @@ import socket
 from time import sleep
 from utilities.reservation_queue import ReservationQueue
 from superVisor import supervise
-from ours_git_api import git_launch
+from ours_git_api import perform_git_basic_command_to_update_repo
 from reservation_manager_api import managing_reservations
 
 # create logger
@@ -163,7 +163,7 @@ class JobManagerApi(ReservationQueue):
 
     def update_local_git_repository(self):
         logger_adapter.debug("Update local git repository")
-        git_launch('localhost', self._directory_with_testsuites, pull_only=True)
+        perform_git_basic_command_to_update_repo('localhost', self._directory_with_testsuites, pull_only=True)
 
 
 if __name__ == "__main__":

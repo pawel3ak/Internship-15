@@ -24,7 +24,7 @@ import paramiko
 
 from utilities.mailing_list import mail_dict, admin
 from utilities.logger_messages import LOGGER_INFO
-from ours_git_api import git_launch
+from ours_git_api import perform_git_basic_command_to_update_repo
 
 
 # create logger
@@ -69,7 +69,7 @@ class SuperVisor(Jenkins):
                                                                                       self.__user_info,
                                                                                       self.__TLname))
         self.set_commit_version(self.get_last_commit_from_file())
-        git_launch(self.get_TLaddress(), self.suitename_folder_path, pull_only=True)
+        perform_git_basic_command_to_update_repo(self.get_TLaddress(), self.suitename_folder_path, pull_only=True)
 
 
     #########################################################################################
@@ -505,7 +505,7 @@ class SuperVisor(Jenkins):
                 file2 = SFTP.file(os.path.join(filename_and_path['path'], filename_and_path['filename']), 'w')
                 file2.writelines(lines_in_robot_file)
                 file2.close()
-            #   git_result = self.git_launch(file_info=[path, file_name])
+            #   git_result = self.perform_git_basic_command_to_update_repo(file_info=[path, file_name])
             #   if not git_result == True:
             #         self.failureStatus = 114
             #         self.logger_adapter.warning('{} : {}'.format(LOGGER_INFO[self.failureStatus], git_result))
