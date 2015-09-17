@@ -62,7 +62,7 @@ class ReservationManager(CloudReservationApi):
         elif re.search("request\/free_testline\=(.*)", client_request):
             client_socket.send(self.request_free_testline(client_request))
         elif client_request == "request/manager_status":
-            client_socket.send(self.check_if_I_am_working())
+            client_socket.send(self.is_I_am_working())
         elif re.search("request\/get_end_date_of_=(.*)", client_request):
             client_socket.send(self.request_get_end_date(client_request))
         elif re.search("request\/blacklist_remove_TL=(.*)", client_request):
@@ -95,8 +95,8 @@ class ReservationManager(CloudReservationApi):
             return "Wrong TL name"
 
 
-    def check_if_I_am_working(self):
-        return "YES!"
+    def is_I_am_working(self):
+        return True
 
 
     def request_get_testline(self, client_request):

@@ -132,7 +132,7 @@ class JobManagerApi(ReservationQueue):
             sleep(5)
             logger_adapter.debug("{} try connection with RM".format(counter))
             response = self._send_request_to_rm_and_get_response("request/manager_status")
-            if response == "YES!":
+            if response:
                 logger_adapter.info("Reservation Manager is working")
                 return True
             elif response == "Unknown command":
