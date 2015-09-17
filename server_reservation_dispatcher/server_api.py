@@ -96,6 +96,6 @@ class MainServerApi(object):
         self._server_socket.close()
         self._job_manager_handler.join()
 
-    def check_if_job_manager_is_alive(self):
+    def is_job_manager_alive(self):
         logger_adapter.debug("Chceck job manager status")
         return self._job_manager_handler.is_alive()

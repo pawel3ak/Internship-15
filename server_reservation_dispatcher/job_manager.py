@@ -60,8 +60,11 @@ def managing_loop(manager, loop_interval):
             if tl_name == "No available TL":
                 logger_adapter.debug("No available TL")
                 break
-            if not tl_name:
-                logger_adapter.debug("Connection error\\Wrong request")
+            elif tl_name == "Unknown command":
+                logger_adapter.debug("Wrong request")
+                break
+            elif tl_name == "Connection error":
+                logger_adapter.debug("Connection error")
                 break
             else:
                 if manager.get_queue_length() == 0:

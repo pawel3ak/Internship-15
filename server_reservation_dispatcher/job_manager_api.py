@@ -93,33 +93,25 @@ class JobManagerApi(ReservationQueue):
 
     def write_job_manager_dictionary_to_file(self):
         logger_adapter.debug("Write JM dictionary to file: {}".format(self._job_manager_dictionary_file_path))
-        with open(self._job_manager_dictionary_file_path, "wb") as open_file:
-            json.dump(self._job_manager_dictionary, open_file)
+        with open(self._job_manager_dictionary_file_path, "wb") as opened_file:
+            json.dump(self._job_manager_dictionary, opened_file)
 
     def read_job_manager_dictionary_from_file(self):
         logger_adapter.debug("Read JM dictionary from file: {}".format(self._job_manager_dictionary_file_path))
-        with open(self._job_manager_dictionary_file_path, "rb") as open_file:
-            if len(open_file.readlines()) > 0:
-                open_file.seek(0, 0)
-                self._job_manager_dictionary = json.load(open_file)
+        with open(self._job_manager_dictionary_file_path, "rb") as opened_file:
+            if len(opened_file.readlines()) > 0:
+                opened_file.seek(0, 0)
+                self._job_manager_dictionary = json.load(opened_file)
 
     def start_reservation_manager(self):
         logger_adapter.info("Start new RM process")
         self._reservation_manager_handler = multiprocessing.Process(target=managing_reservations)
         self._reservation_manager_handler.start()
-        for counter in range(1, 10, 1):
-            sleep(5)
-            logger_adapter.debug("{} try connection with RM".format(counter))
-            if self.check_reservation_manager_status():
-                logger_adapter.info("Reservation Manager is working")
-                return True
-        logger_adapter.error("Cannot connect to RM")
-        return False
 
     def stop_reservation_manager(self):
         self._reservation_manager_handler.join()
 
-    def __send_request_to_rm_and_get_response(self, request):
+    def _send_request_to_rm_and_get_response(self, request):
         try:
             logger_adapter.debug("Connect to RM")
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -129,37 +121,42 @@ class JobManagerApi(ReservationQueue):
             response = sock.recv(1024)
             logger_adapter.debug("Receive from RM: {}".format(response))
             sock.close()
-            if response == "Unknown command":
-                logger_adapter.warning("Response from RM = \"Unknown command\"")
-                return False
             return response
         except socket.error, err:
             print err
             logger_adapter.error("Error in connection with RM: {}".format(err))
-            return False
+            return "Connection error"
 
-    def check_reservation_manager_status(self):
-        return self.__send_request_to_rm_and_get_response("request/manager_status")
+    def is_reservation_manager_working(self):
+        for counter in xrange(1, 10, 1):
+            sleep(5)
+            logger_adapter.debug("{} try connection with RM".format(counter))
+            response = self._send_request_to_rm_and_get_response("request/manager_status")
+            if response == "YES!":
+                logger_adapter.info("Reservation Manager is working")
+                return True
+            elif response == "Unknown command":
+                logger_adapter.warning("Some weird case - \"Unknown command\" from RM")
+        logger_adapter.error("Cannot connect to RM")
+        return False
 
     def get_tl_name_from_reservation_manager(self, cloud_type="CLOUD_F"):
-        return self.__send_request_to_rm_and_get_response("request/get_testline&cloud={}".format(cloud_type))
+        return self._send_request_to_rm_and_get_response("request/get_testline&cloud={}".format(cloud_type))
 
     def get_tl_status_from_reservation_manager(self, tl_name):
-        """
-        Get testline status as string.
+        """Get TestLine status as string.
 
-        Status list:
-            'Active'
-            'Not active'
-            'Wrong TL name'
-+
-        :param tl_name: string
-        :return: string
+        Possible Test Line status:
+        Active  Not Active
+        * Wrong TL name
+
+        :param string tl_name:      checking TesLine name
+        :return string:             TL status as on list
         """
-        return self.__send_request_to_rm_and_get_response(("request/status_of_=" + tl_name))
+        return self._send_request_to_rm_and_get_response(("request/status_of_=" + tl_name))
 
     def free_testline_in_reservation_manager(self, tl_name):
-        return self.__send_request_to_rm_and_get_response(("request/free_testline=" + tl_name))
+        return self._send_request_to_rm_and_get_response(("request/free_testline=" + tl_name))
 
     def update_local_git_repository(self):
         logger_adapter.debug("Update local git repository")

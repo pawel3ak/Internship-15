@@ -34,7 +34,7 @@ def main_server():
     while True:
         [connection, data] = server.get_request_from_client()
         server.response_for_client_request(connection, data)
-        if not server.check_if_job_manager_is_alive():
+        if not server.is_job_manager_alive():
             logger_adapter.info("Job manager is not alive")
             break
     server.stop_server()
