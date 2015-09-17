@@ -17,7 +17,7 @@ LOGGER_INFO = {
     124: "Problems with connecting to Jenkins",
     128: "SSH Connection Failure",
     129: "TAG not found in file",
-    130: "didn't run count was incremented",
+    130: "Critical fail occured, test end status",
     131: "failed to start - suitename added to file",
     132: "Changed tag in robot_file",
     133: "SSH Connection Error -can not execute 'git pull' command",

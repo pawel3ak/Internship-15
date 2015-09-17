@@ -21,8 +21,6 @@ def supervise(TLname, jenkins_job_info, user_info = None):
     superVisor_api.is_queued_or_running()
     superVisor_api.set_job_status()
     superVisor_api.check_job_status()
-    # superVisor_api.set_job_status()
-    # superVisor_api.check_job_status()
     if superVisor_api.get_job_status() == "SUCCESS":
         superVisor_api.remove_tag_from_testsWithoutTag_file_if_tag_is_in_suite()
         superVisor_api.set_jenkins_console_output()

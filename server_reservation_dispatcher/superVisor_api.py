@@ -29,11 +29,12 @@ from ours_git_api import git_launch
 
 # create logger
 logger = logging.getLogger("server." + __name__)
+logger.setLevel(logging.DEBUG)
 #######################################################################################
 # temporary
 
 from utilities.logger_config import config_logger
-logger.setLevel(logging.DEBUG)
+
 config_logger(logger,'server_config.cfg')
 
 ########################################################################################
@@ -441,7 +442,7 @@ class SuperVisor(Jenkins):
             try:
                 index = (lines_in_file.index(line) for line in lines_in_file if self.get_suitname() in line).next()
                 lines_in_file[index][self.get_suitname()] += 1
-                self.logger_adapter.info("'{}' {}".format(self.get_suitname(), LOGGER_INFO[130]))
+                self.logger_adapter.info("'{}' = {}".format(self.get_suitname(), LOGGER_INFO[130]))
             except:
                 lines_in_file.append({self.get_suitname(): 1})
                 self.logger_adapter.info("'{}' - {}".format(self.get_suitname(), LOGGER_INFO[131]))
