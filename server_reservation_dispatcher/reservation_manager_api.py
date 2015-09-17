@@ -49,7 +49,7 @@ class ReservationManager(CloudReservationApi):
         self.socket.bind(('127.0.0.1', 50010))
         self.socket.listen(5)
         self.outputs = []
-        self.MAXTL = 3
+        self.MAXTL = 2
         self.FREETL = 0
 
 
@@ -125,8 +125,8 @@ class ReservationManager(CloudReservationApi):
 
     def __create_reservation(self):
         try:
-            ID = (super(ReservationManager, self).create_reservation(testline_type = "CLOUD_F", duration = 60))
-            # ID = (super(ReservationManager, self).create_reservation(testline_type = "CLOUD_L", state="commissioned", duration = 480))
+            # ID = (super(ReservationManager, self).create_reservation(testline_type = "CLOUD_F", duration = 60))
+            ID = (super(ReservationManager, self).create_reservation(enb_build="FL15A_ENB_0107_001192_000000", testline_type = "CLOUD_L", state="commissioned", duration = 480))
             return ID
         except:
             return -103  # User max reservation count exceeded
@@ -435,11 +435,11 @@ def managing_reservations():
     t.start()
     while True:
         release = True
-        print "Available TL on Cloud F = {}".format(ReservManager.get_available_tl_count_group_by_type()['CLOUD_F'])
+        print "Available TL on Cloud L = {}".format(ReservManager.get_available_tl_count_group_by_type()['CLOUD_L'])
         print "FreeTL = {}".format(ReservManager.FREETL)
         print "Len of dict = {}".format(len(ReservManager.get_reservation_dictionary()))
         print "MAXTL = {}".format(ReservManager.MAXTL)
-        if ReservManager.get_available_tl_count_group_by_type()['CLOUD_F'] > ReservManager.FREETL:
+        if ReservManager.get_available_tl_count_group_by_type()['CLOUD_L'] > ReservManager.FREETL:
             release = False
             if len(ReservManager.get_reservation_dictionary()) < ReservManager.MAXTL:
                 print "creating reservation..."

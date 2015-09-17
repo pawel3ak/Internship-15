@@ -29,13 +29,13 @@ from ours_git_api import perform_git_basic_command_to_update_repo
 
 # create logger
 logger = logging.getLogger("server." + __name__)
-logger.setLevel(logging.DEBUG)
+# logger.setLevel(logging.DEBUG)
 #######################################################################################
 # temporary
 
-from utilities.logger_config import config_logger
-
-config_logger(logger,'server_config.cfg')
+# from utilities.logger_config import config_logger
+#
+# config_logger(logger,'server_config.cfg')
 
 ########################################################################################
 
