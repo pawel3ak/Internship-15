@@ -6,7 +6,7 @@
 # REV 0.1 (draft)
 #
 # PLATFORM: UTE
-# 
+#
 # PURPOSE: This script gives the ute engineer an easy-
 #          to-follow menu to handle daily tasks, such
 #          as software donwload from the trunk
@@ -20,7 +20,7 @@
 ###############################################
 ####### DEFINE FILES AND VARIABLES HERE #######
 ###############################################
-   
+
 BINDIR="/usr/local/bin"
 PASSWORD_SERVER="yogi"
 THIS_HOST=$(hostname)
@@ -28,7 +28,7 @@ SCRIPT_NAME=`basename $0`
 
 msg="                        "
 opt=" " # Variable for menu selection
-   
+
 ###############################################
 ########## DEFINE FUNCTIONS HERE  #############
 ###############################################
@@ -48,16 +48,6 @@ function show_usage()
     echo "  argument  - provide argument if required by option"
 }
 
-function check_if_built_is_locally_available
-{
-BUILT_DIRECTORY=$USER_REPOSITORY/$built_ver
-if [ -d "$BUILT_DIRECTORY" ]; then
-	echo -e 'Build already exist'
-	return 1
-else
-	return 0
-fi
-}
 
 function BTSSM_install
 {
@@ -119,10 +109,10 @@ btssm_rel=$(cat ${SW_CONFIG_TMP} | grep BTSSM | head -n 1 | cut -d'/' -f9)
 
 BTSSM_FDD="BTSSiteEM-"
 echo "Mode: FDD"
-    
+
 wget    -O ${USER_REPOSITORY}/${build_ver}/${build_ver}_release_BTSSM_downloadable_wo_images.zip \
            ${FDD_TRUNK_STORAGE_URL}/job/build.fsmr3/${build_no}/artifact/build/${build_ver}_release_BTSSM_downloadable.zip
-      
+
 wget    -O ${USER_REPOSITORY}/${build_ver}/im_${build_no}.jar \
            ${FDD_TRUNK_STORAGE_URL}/job/build.fsmr3/${build_no}/artifact/build/im_${build_no}.jar
 
@@ -159,7 +149,7 @@ qt2=$(echo "$qt" | cut -d' ' -f2)
 echo "QT1: $qt1"
 echo "QT2: $qt2"
 
-if test "$qt1" != "released" 
+if test "$qt1" != "released"
 then
         echo "QuickTest1 has not been released"
         exit 1
@@ -211,7 +201,7 @@ qt2=$(echo "$qt" | cut -d' ' -f2)
 echo "QT1: $qt1"
 echo "QT2: $qt2"
 
-if test "$qt1" != "released" 
+if test "$qt1" != "released"
 then
         echo "QuickTest1 has not been released"
         #exit 1
@@ -263,7 +253,7 @@ qt2=$(echo "$qt" | cut -d' ' -f2)
 echo "QT1: $qt1"
 echo "QT2: $qt2"
 
-if test "$qt1" != "released" 
+if test "$qt1" != "released"
 then
         echo "QuickTest1 has not been released"
         #exit 1
@@ -283,7 +273,7 @@ btssm_ver=$(echo $btssm_rel | sed 's/_BTSSM_/-/g')
 
 BTSSM_FDD="BTSSiteEM-"
 
-wget --no-check-certificate -O ${USER_REPOSITORY}/${build_ver}/${BTSSM_FDD}${btssm_ver}_x64.bin ${FDD_WFT_STORAGE_URL}/load_file/${btssm_rel}/4?file=/C_Element/SE_UICA/Setup/${BTSSM_FDD}${btssm_ver}_x64.bin                                                                                
+wget --no-check-certificate -O ${USER_REPOSITORY}/${build_ver}/${BTSSM_FDD}${btssm_ver}_x64.bin ${FDD_WFT_STORAGE_URL}/load_file/${btssm_rel}/4?file=/C_Element/SE_UICA/Setup/${BTSSM_FDD}${btssm_ver}_x64.bin
 wget --no-check-certificate -O ${USER_REPOSITORY}/${build_ver}/${build_ver}_release_BTSSM_downloadable_wo_images.zip http://wrlinb104.emea.nsn-net.net:9090/lteRel/build/FL15A/${build_ver}_release_BTSSM_downloadable_wo_images.zip&project=ALL
 
 
@@ -292,7 +282,7 @@ chmod +x ${USER_REPOSITORY}/${build_ver}//${BTSSM_FDD}${btssm_ver}_x64.bin
 
 BTSSM_install FL00
 }
- 
+
 function software_download
 {
 # Flexi baseline
@@ -327,35 +317,32 @@ LINKS="/tmp/${build_no}_LINKS"
 
 
 sw_rel=$(echo $build_ver | cut -d'_' -f1)
+case "$sw_rel" in
+    FL00)
+                    FDD_Trunk
+    ;;
+    TL00)
+                    TDD_Trunk
+    ;;
+    LN6.0)
+                    FDD_RL60
 
-if check_if_built_is_locally_available; then
-	case "$sw_rel" in
-		FL00)
-		                FDD_Trunk
-		;;
-		TL00)
-		                TDD_Trunk
-		;;
-		LN6.0)
-		                FDD_RL60
+    ;;
+    LN7.0)
+                    FDD_RL70
 
-		;;
-		LN7.0)
-		                FDD_RL70
+    ;;
+    FL15A)
+                    FDD_FL15A
 
-		;;
-		FL15A)
-		                FDD_FL15A
-
-		;;        
-		LNT4.0)
-		                FDD_RL45
-		;;
-		*)
-		                echo -e "\n Unknown Software Release \n"
-		;;
-	esac
-fi
+    ;;
+    LNT4.0)
+                    FDD_RL45
+    ;;
+    *)
+                    echo -e "\n Unknown Software Release \n"
+    ;;
+esac
 }
 
 
@@ -363,10 +350,10 @@ fi
 ###############################################
 ############## SET A TRAP HERE ################
 ###############################################
-   
+
 trap 'echo "\nEXITING on a TRAPPED SIGNAL\n"; \
       exit 1' 1 2 3 15
-   
+
 ###############################################
 ############ BEGINNING OF MAIN ################
 ###############################################
@@ -385,65 +372,65 @@ then
         1)
             software_download $2
             ;;
-        *) 
+        *)
             show_usage
-            exit 1     
-            ;;          
-    esac 
+            exit 1
+            ;;
+    esac
 else
     # Loop until option 99 is Selected
-       
+
     # We use 99 as a character instead of an integer
     # in case a user enters a non-integer selection,
     # which would cause the script to fail.
     while [[ $opt != 99 ]]
     do
-       
+
        # Display a reverse video image bar across the top
        # of the screen with the hostname of the machine.
-       
+
        clear        # Clear the screen first
        tput smso    # Turn on reverse video
        echo -e "                                  ${THIS_HOST}\c"
        echo -e "                                       "
        tput sgr0    # Turn off reverse video
        echo -e "\n"    # Add one blank line of output
-       
+
        # Show the menu options available to the user with the
        # numbered options highlighted in reverse video
        #
        # $(tput smso) Turns ON reverse video
        # $(tput sgr0) Turns OFF reverse video
-       
+
        echo -e "$(tput smso)1$(tput sgr0) - Software Download"
-    
+
        echo -e "\n" # echo new lines
-       
+
        echo -e "$(tput smso)99$(tput sgr0) - Logout\n"
-       
+
        # Draw a reverse video message bar across bottom of screen,
        # with the error message displayed, if there is a message.
-       
+
        tput smso  # Turn on reverse video
-       
+
        echo -e "                              ${msg}\c"
        echo -e "                          "
-       
+
        tput sgr0  # Turn off reverse video
-       
+
        # Prompt for menu option.
-       
+
        echo -e "Selection: \c"
        read opt
-       
+
        # Assume the selection was invalid. Because a message is always
-       # displayed we need to blank it out when a valid option 
+       # displayed we need to blank it out when a valid option
        # is selected.
-       
+
        msg="Invalid option selected."
-       
+
        # Process the Menu Selection
-       
+
        case $opt in
        1)
             # option 1 - Software Download
@@ -455,13 +442,13 @@ else
             msg="                        "
             ;;
        esac
-       
+
        # End of Loop until 99 is selected
-       
+
     done
-       
+
     # Erase menu from screen upon exiting with the "clear" command
-       
+
     clear
     # End of Script
-fi 
+fi
