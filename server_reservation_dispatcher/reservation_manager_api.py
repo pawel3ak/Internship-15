@@ -27,6 +27,9 @@ import copy
 
 logger = logging.getLogger("server." + __name__)
 logger_adapter = logging.LoggerAdapter(logger, {'custom_name': None})
+HOST = "127.0.0.1"
+PORT = 50010
+SMTP_SERVER_IP = "10.150.129.55"
 
 #######################################################################################
 # temporary
@@ -46,7 +49,7 @@ class ReservationManager(CloudReservationApi):
         self.TL_blacklist_file_path = os.path.join('.','files','ReservationManager','blacklist.data')
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.socket.bind(('127.0.0.1', 50010))
+        self.socket.bind((HOST, PORT))
         self.socket.listen(5)
         self.outputs = []
         self.MAXTL = 2
@@ -123,7 +126,7 @@ class ReservationManager(CloudReservationApi):
             return TLname
 
 
-    def __create_reservation(self):
+    def _create_reservation(self):
         try:
             # ID = (super(ReservationManager, self).create_reservation(testline_type = "CLOUD_F", duration = 60))
             ID = (super(ReservationManager, self).create_reservation(enb_build="FL15A_ENB_0107_001192_000000", testline_type = "CLOUD_L", state="commissioned", duration = 480))
@@ -132,7 +135,7 @@ class ReservationManager(CloudReservationApi):
             return -103  # User max reservation count exceeded
 
 
-    def __set_TLinfo(self, ID):
+    def _set_TLinfo(self, ID):
         while True:
             TLinfo = self.get_reservation_details(ID)
             if not TLinfo['testline']['name']:
@@ -165,9 +168,9 @@ class ReservationManager(CloudReservationApi):
 
     def create_reservation_and_set_TL_info(self):
         try:
-            ID = self.__create_reservation()
+            ID = self._create_reservation()
             logger_adapter.info('{} : {}'.format(LOGGER_INFO[115], ID))
-            self.__set_TLinfo(ID)
+            self._set_TLinfo(ID)
         except:
             if ID == -102:
                 logger_adapter.warning('{}'.format(LOGGER_INFO[1102]))
@@ -233,7 +236,7 @@ class ReservationManager(CloudReservationApi):
             mail = ute_mail.mail.Mail(subject=subject,message=message,
                                       recipients=admin['mail'],
                                       name_from="ReservationManager_Api")
-            send = ute_mail.sender.SMTPMailSender(host = '10.150.129.55')
+            send = ute_mail.sender.SMTPMailSender(host=SMTP_SERVER_IP)
             send.connect()
             send.send(mail)
         except:
@@ -253,35 +256,35 @@ class ReservationManager(CloudReservationApi):
                 self.make_backup_file()
 
 
-    def from_unicode_to_datetime(self,unicode):
+    def convert_unicode_to_datetime(self,unicode):
         date = datetime.datetime.strptime(unicode.split('.')[0],"%Y-%m-%d %H:%M:%S")
         return date
 
 
-    def from_datetime_to_unicode(self,date):
+    def convert_datetime_to_unicode(self,date):
         unicode = u'{}'.format(date.strftime("%Y-%m-%d %H:%M:%S"))
         return unicode
 
 
-    def get_add_date(self, TLname, convert=True):
+    def get_add_date(self, TLname, convert_unicode_to_datetime=True):
         add_date = super(ReservationManager, self).get_reservation_details(self.get_reservation_dictionary()[TLname]['id'])['add_date']
-        if convert:
-            return self.from_unicode_to_datetime(add_date)
+        if convert_unicode_to_datetime:
+            return self.convert_unicode_to_datetime(add_date)
         else:
             return add_date
 
 
-    def get_end_date(self, TLname, convert=True):
+    def get_end_date(self, TLname, convert_unicode_to_datetime=True):
         end_date = super(ReservationManager, self).get_reservation_details(self.get_reservation_dictionary()[TLname]['id'])['end_date']
-        if convert:
-            return self.from_unicode_to_datetime(end_date)
+        if convert_unicode_to_datetime:
+            return self.convert_unicode_to_datetime(end_date)
         else:
             return end_date
 
 
     def get_start_date(self, TLname):
         start_date = super(ReservationManager, self).get_reservation_details(self.get_reservation_dictionary()[TLname]['id'])['start_date']
-        return self.from_unicode_to_datetime(start_date)
+        return self.convert_unicode_to_datetime(start_date)
 
 
     def get_job_from_reservation_dictionary(self, TLname):
