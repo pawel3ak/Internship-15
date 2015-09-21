@@ -85,7 +85,8 @@ def job_manager(config_filename='server_config.cfg'):
     config.read(config_filename)
     loop_interval = config.getfloat('JobManager', 'loop_interval')
 
-    if not manager.start_reservation_manager():
+    manager.start_reservation_manager()
+    if not manager.is_reservation_manager_working():
         logger_adapter.critical("RM does not work")
         return None
 

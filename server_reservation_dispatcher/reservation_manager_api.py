@@ -99,7 +99,7 @@ class ReservationManager(CloudReservationApi):
 
 
     def is_I_am_working(self):
-        return True
+        return "Y"
 
 
     def request_get_testline(self, client_request):

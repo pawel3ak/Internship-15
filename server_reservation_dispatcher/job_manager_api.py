@@ -134,13 +134,13 @@ class JobManagerApi(ReservationQueue):
             response = self._send_request_to_rm_and_get_response("request/manager_status")
             if response == "Unknown command":
                 logger_adapter.warning("Some weird case - \"Unknown command\" from RM")
-            elif response:
+            elif response == "Y":
                 logger_adapter.info("Reservation Manager is working")
                 return True
         logger_adapter.error("Cannot connect to RM")
         return False
 
-    def get_tl_name_from_reservation_manager(self, cloud_type="CLOUD_F"):
+    def get_tl_name_from_reservation_manager(self, cloud_type="CLOUD_L"):
         return self._send_request_to_rm_and_get_response("request/get_testline&cloud={}".format(cloud_type))
 
     def get_tl_status_from_reservation_manager(self, tl_name):
