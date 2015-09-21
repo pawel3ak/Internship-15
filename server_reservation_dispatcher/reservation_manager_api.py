@@ -10,7 +10,7 @@
 from ute_cloud_reservation_api.api import CloudReservationApi
 from ute_cloud_reservation_api.exception import ApiMaxReservationCountExceededException
 import logging
-from utilities.logger_messages import LOGGER_INFO
+from utilities.logger_messages import logging_messages
 from utilities.mailing_list import admin
 import ute_mail.sender
 import ute_mail.mail
@@ -129,7 +129,7 @@ class ReservationManager(CloudReservationApi):
     def _create_reservation(self):
         try:
             # ID = (super(ReservationManager, self).create_reservation(testline_type = "CLOUD_F", duration = 60))
-            ID = (super(ReservationManager, self).create_reservation(enb_build="FL15A_ENB_0107_001192_000000", testline_type = "CLOUD_L", state="commissioned", duration = 480))
+            ID = (super(ReservationManager, self).create_reservation(enb_build="FL15A_ENB_0107_001192_000018", testline_type = "CLOUD_L", state="commissioned", duration = 480))
             return ID
         except:
             return -103  # User max reservation count exceeded
@@ -169,13 +169,13 @@ class ReservationManager(CloudReservationApi):
     def create_reservation_and_set_TL_info(self):
         try:
             ID = self._create_reservation()
-            logger_adapter.info('{} : {}'.format(LOGGER_INFO[115], ID))
+            logger_adapter.info('{}'.format(logging_messages(115, ID=ID)))
             self._set_TLinfo(ID)
         except:
             if ID == -102:
-                logger_adapter.warning('{}'.format(LOGGER_INFO[1102]))
+                logger_adapter.warning('{}'.format(logging_messages(1102)))
             elif ID == -103:
-                logger_adapter.warning('{}'.format(LOGGER_INFO[1103]))
+                logger_adapter.warning('{}'.format(logging_messages(1103)))
 
 
     def get_TL_address_from_ute_reservation_api(self, TLname):
@@ -186,14 +186,14 @@ class ReservationManager(CloudReservationApi):
         try:
             return super(ReservationManager, self).release_reservation(self.get_reservation_dictionary()[TLname]['id'])
         except:
-            logger_adapter.error('{}'.format(LOGGER_INFO[1104]))
+            logger_adapter.error('{}'.format(logging_messages(1104)))
 
 
     def cancel_reservation(self, TLname):
         try:
             return super(ReservationManager, self).release_reservation(self.get_reservation_dictionary()[TLname]['id'])
         except:
-            logger_adapter.error('{}'.format(LOGGER_INFO[1104]))
+            logger_adapter.error('{}'.format(logging_messages(1104)))
 
 
     def find_first_free_TL(self, cloud):
@@ -240,7 +240,7 @@ class ReservationManager(CloudReservationApi):
             send.connect()
             send.send(mail)
         except:
-            logger_adapter.error('{}'.format(LOGGER_INFO[1105]))
+            logger_adapter.error('{}'.format(logging_messages(1105)))
 
 
     def remove_TL_from_reservations_dictionary(self,TLname):

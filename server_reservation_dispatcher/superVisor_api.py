@@ -53,7 +53,7 @@ class SuperVisor(Jenkins):
         self.__commit_version = None
 
         try:
-            super(SuperVisor, self).__init__('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='nogiec', password='!salezjanierlz3!')
+            super(SuperVisor, self).__init__('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='crt', password='Flexi1234')
             self.set_default_jobname()
         except:
             self.set_test_end_status("JenkinsError")
@@ -133,7 +133,7 @@ class SuperVisor(Jenkins):
         return self.__jenkins_info['parameters']
 
     def set_default_jobname(self):
-        self.__jenkins_info['jobname'] = 'test_on_{}'.format(self.get_TLname())
+        self.__jenkins_info['jobname'] = 'dispatcher_{}'.format(self.get_TLname())
 
     def get_jobname(self):
         if 'jobname' in self.get_jenkins_info():
