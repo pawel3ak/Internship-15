@@ -31,24 +31,6 @@ def start_suites_from_job_manager_dictionary(manager):
     manager.write_job_manager_dictionary_to_file()
 
 
-def fast_supervisors_start(manager):
-    # TODO do it right and check or delete
-    # not used
-    queue_list = manager.read_all_records_from_queue()
-    while True:
-        tl_name = manager.get_tl_name_from_reservation_manager()
-        if tl_name is None:
-            break
-        else:
-            if len(queue_list) == 0:
-                manager.write_queue_to_file(queue_list)
-                manager.update_local_git_repository()
-                manager.make_tests_queue_from_testsuites_dir()
-                queue_list = manager.read_all_records_from_queue()
-            next_suite = json.loads(queue_list.pop(0))
-            manager.start_new_supervisor(tl_name, next_suite)
-
-
 def managing_loop(manager, loop_interval):
     while True:
         logger_adapter.debug("Main JM loop")
