@@ -84,7 +84,7 @@ class JobManagerApi(ReservationQueue):
     def start_new_supervisor(self, tl_name, jenkins_info, user_info=None):
         logger_adapter.info("Start new supervisor with suite {} at TL name: {}".format(jenkins_info['parameters']['name'], tl_name))
         # TODO remove temp
-        handle = multiprocessing.Process(target=supervise, args=('tl99_test', jenkins_info, user_info,))
+        handle = multiprocessing.Process(target=supervise, args=(tl_name, jenkins_info, user_info,))
         # handle = multiprocessing.Process(target=supervise, args=(tl_name, jenkins_info, user_info,))
         handle.start()
         logger_adapter.debug("Add process to dictionaries")

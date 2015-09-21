@@ -79,7 +79,7 @@ class ReservationManager(CloudReservationApi):
         if not TLname in self.get_reservation_dictionary():
             return "Wrong TLname"
         if self.get_reservation_status(TLname) == 3:
-            return self.get_end_date(TLname, convert=False)
+            return self.get_end_date(TLname, convert_unicode_to_datetime=False)
         else:
             return "TL preparing"
 

@@ -39,7 +39,7 @@ def logging_messages(*args, **kwargs):
     elif args[0] == 114:
         return "Git error"
     elif args[0] == 115:
-        return "Reservation created with ID"
+        return "Reservation created with ID {}".format(kwargs['ID'])
     elif args[0] == 116:
         return "Node in job updated : {} -> {}".format(kwargs['TLname'], kwargs['jobname']),
     elif args[0] == 117:

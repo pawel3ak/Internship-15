@@ -14,8 +14,10 @@ import os
 import sys
 import logging
 import json
+from urllib import urlencode
 
 from jenkinsapi.api import Jenkins
+from jenkinsapi.node import Node
 import ute_mail.sender
 import ute_mail.mail
 import paramiko
@@ -55,6 +57,7 @@ class SuperVisor(Jenkins):
         try:
             super(SuperVisor, self).__init__('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='crt', password='Flexi1234')
             self.set_default_jobname()
+            self.create_node_if_not_exists()
         except:
             self.set_test_end_status("JenkinsError")
             self.logger_adapter.critical('{}'.format(logging_messages(124)))
@@ -69,6 +72,7 @@ class SuperVisor(Jenkins):
 
     def __exit__(self):
         self.delete_file_with_basic_info()
+        self.delete_node(self.get_TLname())
 
     #########################################################################################
     # getters and setters
@@ -140,6 +144,54 @@ class SuperVisor(Jenkins):
             return self.__jenkins_info['jobname']
         else:
             return None
+
+    def create_node_if_not_exists(self):
+        if not self.has_node(self.get_TLname()):
+            print "Tworze node"
+            self.create_node(self.get_TLname())
+
+    def create_node(self, name, num_executors=2, node_description=None,
+                    remote_fs='/home/ute', labels=None, exclusive=False):
+        """
+        Create a new slave node by name.
+
+        :param name: fqdn of slave, str
+        :param num_executors: number of executors, int
+        :param node_description: a freetext field describing the node
+        :param remote_fs: jenkins path, str
+        :param labels: labels to associate with slave, str
+        :param exclusive: tied to specific job, boolean
+        :return: node obj
+        """
+        NODE_TYPE = 'hudson.slaves.DumbSlave$DescriptorImpl'
+        MODE = 'NORMAL'
+        # if self.has_node(name):
+        #     return Node(nodename=name, baseurl=self.get_node_url(nodename=name), jenkins_obj=self)
+        if exclusive:
+            MODE = 'EXCLUSIVE'
+        params = {
+            'name': name,
+            'type': NODE_TYPE,
+            'json': json.dumps({
+            'name': name,
+            'nodeDescription': node_description,
+            'numExecutors': num_executors,
+            'remoteFS': remote_fs,
+            'labelString': labels,
+            'mode': MODE,
+            'type': NODE_TYPE,
+            'retentionStrategy': {'stapler-class': 'hudson.slaves.RetentionStrategy$Always'},
+            'nodeProperties': {'stapler-class-bag': 'true'},
+            'launcher': {'stapler-class': 'hudson.plugins.sshslaves.SSHLauncher',
+                         "host": self.get_TLaddress(),
+                         "port": "22",
+                         "username" : "ute",
+                         "password": "ute2"}
+            })
+        }
+        url = self.get_node_url() + "doCreateItem?%s" % urlencode(params)
+        self.requester.get_and_confirm_status(url)
+        return Node(nodename=name, baseurl=self.get_node_url(nodename=name), jenkins_obj=self)
 
     def get_jenkins_connection(self):
         return self
