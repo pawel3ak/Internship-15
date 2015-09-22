@@ -61,9 +61,10 @@ poseidonStarter_killer=$(ps aux | grep -v grep | grep "PoseidonStarter" | awk '{
 
 # Install BTSSM in silent mode
 
-if [[ "$sw_rel" == "FL00" ||  "$sw_rel" == "FL15A" ]]
-then
-        /bin/bash ${USER_REPOSITORY}/${build_ver}//${BTSSM_FDD}${btssm_ver}_x64.bin -i silent
+if [[ "$sw_rel" == "FL00" ||  "$sw_rel" == "FL15A" ]];then
+         /bin/bash ${USER_REPOSITORY}/${build_ver}//${BTSSM_FDD}${btssm_ver}_x64.bin -i silent
+elif [[ "$sw_rel" == "EMSS" ]]; then
+        /bin/bash ${USER_REPOSITORY}/${build_ver}/*_x64.bin -i silent
 else
         /bin/bash ${USER_REPOSITORY}/${build_ver}//${BTSSM_FDD}${1}-${btssm_ver}_x64.bin -i silent
 fi
@@ -128,110 +129,6 @@ chmod +x ${USER_REPOSITORY}/${build_ver}//${BTSSM_FDD}${btssm_ver}_x64.bin
 BTSSM_install FL00
 }
 
-function FDD_RL60
-{
-# Verify whether build exists on WFT
-wget --no-check-certificate --spider https://wft.inside.nsn.com/ext/build_content/$build_ver
-
-# If software does not exist, then exit
-if [ $? -ne 0 ]
-then
-        echo -e "\nSoftware version is not proper or doesn't exist on WFT_server\n"
-        exit 1
-fi
-
-# Verify whether build passed Quick Tests
-qt=$(curl -k  https://wft.inside.nsn.com/ext/build_content/$build_ver | xml_grep --text_only --cond 'result' | tr '\n' ' ')
-
-qt1=$(echo "$qt" | cut -d' ' -f1)
-qt2=$(echo "$qt" | cut -d' ' -f2)
-
-echo "QT1: $qt1"
-echo "QT2: $qt2"
-
-if test "$qt1" != "released"
-then
-        echo "QuickTest1 has not been released"
-        exit 1
-elif  test "$qt2" != "released"
-then
-        echo "QuickTest2 has not been released"
-        exit 1
-
-fi
-
-# Prepare software-specific localization
-mkdir $USER_REPOSITORY/$build_ver
-
-# BTS SiteManager Version
-btssm_rel=$(curl -k  https://wft.inside.nsn.com/ext/build_content/$build_ver | xml_grep --text_only  --cond '*[@title="BTS Site Manager"]' | head -1)
-btssm_ver=$(echo $btssm_rel | sed 's/^.*\(.\{11\}\)$/\1/')
-
-BTSSM_FDD="BTSSiteEM-"
-
-wget --no-check-certificate -O ${USER_REPOSITORY}/${build_ver}/${BTSSM_FDD}LTE60-${btssm_ver}_x64.bin ${FDD_WFT_STORAGE_URL}/load_file/${btssm_rel}/4?file=/C_Element/SE_UICA/Setup/${BTSSM_FDD}LTE60-${btssm_ver}_x64.bin
-wget --no-check-certificate -O ${USER_REPOSITORY}/${build_ver}/${build_ver}_release_BTSSM_downloadable_wo_images.zip ${FDD_WFT_STORAGE_URL}/build_result/${build_ver}/598-lte-enb-build-package-for-bts-site-manager-download
-#wget --no-check-certificate -O ${USER_REPOSITORY}/${build_ver}/${build_ver}_ida.zip ${FDD_WFT_STORAGE_URL}/build_result/${build_ver}/641-ida
-
-# Make BTSSM binary installable (chmod +x BTSSM*)
-chmod +x ${USER_REPOSITORY}/${build_ver}//${BTSSM_FDD}LTE60-${btssm_ver}_x64.bin
-
-BTSSM_install LTE60
-}
-
-
-function FDD_RL70
-{
-# Verify whether build exists on WFT
-wget --no-check-certificate --spider https://wft.inside.nsn.com/ext/build_content/$build_ver
-
-# If software does not exist, then exit
-if [ $? -ne 0 ]
-then
-        echo -e "\nSoftware version is not proper or doesn't exist on WFT_server\n"
-        exit 1
-fi
-
-# Verify whether build passed Quick Tests
-qt=$(curl -k  https://wft.inside.nsn.com/ext/build_content/$build_ver | xml_grep --text_only --cond 'result' | tr '\n' ' ')
-
-qt1=$(echo "$qt" | cut -d' ' -f1)
-qt2=$(echo "$qt" | cut -d' ' -f2)
-
-echo "QT1: $qt1"
-echo "QT2: $qt2"
-
-if test "$qt1" != "released"
-then
-        echo "QuickTest1 has not been released"
-        #exit 1
-elif  test "$qt2" != "released"
-then
-        echo "QuickTest2 has not been released"
-        #exit 1
-
-fi
-
-# Prepare software-specific localization
-mkdir $USER_REPOSITORY/$build_ver
-
-# BTS SiteManager Version
-btssm_rel=$(curl -k  https://wft.inside.nsn.com/ext/build_content/$build_ver | xml_grep --text_only  --cond '*[@title="BTS Site Manager"]' | head -1)
-btssm_ver=$(echo $btssm_rel | sed 's/^.*\(.\{11\}\)$/\1/')
-
-BTSSM_FDD="BTSSiteEM-"
-
-wget --no-check-certificate -O ${USER_REPOSITORY}/${build_ver}/${BTSSM_FDD}LTE70-${btssm_ver}_x64.bin ${FDD_WFT_STORAGE_URL}/load_file/${btssm_rel}/4?file=/C_Element/SE_UICA/Setup/${BTSSM_FDD}LTE70-${btssm_ver}_x64.bin
-wget --no-check-certificate -O ${USER_REPOSITORY}/${build_ver}/${build_ver}_release_BTSSM_downloadable_wo_images.zip ${FDD_WFT_STORAGE_URL}/build_result/${build_ver}/598-lte-enb-build-package-for-bts-site-manager-download
-#wget --no-check-certificate -O ${USER_REPOSITORY}/${build_ver}/${build_ver}_ida.zip ${FDD_WFT_STORAGE_URL}/build_result/${build_ver}/641-ida
-
-# Make BTSSM binary installable (chmod +x BTSSM*)
-chmod +x ${USER_REPOSITORY}/${build_ver}//${BTSSM_FDD}LTE70-${btssm_ver}_x64.bin
-
-BTSSM_install LTE70
-}
-
-
 function FDD_FL15A
 {
 # Verify whether build exists on WFT
@@ -282,7 +179,44 @@ chmod +x ${USER_REPOSITORY}/${build_ver}//${BTSSM_FDD}${btssm_ver}_x64.bin
 
 BTSSM_install FL00
 }
-
+function check_version
+{
+build_ver=FL00_FSM3_9999_150921_025249
+USER_REPOSITORY="/home/ute/LOADS"
+EMSS_REPOSITORY="/home/emssim/LOADS"
+is_it_available_on_our_server=$( ssh $EMSS_ADDRESS bash -c "'
+cd LOADS/
+if [ -d "$build_ver" ]; then
+    cd "$build_ver"
+    ls *_x64.bin
+    ls "$build_ver"_release_BTSSM_downloadable.zip
+    find * -size +100M >tmpfile.txt
+     if grep -q *_x64.bin tmpfile.txt;then
+        echo "First file is larger than 100M"
+        if grep -q "$build_ver"_release_BTSSM_downloadable.zip tmpfile.txt;then
+            echo "Second file is larger than 100M"
+        elif grep -q "$build_ver"_release_BTSSM_downloadable_wo_images.zip tmpfile.txt; then
+            echo "This is a symbolic link"
+            echo "Second file is larger than 100M"
+        fi
+    fi
+    rm tmpfile.txt
+fi
+exit
+'")
+echo $is_it_available_on_our_server
+}
+function download_from_emss_server
+{
+echo "We download files from emss server"
+                    cd $USER_REPOSITORY
+                    mkdir $build_ver
+                    scp $EMSS_ADDRESS:~/LOADS/$build_ver/$build_ver"_release_BTSSM_downloadable.zip" $USER_REPOSITORY/$build_ver
+                    scp $EMSS_ADDRESS:~/LOADS/$build_ver/*_x64.bin $USER_REPOSITORY/$build_ver
+                    chmod +x $USER_REPOSITORY/$build_ver/$build_ver'_release_BTSSM_downloadable.zip'
+                    chmod +x $USER_REPOSITORY/$build_ver/*_x64.bin
+                    BTSSM_install EMSS
+}
 function software_download
 {
 # Flexi baseline
@@ -296,7 +230,7 @@ build_no=$(echo $build_ver | cut -d'_' -f5 | sed 's/^0*//')
 # User-specific Variables
 USER=$(whoami)
 USER_REPOSITORY="/home/ute/LOADS"
-
+EMSS_ADDRESS=emssim@10.83.202.52
 # FDD Jenkins
 FDD_TRUNK_STORAGE_URL="http://wrling23.emea.nsn-net.net:8080"
 
@@ -314,30 +248,28 @@ LINKS="/tmp/${build_no}_LINKS"
 
 # Verify the type of input and number of values
 [ $# -ne 1 ] && { echo "Usage: $SCRIPT_NAME $opt <SOFTWARE_VERSION>"; exit 1; }
-
-
+#Check if build is on emss srever
+is_it_available_on_our_server=$(check_version $build_ver)
 sw_rel=$(echo $build_ver | cut -d'_' -f1)
+echo $is_it_available_on_our_server
+case $is_it_available_on_our_server in
+     *'Second file is larger than 100M'*)
+        echo "Files are correct"
+        sw_rel='EMSS';;
+     *)
+        echo "No files on our server"
+esac
+
 case "$sw_rel" in
+    EMSS)
+                    download_from_emss_server
+                    ;;
     FL00)
                     FDD_Trunk
-    ;;
-    TL00)
-                    TDD_Trunk
-    ;;
-    LN6.0)
-                    FDD_RL60
-
-    ;;
-    LN7.0)
-                    FDD_RL70
-
     ;;
     FL15A)
                     FDD_FL15A
 
-    ;;
-    LNT4.0)
-                    FDD_RL45
     ;;
     *)
                     echo -e "\n Unknown Software Release \n"
@@ -452,3 +384,4 @@ else
     clear
     # End of Script
 fi
+
