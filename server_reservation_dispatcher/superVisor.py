@@ -13,18 +13,13 @@ from superVisor_api import SuperVisor
 def supervise(TLname, jenkins_job_info, user_info = None):
     superVisor_api = SuperVisor(TLname, jenkins_job_info, user_info)
     superVisor_api.make_file_with_basic_info()
-    print "a"
     # superVisor_api.set_jenkins_connection()
     # superVisor_api.set_job_handler()
     superVisor_api.set_job()
-    print "b"
     if not superVisor_api.is_queued_or_running(once = True):
         superVisor_api.set_node_for_job()
-        print "c"
         superVisor_api.build_job()
-        print "d"
     superVisor_api.is_queued_or_running()
-    print "f"
     # superVisor_api.set_job_status()
     superVisor_api.check_job_status()
     if superVisor_api.get_job_status() == "SUCCESS":

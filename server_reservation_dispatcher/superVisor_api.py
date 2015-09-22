@@ -67,7 +67,6 @@ class SuperVisor(Jenkins):
         self.set_commit_version(self.get_last_commit_from_file())
 
         perform_git_basic_command_to_update_repo(self.get_TLaddress(), self.suitename_folder_path, pull_only=True)
-        print "po commicie"
 
     def __exit__(self):
         self.delete_file_with_basic_info()
