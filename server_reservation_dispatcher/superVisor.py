@@ -31,33 +31,33 @@ def supervise(TLname, jenkins_job_info, user_info = None):
     # superVisor_api.delete_file_with_basic_info()
 
 #
-# if __name__ == '__main__':
-#     import os
-#
-#     dirs = [dir for dir in os.listdir("/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/") if os.path.isdir(os.path.join("/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/", dir))]
-#
-#
-#     jenkins_job_info = {
-#             'parameters' : {
-#                 'name' : 'LTEXYZ'
-#             }
-#     }
-#     user_info = {
-#         'first_name' : 'Pawel',
-#         'last_name' : 'Nogiec',
-#         'mail' : 'pawel.nogiec@nokia.com'
-#     }
-#     for dir in dirs:
-#         if dir == "LTE2465" or dir == "LTE2351" or dir == "LTE1819": continue
-#         import multiprocessing
-#         jenkins_job_info = {
-#             'parameters' : {
-#                 'name' : dir
-#             }
-#         }
-#         process = multiprocessing.Process(target=supervise, args=['tl99_test',jenkins_job_info, None])
-#         process.start()
-#         process.join()
-#         # print "Finishing dir %s" % (dir)
-#         # supervise('tl99_test', jenkins_job_info, user_info)
+if __name__ == '__main__':
+    import os
+
+    dirs = [dir for dir in os.listdir("/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/") if os.path.isdir(os.path.join("/home/ute/auto/ruff_scripts/testsuite/WMP/CPLN/", dir))]
+
+
+    jenkins_job_info = {
+            'parameters' : {
+                'name' : 'LTEXYZ'
+            }
+    }
+    user_info = {
+        'first_name' : 'Pawel',
+        'last_name' : 'Nogiec',
+        'mail' : 'pawel.nogiec@nokia.com'
+    }
+    for dir in dirs:
+        if dir == "LTE2465" or dir == "LTE2351" or dir == "LTE1819": continue
+        import multiprocessing
+        jenkins_job_info = {
+            'parameters' : {
+                'name' : dir
+            }
+        }
+        # process = multiprocessing.Process(target=supervise, args=['tl99_test',jenkins_job_info, None])
+        # process.start()
+        # process.join()
+        # print "Finishing dir %s" % (dir)
+        supervise('IAV_KRA_CLOUD064', jenkins_job_info, user_info)
 #

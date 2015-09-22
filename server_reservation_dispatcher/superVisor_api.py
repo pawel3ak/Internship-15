@@ -30,11 +30,8 @@ logger = logging.getLogger("server." + __name__)
 logger.setLevel(logging.DEBUG)
 #######################################################################################
 # temporary
-
-from utilities.logger_config import config_logger
-#
-config_logger(logger,'server_config.cfg')
-
+# from utilities.logger_config import config_logger
+# config_logger(logger,'server_config.cfg')
 ########################################################################################
 
 class SuperVisor(Jenkins):
@@ -68,6 +65,7 @@ class SuperVisor(Jenkins):
                                                       user_info=self.get_user_info(),
                                                       TLname=self.get_TLname()))
         self.set_commit_version(self.get_last_commit_from_file())
+
         perform_git_basic_command_to_update_repo(self.get_TLaddress(), self.suitename_folder_path, pull_only=True)
 
     def __exit__(self):

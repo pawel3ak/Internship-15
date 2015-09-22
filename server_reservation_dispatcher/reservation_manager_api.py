@@ -437,6 +437,7 @@ def managing_reservations():
     t.setDaemon(True)
     t.start()
     while True:
+        TIME=60
         release = True
         print "Available TL on Cloud L = {}".format(ReservManager.get_available_tl_count_group_by_type()['CLOUD_L'])
         print "FreeTL = {}".format(ReservManager.FREETL)
@@ -445,12 +446,13 @@ def managing_reservations():
         if ReservManager.get_available_tl_count_group_by_type()['CLOUD_L'] > ReservManager.FREETL:
             release = False
             if len(ReservManager.get_reservation_dictionary()) < ReservManager.MAXTL:
+                TIME=0.01
                 print "creating reservation..."
                 ReservManager.create_reservation_and_set_TL_info()
                 print ReservManager.get_reservation_dictionary()
                 ReservManager.make_backup_file()
         ReservManager.check_all_TL_for_extending_or_releasing(release)
-        time.sleep(30)
+        time.sleep(TIME)
 
 
 if __name__ == "__main__":
