@@ -21,7 +21,7 @@ class ReservationQueue(object):
         logger_adapter.debug("Create new queue object: {}".format(self._queue_file_path))
         if not os.path.exists(self._queue_file_path):
             os.mknod(self._queue_file_path)
-        self._queue_length = self.__check_queue_length()
+        self._queue_length = self._check_queue_length()
 
     def get_queue_length(self):
         return self._queue_length
@@ -31,6 +31,13 @@ class ReservationQueue(object):
             json.dump(record, queue_file)
             queue_file.write("\n")
             self._queue_length += 1
+
+    def change_queue_file(self, new_queue_file_path):
+        logger_adapter.debug("Change queue file to: {}".format(new_queue_file_path))
+        self._queue_file_path = new_queue_file_path
+        if not os.path.exists(self._queue_file_path):
+            os.mknod(self._queue_file_path)
+        self._queue_length = self._check_queue_length()
 
     def write_new_record_list_to_queue(self, record_list):
         with open(self._queue_file_path, "wb") as queue_file:
@@ -58,7 +65,7 @@ class ReservationQueue(object):
             queue_file.writelines(queue)
         self._queue_length = len(queue)
 
-    def __check_queue_length(self):
+    def _check_queue_length(self):
         with open(self._queue_file_path, "rb") as queue_file:
             return len(queue_file.readlines())
 

@@ -29,8 +29,9 @@ class JobManagerApi(ReservationQueue):
         config = ConfigParser.RawConfigParser()
         config.read(config_filename)
         try:
-            ReservationQueue.__init__(self, os.path.join(config.get('JobManager', 'directory'),
-                                                         config.get('JobManager', 'queue_filename')))
+            self._std_queue_file_path = os.path.join(config.get('JobManager', 'directory'),
+                                                     config.get('JobManager', 'queue_filename'))
+            ReservationQueue.__init__(self, self._std_queue_file_path)
             self._supervisors_handlers_dictionary = {}      # {reservation_ID: handler}
             self._job_manager_dictionary = {}               # {reservation_ID: suite_name}
             self._job_manager_dictionary_file_path = os.path.join(config.get('JobManager', 'directory'),
@@ -42,6 +43,8 @@ class JobManagerApi(ReservationQueue):
             self._reservation_manager_ip = config.get('ReservationManager', 'host_ip')
             self._reservation_manager_port = config.getint('ReservationManager', 'host_port')
             self._reservation_manager_handler = None
+            self._file_with_eNB_build_name = config.get('JobManager', 'eNB_build_file')
+            self._eNB_build_name = None
         except ConfigParser.NoOptionError, err:
             logger_adapter.warning(err)
 
@@ -80,6 +83,28 @@ class JobManagerApi(ReservationQueue):
         logger_adapter.debug("Write new queue to file")
         self.write_new_record_list_to_queue(jenkins_info_list)
         return True
+
+    def update_build_name(self):
+        logger_adapter.debug("Updating eNB build name")
+        build_name = self.read_eNB_build_name_from_file()
+        if build_name == None:
+            logger_adapter.debug("Empty build name")
+        elif self._eNB_build_name != build_name:
+            logger_adapter.debug("New build: {}".format(build_name))
+            self._eNB_build_name = build_name
+            self.send_build_name_to_reservation_manager()
+            self.change_queue_file((self._std_queue_file_path + "_"
+                                    + self._eNB_build_name.split("_", 1)[0]))
+        else:
+            logger_adapter.debug("Build name already update")
+
+    def read_eNB_build_name_from_file(self):
+        logger_adapter.debug("Read eNB build name from file: {}".format(self._file_with_eNB_build_name))
+        if not os.path.exists(self._file_with_eNB_build_name):
+            logger_adapter.warning("File with eNB build name does not exist: {}".format(self._file_with_eNB_build_name))
+            return None
+        with open(self._file_with_eNB_build_name, "rb") as opened_file:
+            return opened_file.readline()
 
     def start_new_supervisor(self, tl_name, jenkins_info, user_info=None):
         logger_adapter.info("Start new supervisor with suite {} at TL name: {}".format(jenkins_info['parameters']['name'], tl_name))
@@ -151,10 +176,13 @@ class JobManagerApi(ReservationQueue):
         :param string tl_name:      checking TesLine name
         :return string:             TL status as on list
         """
-        return self._send_request_to_rm_and_get_response(("request/status_of_=" + tl_name))
+        return self._send_request_to_rm_and_get_response(("request/status_of_={}".format(tl_name)))
 
     def free_testline_in_reservation_manager(self, tl_name):
-        return self._send_request_to_rm_and_get_response(("request/free_testline=" + tl_name))
+        return self._send_request_to_rm_and_get_response(("request/free_testline={}".format(tl_name)))
+
+    def send_build_name_to_reservation_manager(self):
+        self._send_request_to_rm_and_get_response(("eNB_Build={}".format(self._eNB_build_name)))
 
     def update_local_git_repository(self):
         logger_adapter.debug("Update local git repository")
@@ -162,4 +190,6 @@ class JobManagerApi(ReservationQueue):
 
 
 if __name__ == "__main__":
+    man = JobManagerApi()
+    man.read_eNB_build_from_file()
     pass
