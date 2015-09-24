@@ -102,6 +102,14 @@ def delete_from_blacklist(sock, TL_blacklist):
     except:
         pass
 
+def send_eNB_build_version(sock, build):
+    sock.send("eNB_Build={}".format(build))
+    try:
+        response = sock.recv(1024)
+        if response != "": print response
+    except:
+        pass
+
 
 def main():
     parser = argparse.ArgumentParser(argparse.ArgumentDefaultsHelpFormatter)
@@ -119,7 +127,10 @@ def main():
                         help='ask for status')
     parser.add_argument('-d', '--date', type=str, default='',
                         help='ask for end_date')
-    parser.add_argument('-r', '--remove')
+    parser.add_argument('-r', '--remove', default='',
+                        help='remove form blacklist')
+    parser.add_argument('--build', type=str, default='None',
+                        help='eNB version')
 
 
     args = parser.parse_args()
@@ -131,6 +142,7 @@ def main():
     status = args.status
     TLname = args.date
     TL_blacklist = args.remove
+    build = args.build
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((host, port))
@@ -158,6 +170,9 @@ def main():
 
     elif not TL_blacklist == '':
         delete_from_blacklist(sock, TL_blacklist)
+
+    elif not build == '':
+        send_eNB_build_version(sock, build)
     # elif len(sys.argv) == 3:
     #     if sys.argv[1] == "info":
     #         get_info(sock,sys.argv[2])
