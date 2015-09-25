@@ -57,15 +57,13 @@ def logging_messages(*args, **kwargs):
     elif args[0] == 128:
         return "SSH Connection Failure"
     elif args[0] == 129:
-        return "'{}' TAG not found in file".format(kwargs['old_tag'])
+        return "[TAGS] line not found in file '{}'".format(kwargs['filename'])
     elif args[0] == 130:
         return "Critical fail occured, test end status = {}".format(kwargs['test_end_status'])
     elif args[0] == 131:
         return "Suite '{}' failed to start - suite was added to file".format(kwargs['suitename'])
     elif args[0] == 132:
-        return "Tag in '{}' changed from '{}' to '{}'".format(kwargs['filename'],
-                                                              kwargs['old_tag'],
-                                                              kwargs['new_tag']),
+        return "Tag 'DISABLED' added in file '{}'".format(kwargs['filename'])
     elif args[0] == 133:
         return "Cannot execute 'git pull' command - SSH Error"
     elif args[0] == 134:

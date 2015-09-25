@@ -52,11 +52,10 @@ class ReservationManager(CloudReservationApi):
         self.socket.bind((HOST, PORT))
         self.socket.listen(5)
         self.outputs = []
-        self.MAXTL = 3
-        self.FREETL = 1
+        self.MAXTL = 2
+        self.FREETL = 0
         self.RELEASE = False
         self.eNB_Build = None
-
     def handle_client_request_and_response(self, client_socket):
         client_request = client_socket.recv(1024).strip()
         if re.search("request\/get_testline&cloud=(.*)", client_request):
@@ -129,8 +128,8 @@ class ReservationManager(CloudReservationApi):
 
     def _create_reservation(self):
         try:
-            ID = (super(ReservationManager, self).create_reservation(testline_type = "CLOUD_F", enb_build=self.eNB_Build, duration = 480))
-            # ID = (super(ReservationManager, self).create_reservation(enb_build="FL15A_ENB_0107_001192_000018", testline_type = "CLOUD_L", state="commissioned", duration = 480))
+            # ID = (super(ReservationManager, self).create_reservation(testline_type = "CLOUD_F", enb_build=self.eNB_Build, duration = 480))
+            ID = (super(ReservationManager, self).create_reservation(enb_build=self.eNB_Build, testline_type = "CLOUD_L", state="commissioned", duration = 480))
             return ID
         except:
             return -103  # User max reservation count exceeded
@@ -403,11 +402,11 @@ def managing_reservations():
     t.start()
     while True:
         TIME=20
-        print "Available TL on Cloud F = {}".format(ReservManager.get_available_tl_count_group_by_type()['CLOUD_F'])
+        print "Available TL on Cloud L = {}".format(ReservManager.get_available_tl_count_group_by_type()['CLOUD_L'])
         print "FreeTL = {}".format(ReservManager.FREETL)
         print "Len of dict = {}".format(len(ReservManager.get_reservation_dictionary()))
         print "MAXTL = {}".format(ReservManager.MAXTL)
-        if ReservManager.get_available_tl_count_group_by_type()['CLOUD_F'] > ReservManager.FREETL:
+        if ReservManager.get_available_tl_count_group_by_type()['CLOUD_L'] > ReservManager.FREETL:
             ReservManager.RELEASE = False
             if len(ReservManager.get_reservation_dictionary()) < ReservManager.MAXTL:
                 TIME=0.01

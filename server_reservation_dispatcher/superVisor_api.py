@@ -21,6 +21,7 @@ from jenkinsapi.node import Node
 import ute_mail.sender
 import ute_mail.mail
 import paramiko
+import socket
 
 from utilities.mailing_list import mail_dict, admin
 from utilities.logger_messages import logging_messages
@@ -55,6 +56,7 @@ class SuperVisor(Jenkins):
             super(SuperVisor, self).__init__('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='crt', password='Flexi1234')
             self.set_default_jobname()
             self.create_node_if_not_exists()
+            self.create_job()
         except:
             self.set_test_end_status("JenkinsError")
             self.logger_adapter.critical('{}'.format(logging_messages(124)))
@@ -99,10 +101,10 @@ class SuperVisor(Jenkins):
         else:
             with open(self.TL_name_to_address_map_path, "rb") as TL_map_file:
                 TL_map = [json.loads(line.strip()) for line in TL_map_file.readlines()]
-                try:
-                    TLaddress = [address[self.get_TLname()] for address in TL_map if self.get_TLname() in address][0]
+                TLaddress = [address[self.get_TLname()] for address in TL_map if self.get_TLname() in address]
+                if not len(TLaddress) == 0:
                     return TLaddress
-                except:
+                else:
                     self.logger_adapter.critical(logging_messages(135, TLname=self.get_TLname()))
                     self.set_test_end_status("No_TLaddress")
                     self.finish_with_failure()
@@ -191,9 +193,13 @@ class SuperVisor(Jenkins):
         self.requester.get_and_confirm_status(url)
         return Node(nodename=name, baseurl=self.get_node_url(nodename=name), jenkins_obj=self)
 
+    def create_job(self):
+        if self.has_job(self.get_jobname()):
+            return self.get_jobname()
+        return self.copy_job('dispatcher_generic', self.get_jobname())
+
     def get_jenkins_connection(self):
         return self
-        # return self.__jenkins_info['connection']
 
     def set_job(self):
         try:
@@ -205,10 +211,9 @@ class SuperVisor(Jenkins):
 
     def get_job_output(self):
         return self.job.get_last_build().get_console()
-        # return self.__jenkins_info['output']
 
     def get_job_status(self):
-        for _ in range(5):
+        for _ in xrange(5):
             try:
                 return self.job.get_last_build().get_status()
             except:
@@ -216,7 +221,6 @@ class SuperVisor(Jenkins):
         self.set_test_end_status("JenkinsError")
         self.logger_adapter.critical(logging_messages(135, jobname=self.get_jobname()))
         self.finish_with_failure()
-        # return self.__jenkins_info['job_status']
 
     def make_file_with_basic_info(self):
         """
@@ -235,7 +239,7 @@ class SuperVisor(Jenkins):
         if not os.path.exists(self.file_with_basic_info_path):
             return
         else:
-            for _ in range(5):
+            for _ in xrange(5):
                 try:
                     os.remove(self.file_with_basic_info_path)
                     break
@@ -301,7 +305,7 @@ class SuperVisor(Jenkins):
         job_filenames_failed_tests = []
         try:
             job_filenames_failed_tests.append(re.search(regex, match).group(1))
-        except:
+        except AttributeError:
             pass
         finally:
             if job_filenames_failed_tests:
@@ -330,14 +334,15 @@ class SuperVisor(Jenkins):
                 regexps = ['\w*\.Tests\.{}.*\.({}.*)'.format(self.get_suitname(), self.get_suitname()),
                            '\w*\.Tests\.({}.*)'.format(self.get_suitname()),
                            '\w*\.({}.*)'.format(self.get_suitname())]
-                try:
-                    job_filenames_failed_tests = [self.check_job_output_for_filenames(match, regex)
-                                                  for regex in regexps if self.check_job_output_for_filenames(match, regex)][0]
+
+                job_filenames_failed_tests = [self.check_job_output_for_filenames(match, regex)
+                                              for regex in regexps if self.check_job_output_for_filenames(match, regex)]
+                if not len(job_filenames_failed_tests) == 0:
+                    job_filenames_failed_tests = job_filenames_failed_tests[0]
+                else:
                     self.logger_adapter.info(logging_messages(10, word='found', jobname=self.get_jobname()))
                     self.set_test_end_status("GOT_FAILS")
-                except:
-                    pass
-        except:
+        except Exception:
             self.logger_adapter.debug(logging_messages(10, word='did not find', jobname=self.get_jobname()))
         finally:
             self.set_filenames_of_failed_tests(job_filenames_failed_tests)
@@ -393,26 +398,35 @@ class SuperVisor(Jenkins):
         self.check_if_file_exists_and_create_if_not(self.testsWithoutTag_file_path)
         with open(self.testsWithoutTag_file_path, 'rb+') as testsWithoutTag_file:
             lines_in_file = [json.loads(line) for line in testsWithoutTag_file.readlines() if not line.strip() == '']
-            try:
-                index = (lines_in_file.index(line) for line in lines_in_file if self.get_suitname() in line).next()
-                lines_in_file[index][self.get_suitname()] += 1
+            index = [lines_in_file.index(line) for line in lines_in_file if self.get_suitname() in line]
+            if not len(index) == 0:
+                lines_in_file[index[0]][self.get_suitname()] += 1
                 self.logger_adapter.info(logging_messages(119, suitename=self.get_suitname()))
-            except:
+            # try:
+            #     index = (lines_in_file.index(line) for line in lines_in_file if self.get_suitname() in line).next()
+            #     lines_in_file[index][self.get_suitname()] += 1
+            #     self.logger_adapter.info(logging_messages(119, suitename=self.get_suitname()))
+            # except:
+            else:
                 lines_in_file.append({self.get_suitname(): 1})
                 self.logger_adapter.info(logging_messages(119, suitename=self.get_suitname()))
             self.clear_file(testsWithoutTag_file)
             [testsWithoutTag_file.writelines('{}\n'.format(json.dumps(line))) for line in lines_in_file]
 
     def get_SSHClient_connection(self):
-        for _ in range(5):
+        for _ in xrange(5):
             try:
                 SSHClient = paramiko.SSHClient()
                 SSHClient.load_system_host_keys()
                 SSHClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                SSHClient.connect(self.get_TLaddress(), username='ute', password='ute')
+                SSHClient.connect(self.get_TLaddress(), username='ute', password='ute2')
                 return SSHClient
-            except:
-                pass
+            except socket.error:
+                self.logger_adapter.warning("SSH Timeout")
+            except Exception:
+                self.set_test_end_status('SSH_Connection_Failure')
+                self.logger_adapter.critical(logging_messages(128))
+                self.finish_with_failure()
         return None
 
     def __get_robot_filenames_and_paths(self):
@@ -431,7 +445,7 @@ class SuperVisor(Jenkins):
         self.set_filenames_of_failed_tests([tmp_filename_and_path['filename'] for tmp_filename_and_path in tmp_filenames_and_paths])
         return filenames_and_paths
 
-    def remove_tag_from_robots_tests(self, old_tag='enable', new_tag=''):
+    def remove_tag_from_robots_tests(self):
         tmp_filenames_and_paths = self.__get_robot_filenames_and_paths()
         filenames_and_paths = self.__match_filenames_and_paths(tmp_filenames_and_paths)
         SSHClient = self.get_SSHClient_connection()
@@ -446,12 +460,12 @@ class SuperVisor(Jenkins):
                 robot_file = SFTP.file(robot_file_path, 'r')
                 lines_in_robot_file = robot_file.readlines()
                 matches = [re.search('(.*\[Tags].*)', line) for line in lines_in_robot_file]
-                try:
-                    match, index = ((match.group(1), matches.index(match)) for match in matches if match).next()
-                    lines_in_robot_file[index] = re.sub(old_tag, new_tag, match)
-                    self.logger_adapter.debug(logging_messages(132, filename=robot_file_path, old_tag=old_tag, new_tag=new_tag))
-                except:
-                    self.logger_adapter.warning(logging_messages(129, old_tag=old_tag))
+                index = [matches.index(match) for match in matches if match]
+                if not len(index) == 0:
+                    lines_in_robot_file[index[0]] = "\t{} {}\n".format(lines_in_robot_file[index[0]].strip(), "DISABLED")
+                    self.logger_adapter.debug(logging_messages(132, filename=robot_file_path))
+                else:
+                    self.logger_adapter.warning(logging_messages(129, filename=robot_file_path))
                 robot_file.close()
                 file2 = SFTP.file(os.path.join(filename_and_path['path'], filename_and_path['filename']), 'w')
                 file2.writelines(lines_in_robot_file)
