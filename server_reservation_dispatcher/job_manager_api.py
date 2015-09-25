@@ -33,8 +33,8 @@ class JobManagerApi(ReservationQueue):
             self._std_queue_file_path = os.path.join(config.get('JobManager', 'directory'),
                                                      config.get('JobManager', 'queue_filename'))
             ReservationQueue.__init__(self, self._std_queue_file_path)
-            self._supervisors_handlers_dictionary = {}      # {reservation_ID: handler}
-            self._job_manager_dictionary = {}               # {reservation_ID: suite_name}
+            self._supervisors_handlers_dictionary = {}  # {reservation_ID: handler}
+            self._job_manager_dictionary = {}  # {reservation_ID: suite_name}
             self._job_manager_dictionary_file_path = os.path.join(config.get('JobManager', 'directory'),
                                                                   config.get('JobManager', 'JM_dictionary_filename'))
             if not os.path.exists(self._job_manager_dictionary_file_path):
@@ -76,8 +76,8 @@ class JobManagerApi(ReservationQueue):
 
     def update_build_name(self):
         logger_adapter.debug("Updating eNB build name")
-        build_name = self.read_eNB_build_name_from_file()
-        if build_name == None:
+        build_name = self.read_enb_build_name_from_file()
+        if build_name is None:
             logger_adapter.debug("Empty build name")
         elif self._eNB_build_name != build_name:
             logger_adapter.debug("New build: {}".format(build_name))
@@ -88,7 +88,7 @@ class JobManagerApi(ReservationQueue):
         else:
             logger_adapter.debug("Build name already update")
 
-    def read_eNB_build_name_from_file(self):
+    def read_enb_build_name_from_file(self):
         logger_adapter.debug("Read eNB build name from file: {}".format(self._file_with_eNB_build_name))
         if not os.path.exists(self._file_with_eNB_build_name):
             logger_adapter.warning("File with eNB build name does not exist: {}".format(self._file_with_eNB_build_name))
@@ -111,24 +111,25 @@ class JobManagerApi(ReservationQueue):
         return True
 
     def is_release_tag_exists_in_dir(self, dir_path):
-        filenames_and_paths_with_robot_files = []
+        robot_files_filenames_and_paths = []
+        logger_adapter.debug("Check is release tag exist in dir: {}".format(dir_path))
         for root_path, dir_names, file_names in os.walk(dir_path):
-           [filenames_and_paths_with_robot_files.append({'path': root_path, 'filename': filename})
-                for filename in file_names if filename.endswith('.robot') or filename.endswith('.txt')]
-        for file in filenames_and_paths_with_robot_files:
-            if self.is_release_tag_exists_in_file(os.path.join(file['path'], file['filename'])):
+            [robot_files_filenames_and_paths.append({'path': root_path, 'filename': filename})
+             for filename in file_names if filename.endswith('.robot') or filename.endswith('.txt')]
+        for robot_file in robot_files_filenames_and_paths:
+            if self.is_release_tag_exists_in_file(os.path.join(robot_file['path'], robot_file['filename'])):
                 return True
         return False
 
     def is_release_tag_exists_in_file(self, file_path):
-        if self._eNB_build_name == None:
+        if self._eNB_build_name is None:
             return True
         current_release = re.search('(FL)(.{2,4})(_)', self._eNB_build_name).group(2)
         if current_release == '00':
             current_release = self._current_00_release
         with open(os.path.join(file_path), 'rb') as robot_file:
             for line in robot_file.readlines():
-                if re.search('\[Tags].*RELEASE_.{,2}' + current_release + ' ', line) != None:
+                if re.search('\[Tags].*RELEASE_.{,2}' + current_release + ' ', line) is not None:
                     return True
         return False
 
