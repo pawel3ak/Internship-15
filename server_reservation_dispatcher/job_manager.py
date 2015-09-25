@@ -5,7 +5,6 @@
 :author: Damian Papiez
 :contact: damian.papiez@nokia.com
 """
-import json
 import logging
 from time import sleep
 import ConfigParser

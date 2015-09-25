@@ -12,6 +12,7 @@ import logging
 import multiprocessing
 import ConfigParser
 import socket
+import re
 from time import sleep
 from utilities.reservation_queue import ReservationQueue
 from superVisor import supervise
@@ -43,8 +44,10 @@ class JobManagerApi(ReservationQueue):
             self._reservation_manager_ip = config.get('ReservationManager', 'host_ip')
             self._reservation_manager_port = config.getint('ReservationManager', 'host_port')
             self._reservation_manager_handler = None
-            self._file_with_eNB_build_name = config.get('JobManager', 'eNB_build_file')
+            self._file_with_eNB_build_name = config.get('JobManager', 'file_with_eNB_build_name')
             self._eNB_build_name = None
+            self._current_00_release = config.get('JobManager', 'current_00_release')
+            self._cloud_type = config.get('JobManager', 'cloud_type')
         except ConfigParser.NoOptionError, err:
             logger_adapter.warning(err)
 
@@ -71,19 +74,6 @@ class JobManagerApi(ReservationQueue):
                 del self._supervisors_handlers_dictionary[key]
                 del self._job_manager_dictionary[key]
 
-    def make_tests_queue_from_testsuites_dir(self):
-        logger_adapter.debug("Make new queue")
-        jenkins_info_list = []
-        [jenkins_info_list.append({'parameters': {'name': directory}})
-            for directory in os.listdir(self._directory_with_testsuites)
-            if os.path.isdir(os.path.join(self._directory_with_testsuites, directory))]
-        if len(jenkins_info_list) < 1:
-            logger_adapter.warning("No suites to add to queue")
-            return False
-        logger_adapter.debug("Write new queue to file")
-        self.write_new_record_list_to_queue(jenkins_info_list)
-        return True
-
     def update_build_name(self):
         logger_adapter.debug("Updating eNB build name")
         build_name = self.read_eNB_build_name_from_file()
@@ -105,6 +95,42 @@ class JobManagerApi(ReservationQueue):
             return None
         with open(self._file_with_eNB_build_name, "rb") as opened_file:
             return opened_file.readline()
+
+    def make_tests_queue_from_testsuites_dir(self):
+        logger_adapter.debug("Make new queue")
+        jenkins_info_list = []
+        for directory in os.listdir(self._directory_with_testsuites):
+            if os.path.isdir(os.path.join(self._directory_with_testsuites, directory)) and \
+                    self.is_release_tag_exists_in_dir(os.path.join(self._directory_with_testsuites, directory)):
+                jenkins_info_list.append({'parameters': {'name': directory}})
+        if len(jenkins_info_list) < 1:
+            logger_adapter.warning("No suites to add to queue for release: {}".format(self._eNB_build_name))
+            return False
+        logger_adapter.debug("Write new queue to file")
+        self.write_new_record_list_to_queue(jenkins_info_list)
+        return True
+
+    def is_release_tag_exists_in_dir(self, dir_path):
+        filenames_and_paths_with_robot_files = []
+        for root_path, dir_names, file_names in os.walk(dir_path):
+           [filenames_and_paths_with_robot_files.append({'path': root_path, 'filename': filename})
+                for filename in file_names if filename.endswith('.robot') or filename.endswith('.txt')]
+        for file in filenames_and_paths_with_robot_files:
+            if self.is_release_tag_exists_in_file(os.path.join(file['path'], file['filename'])):
+                return True
+        return False
+
+    def is_release_tag_exists_in_file(self, file_path):
+        if self._eNB_build_name == None:
+            return True
+        current_release = re.search('(FL)(.{2,4})(_)', self._eNB_build_name).group(2)
+        if current_release == '00':
+            current_release = self._current_00_release
+        with open(os.path.join(file_path), 'rb') as robot_file:
+            for line in robot_file.readlines():
+                if re.search('\[Tags].*RELEASE_.{,2}' + current_release + ' ', line) != None:
+                    return True
+        return False
 
     def start_new_supervisor(self, tl_name, jenkins_info, user_info=None):
         logger_adapter.info("Start new supervisor with suite {} at TL name: {}".format(jenkins_info['parameters']['name'], tl_name))
@@ -163,8 +189,8 @@ class JobManagerApi(ReservationQueue):
         logger_adapter.error("Cannot connect to RM")
         return False
 
-    def get_tl_name_from_reservation_manager(self, cloud_type="CLOUD_L"):
-        return self._send_request_to_rm_and_get_response("request/get_testline&cloud={}".format(cloud_type))
+    def get_tl_name_from_reservation_manager(self):
+        return self._send_request_to_rm_and_get_response("request/get_testline&cloud={}".format(self._cloud_type))
 
     def get_tl_status_from_reservation_manager(self, tl_name):
         """Get TestLine status as string.
@@ -190,6 +216,4 @@ class JobManagerApi(ReservationQueue):
 
 
 if __name__ == "__main__":
-    man = JobManagerApi()
-    man.read_eNB_build_from_file()
     pass
