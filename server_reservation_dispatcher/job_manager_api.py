@@ -104,7 +104,7 @@ class JobManagerApi(ReservationQueue):
                     self.is_release_tag_exists_in_dir(os.path.join(self._directory_with_testsuites, directory)):
                 jenkins_info_list.append({'parameters': {'name': directory}})
         if len(jenkins_info_list) < 1:
-            logger_adapter.warning("No suites to add to queue for release: {}".format(self._eNB_build_name))
+            logger_adapter.warning("No suites add to queue for release: {}".format(self._eNB_build_name))
             return False
         logger_adapter.debug("Write new queue to file")
         self.write_new_record_list_to_queue(jenkins_info_list)
