@@ -56,6 +56,7 @@ class ReservationManager(CloudReservationApi):
         self.FREETL = 0
         self.RELEASE = False
         self.eNB_Build = None
+
     def handle_client_request_and_response(self, client_socket):
         client_request = client_socket.recv(1024).strip()
         if re.search("request\/get_testline&cloud=(.*)", client_request):
@@ -76,6 +77,7 @@ class ReservationManager(CloudReservationApi):
             client_socket.send("Unknown command")
 
     def set_eNB_build(self, client_request):
+        print client_request
         self.eNB_Build = re.search('eNB_Build=(.*)', client_request).group(1)
         return self.eNB_Build
 

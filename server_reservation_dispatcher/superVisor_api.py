@@ -402,11 +402,6 @@ class SuperVisor(Jenkins):
             if not len(index) == 0:
                 lines_in_file[index[0]][self.get_suitname()] += 1
                 self.logger_adapter.info(logging_messages(119, suitename=self.get_suitname()))
-            # try:
-            #     index = (lines_in_file.index(line) for line in lines_in_file if self.get_suitname() in line).next()
-            #     lines_in_file[index][self.get_suitname()] += 1
-            #     self.logger_adapter.info(logging_messages(119, suitename=self.get_suitname()))
-            # except:
             else:
                 lines_in_file.append({self.get_suitname(): 1})
                 self.logger_adapter.info(logging_messages(119, suitename=self.get_suitname()))
