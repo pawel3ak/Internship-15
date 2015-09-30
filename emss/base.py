@@ -11,7 +11,7 @@ from ..utilities.EmssAttribute import transform_dict_of_attributes_to_emss_input
 
 
 class EMSSInterface(object):
-    def __init__(self, emssim_name="emss", host=None, port=None, timeout=30):
+    def __init__(self, emssim_name="emss", host=None, port=None):
         '''
         EMSsim interface used EMSsim device to perform commands on it
 
@@ -20,13 +20,16 @@ class EMSSInterface(object):
 
         json_svr
 
+        |========================================================|
+        | NAME |           INTERFACE            | PORT | CLIENTS |
+        |========================================================|
+        | emssj| emssim-2.krk-lab.nsn-rdnet.net | 4037 |   ---   |
+        |--------------------------------------------------------|
         '''
         self.emss_name = emssim_name
-# TODO if order of inherited class is meaningfull we can add as a first class EmmsProcessStarter
-        if (host is not None) and (port is not None):
-            self.emssim = devicemanager.get_device(name=emssim_name, device_class=EMSsim, port=port, host=host)
-        else:
-            self.emssim = devicemanager.get_device(name=emssim_name)
+        self.emss_host = host
+        self.emss_port = port
+        self.emssim = None
 
     def __del__(self):
         self._terminate_emss_instance()
@@ -47,7 +50,6 @@ class EMSSInterface(object):
         | ${started}=  Call Method        |  ${cmd_obj}   start                          |
         | Call Method                     |  ${cmd_obj}   await finish  timeout=30       |
         +---------------------------------+----------------------------+-----------------+
-
         '''
         # find command method inside device emssim
         if command[:4] != 'cmd_':

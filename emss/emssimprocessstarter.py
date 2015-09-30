@@ -3,7 +3,6 @@
 :author: Pawel Tarsa
 :contact: tarsa.pawel@nokia.com
 '''
-
 __author__ = 'tarsa'
 __copyright__ = 'Copyright 2015, Nokia'
 __version__ = '2015-07-7'
@@ -12,16 +11,8 @@ __email__ = 'tarsa.pawel@nokia.com'
 
 import os
 import sys
-import atexit
 import re
 import subprocess
-import time
-from shlex import split
-
-EMSS_CLOUD_DEFAULT_HOST = '10.0.1.1'
-EMSS_CLOUD_DEFAULT_PORT = 4001
-
-from ta_emss.emssexceptions.EmssExceptions import ErrUteEmssTimeout
 import time
 try:
     import pexpect
@@ -29,21 +20,23 @@ except ImportError:
     sys.stderr.write("You do not have 'pexpect' installed. \n")
     sys.stderr.write('On linux you need the "python-pexpect" package \n')
     exit(1)
+from shlex import split
+from .base import EMSSInterface
+from ta_emss.emssexceptions.EmssExceptions import ErrUteEmssTimeout
+from ta_emss.emssexceptions.EmssExceptions import IllegalCredentialsError
+from ruff.devices.emss import EMSsim
+from ruff.devices import devicemanager
 
 
-class EmssimProcessStarter(object):
+class EmssimProcessStarter(EMSSInterface):
 
-    def __init__(self, host, port, which_emss=1, timeout=30):
-        self.setup_emss(which_emss=which_emss)
-        #add here asserts for host and port should not be None? I think that it is art for art - not neccessary
-        while not self._is_cloud_host_reachable() and timeout > 0:
-            timeout -= 2
-            time.sleep(2)
-        time.sleep(30)   # let EMSS exchange data with eNB
-        if timeout <= 0:
-            raise ErrUteEmssTimeout()
+    def __init__(self):
+        if self.emss_host == None or self.emss_port == None:
+            raise IllegalCredentialsError()
+        self._which_emss = 1 if int(re.findall("\d+\.\d+\.\d+\.(\d+)", self.emss_host).pop()) == 1 else 2
+        self._user = "flexi%s" % self._which_emss
 
-    def setup_emss(self, which_emss=1):
+    def setup_emss(self, timeout=30):
         """
             Method starting EMSS processes.
 
@@ -52,19 +45,26 @@ class EmssimProcessStarter(object):
             +----------------+-------------------+
             |              Examples              |
             +================+===================+
-            |   start_emss      which_emss=1     |
+            |             start_emss             |
             +----------------+-------------------+
 
         """
         if not self._is_fbox_running():
             self._start_localy_fbox_process()
-        if not self._is_emss_running(which_emss=which_emss):
-            flexi_process = self._move_to_flexi_user(user='flexi%s' % str(which_emss), pswd='flexi%s' % str(which_emss))
-            self._start_emssim_as_choosed_user(process_with_logedin_user=flexi_process, user='flexi%s' % str(which_emss))
-            self._check_if_emss_started(which_emss)
+        if not self._is_emss_running():
+            flexi_process = self._move_to_flexi_user()
+            self._start_emssim_as_choosed_user(process_with_logedin_user=flexi_process)
+            self._check_if_emss_started()
+        while not self._is_cloud_host_reachable() and timeout > 0:
+            timeout -= 2
+            time.sleep(2)
+        time.sleep(30)   # let EMSS exchange data with eNB
+        if timeout <= 0:
+            raise ErrUteEmssTimeout()
+        self.emssim = devicemanager.get_device(name=self.emssim_name, device_class=EMSsim, port=self.emss_port, host=self.emss_host)
             #TODO add status-checking function
 
-    def teardown_emss(self, which_emss=1):
+    def teardown_emss(self):
         """
             Method stopping EMSS processes (both emss1 and emss2).
 
@@ -73,35 +73,35 @@ class EmssimProcessStarter(object):
             +----------------+-------------------+
             |              Examples              |
             +================+===================+
-            |   stop_emss    | which_emss = 1    |
+            |              stop_emss             |
             +----------------+-------------------+
 
         """
         kill_command = self._get_created_kill_command_from_given_pids(
-            self._get_emss_start_process_pids(which_emss),
+            self._get_emss_start_process_pids(),
             self._get_fbox_dual_pid_if_started())
         self._execute_command(command=kill_command)
 
-    def recover_emss_connection(self, which_emss=1):
+    def recover_emss_connection(self):
         """
             Method which recover choosed EMSS session.
             Just kill and start choosed EMSS session.
 
             May be parametrized (if we work with HO setup) like:
 
-            +----------------+-------------------------+
+            +------------------------------------------+
             |              Examples                    |
-            +================+=========================+
-            | recover_emss_connection | which_emss = 1 |
-            +----------------+-------------------------+
+            +==========================================+
+            |        recover_emss_connection           |
+            +------------------------------------------+
 
         """
-        self.teardown_emss(which_emss=which_emss)
-        self.setup_emss(which_emss=which_emss)
+        self.teardown_emss()
+        self.setup_emss()
 
     def _is_cloud_host_reachable(self):
         try:
-            nmap_cmd = pexpect.spawn(command="nmap -p %d %s" % (EMSS_CLOUD_DEFAULT_PORT, EMSS_CLOUD_DEFAULT_HOST))
+            nmap_cmd = pexpect.spawn(command="nmap -p %d %s" % (self.emss_port, self.emss_host))
             match_index = nmap_cmd.expect([".*open.*", '.*closed.*', '.*filtered.*', '.*unfiltered.*', pexpect.EOF])
         except pexpect.TIMEOUT as err:
             print 'Timeouted: %s' % err.message.split('\n', 1)[0]
@@ -119,31 +119,32 @@ class EmssimProcessStarter(object):
         else:
             return True
 
-    def _is_emss_running(self, which_emss=1):
-        if self._get_emss_start_process_pids(which_emss) == []:
+    def _is_emss_running(self):
+        if self._get_emss_start_process_pids() == []:
             return False
         else:
             return True
 
-    def _check_if_emss_started(self, which_emss):
+    def _check_if_emss_started(self):
         emss_processes_pids = self._get_fbox_dual_pid_if_started()
         try:
-            emss_processes_pids += self._get_emss_start_process_pids(which_emss)
+            emss_processes_pids += self._get_emss_start_process_pids()
         except Exception:
             print "FBOX_DUAL process does not exist\n"
 
     def _open_and_get_log_file(self, path_fo_log_file='/home/ute/emss_setup.log'):
         return open(path_fo_log_file, 'a+')
 
-    def _move_to_flexi_user(self, user='flexi1', pswd='flexi1'):
-        login_command = "sudo login %s" % user
+    def _move_to_flexi_user(self):
+        pswd = self._user
+        login_command = "sudo login %s" % self._user
         login_process = pexpect.spawn(login_command,
                                       logfile=self._open_and_get_log_file())
         login_process.expect("Password:")
         login_process.sendline(pswd)
         match_index = login_process.expect(["Login incorrect",
                                             pexpect.TIMEOUT,
-                                            ".+%s" % user],
+                                            ".+%s" % self._user],
                                            timeout=5)
         if match_index == 0:
             sys.stderr.write("Login failed. Please check mocked in \
@@ -151,16 +152,16 @@ class EmssimProcessStarter(object):
             raise Exception
         elif match_index == 1:
             sys.stderr.write("Command timeout. Could not move to %s user! \
-            It can be environment issue.\n" % user)
+            It can be environment issue.\n" % self._user)
             raise Exception
         elif match_index == 2:
-            if self._is_login_succeed(login_process, user):
-                sys.stdout.write("Login as %s succeed\n" % user)
+            if self._is_login_succeed(login_process):
+                sys.stdout.write("Login as %s succeed\n" % self._user)
             return login_process
 
-    def _is_login_succeed(self, process, user):
+    def _is_login_succeed(self, process):
         process.sendline("whoami")
-        match_index = process.expect(['.+%s' % user,
+        match_index = process.expect(['.+%s' % self._user,
                                       pexpect.TIMEOUT],
                                      timeout=0.1)
         if match_index == 0:
@@ -192,10 +193,9 @@ class EmssimProcessStarter(object):
                                    self._get_specyfic_proceses_id(name_of_process='fbox'))
         return fbox_dual_pid[:1]
 
-    def _get_emss_start_process_pids(self, which_emss):
-        user = "flexi%s" % str(which_emss)
+    def _get_emss_start_process_pids(self):
         list_of_START_EMSS_process_pids = re.findall("(\d{1,5})",
-                                                     self._get_specyfic_proceses_id(name_of_process='fbox', effective_uid=user))
+                                                     self._get_specyfic_proceses_id(name_of_process='fbox', effective_uid=self._user))
         return list_of_START_EMSS_process_pids
 
     def _get_created_kill_command_from_given_pids(self, *args):
@@ -221,14 +221,14 @@ class EmssimProcessStarter(object):
             with self._open_and_get_log_file() as log_file:
                 pass  # maybe better use logging module? how to verify what other cases can be here?
 
-    def _start_emssim_as_choosed_user(self, process_with_logedin_user, user='', dir_with_logs='/home/ute/emss_logs', log_on=True):
+    def _start_emssim_as_choosed_user(self, process_with_logedin_user, dir_with_logs='/home/ute/emss_logs', log_on=True):
         print "\n In start_emssim_as_chosed_user method\n"
         if log_on:
             process_with_logedin_user.sendline("screen ./start")  # -LOG_FILE %" % )  # ./start ....-LOG_FILE ./mylog.txt
         match_index = process_with_logedin_user.expect(["\d{2}\:\d{2}\:\d{2}.+|Established Trace TCP-IP server.+", "Could not establish BTSOM "
                                                                                                                    "connection for BTS"])
         if match_index == 0:
-            sys.stdout.write("EMSS started as %s user!\n" % user)
+            sys.stdout.write("EMSS started as %s user!\n" % self._user)
         elif match_index == 1:
             sys.stdout.write("EMSS is already started!\n")
         return process_with_logedin_user
