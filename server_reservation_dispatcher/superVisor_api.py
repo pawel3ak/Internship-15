@@ -29,10 +29,13 @@ from ours_git_api import perform_git_basic_command_to_update_repo
 
 logger = logging.getLogger("server." + __name__)
 logger.setLevel(logging.DEBUG)
+HOST = "127.0.0.1"
+PORT = 50010
+
 #######################################################################################
 # temporary
-# from utilities.logger_config import config_logger
-# config_logger(logger,'server_config.cfg')
+from utilities.logger_config import config_logger
+config_logger(logger,'server_config.cfg')
 ########################################################################################
 
 class SuperVisor(Jenkins):
@@ -54,7 +57,8 @@ class SuperVisor(Jenkins):
 
         try:
             super(SuperVisor, self).__init__('http://plkraaa-jenkins.emea.nsn-net.net:8080', username='crt', password='Flexi1234')
-            self.set_default_jobname()
+            if not self.get_jobname():
+                self.set_default_jobname()
             self.create_node_if_not_exists()
             self.create_job()
         except:
@@ -63,9 +67,9 @@ class SuperVisor(Jenkins):
             self.finish_with_failure()
 
         self.logger_adapter.debug(logging_messages(100,
-                                                      jenkins=self.get_jenkins_info(),
-                                                      user_info=self.get_user_info(),
-                                                      TLname=self.get_TLname()))
+                                                   jenkins=self.get_jenkins_info(),
+                                                   user_info=self.get_user_info(),
+                                                   TLname=self.get_TLname()))
         self.set_commit_version(self.get_last_commit_from_file())
 
         perform_git_basic_command_to_update_repo(self.get_TLaddress(), self.suitename_folder_path, pull_only=True)
@@ -103,7 +107,7 @@ class SuperVisor(Jenkins):
                 TL_map = [json.loads(line.strip()) for line in TL_map_file.readlines()]
                 TLaddress = [address[self.get_TLname()] for address in TL_map if self.get_TLname() in address]
                 if not len(TLaddress) == 0:
-                    return TLaddress
+                    return TLaddress[0]
                 else:
                     self.logger_adapter.critical(logging_messages(135, TLname=self.get_TLname()))
                     self.set_test_end_status("No_TLaddress")
@@ -147,8 +151,8 @@ class SuperVisor(Jenkins):
 
     def create_node_if_not_exists(self):
         if not self.has_node(self.get_TLname()):
-            print "Tworze node"
             self.create_node(self.get_TLname())
+            self.logger_adapter.debug(logging_messages(14, TLname=self.get_TLname()))
 
     def create_node(self, name, num_executors=2, node_description=None,
                     remote_fs='/home/ute', labels=None, exclusive=False):
@@ -173,20 +177,20 @@ class SuperVisor(Jenkins):
             'name': name,
             'type': NODE_TYPE,
             'json': json.dumps({
-            'name': name,
-            'nodeDescription': node_description,
-            'numExecutors': num_executors,
-            'remoteFS': remote_fs,
-            'labelString': labels,
-            'mode': MODE,
-            'type': NODE_TYPE,
-            'retentionStrategy': {'stapler-class': 'hudson.slaves.RetentionStrategy$Always'},
-            'nodeProperties': {'stapler-class-bag': 'true'},
-            'launcher': {'stapler-class': 'hudson.plugins.sshslaves.SSHLauncher',
-                         "host": self.get_TLaddress(),
-                         "port": "22",
-                         "username" : "ute",
-                         "password": "ute2"}
+                'name': name,
+                'nodeDescription': node_description,
+                'numExecutors': num_executors,
+                'remoteFS': remote_fs,
+                'labelString': labels,
+                'mode': MODE,
+                'type': NODE_TYPE,
+                'retentionStrategy': {'stapler-class': 'hudson.slaves.RetentionStrategy$Always'},
+                'nodeProperties': {'stapler-class-bag': 'true'},
+                'launcher': {'stapler-class': 'hudson.plugins.sshslaves.SSHLauncher',
+                             "host": self.get_TLaddress(),
+                             "port": "22",
+                             "username" : "ute",
+                             "password": "ute2"}
             })
         }
         url = self.get_node_url() + "doCreateItem?%s" % urlencode(params)
@@ -201,16 +205,32 @@ class SuperVisor(Jenkins):
     def get_jenkins_connection(self):
         return self
 
+    def get_next_build_number(self):
+        try:
+            return self.job.get_next_build_number()
+        except Exception:
+            self.set_test_end_status("JenkinsError")
+            self.logger_adapter.critical(logging_messages(126, jobname=self.get_jobname()))
+            self.finish_with_failure()
+
     def set_job(self):
         try:
             self.job = self.get_job(self.get_jobname())
-        except:
+        except Exception:
             self.set_test_end_status("JenkinsError")
             self.logger_adapter.critical(logging_messages(125, jobname=self.get_jobname()))
             self.finish_with_failure()
 
     def get_job_output(self):
-        return self.job.get_last_build().get_console()
+        for _ in xrange(5):
+            try:
+                return self.job.get_last_build().get_console()
+            except Exception:
+                pass
+        else:
+            self.set_test_end_status("JenkinsError")
+            self.logger_adapter.critical(logging_messages(137, jobname=self.get_jobname()))
+            self.finish_with_failure()
 
     def get_job_status(self):
         for _ in xrange(5):
@@ -280,6 +300,7 @@ class SuperVisor(Jenkins):
     def is_queued_or_running(self, once=False):
         try:
             while not once:
+
                 if self.job.is_queued_or_running():
                     time.sleep(3)  # TODO LONGER SLEEP LATER
                 else:
@@ -311,9 +332,11 @@ class SuperVisor(Jenkins):
             if job_filenames_failed_tests:
                 return job_filenames_failed_tests
 
-    def findall_test_failes(self):
+    def findall_test_failes(self, output_name):
         regex = r'({}.*)\s\=\W*.*FAIL'.format(self.get_suitname())
-        matches = re.findall(regex, self.get_job_output())
+        matches = re.findall(regex, self.suite_output)
+        if output_name == "golden":
+            matches = re.findall(regex, self.golden_output)
         if matches:
             self.set_are_any_failed_tests(True)
         return matches
@@ -325,10 +348,16 @@ class SuperVisor(Jenkins):
         elif match[-1:] == '_': match = match[:-1]  # cutting last "_"
         return match
 
-    def parse_output_and_set_job_failed_tests(self):
+    def divide_job_output_into_suite_and_golden_part(self):
+        output = self.get_job_output()
+        index = output.find("Elapsed")
+        self.suite_output = output[:index]
+        self.golden_output = output[index:]
+
+    def parse_output_and_set_job_failed_tests(self, output_name):
         job_filenames_failed_tests = []
         try:
-            matches = self.findall_test_failes()
+            matches = self.findall_test_failes(output_name)
             for match in matches:
                 match = self.prepare_output_for_regex_matching(match)
                 regexps = ['\w*\.Tests\.{}.*\.({}.*)'.format(self.get_suitname(), self.get_suitname()),
@@ -345,18 +374,42 @@ class SuperVisor(Jenkins):
         except Exception:
             self.logger_adapter.debug(logging_messages(10, word='did not find', jobname=self.get_jobname()))
         finally:
-            self.set_filenames_of_failed_tests(job_filenames_failed_tests)
-            self.check_output_for_other_fails_or_errors_and_set_test_end_status()
+            if output_name == "golden":
+                return self.parse_golden_suite_output()
 
-    def check_output_for_fails(self):
-        output = self.get_job_output()
+            self.set_filenames_of_failed_tests(job_filenames_failed_tests)
+            self.check_output_for_other_fails_or_errors_and_set_test_end_status(output_name)
+
+    def parse_golden_suite_output(self):
+        output = self.golden_output.split("\n")
+        match = [re.search("passed,\ (\d{0,})\ ", line).group(1) for line in output if re.search("passed,\ (\d{0,})\ ", line)]
+        if match:
+            try:
+                number_of_fails = int(match[len(match)-1])
+                if number_of_fails > 0:
+                    self.set_test_end_status("GOLDEN_FATAL")
+                    supervisor_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+                    supervisor_socket.connect((HOST, PORT))
+                    supervisor_socket.send('request/release_TL={}'.format(self.get_TLname()))
+                else:
+                    return True
+            except ValueError:
+                self.set_test_end_status("GOLDEN_FATAL")
+                return False
+
+    def check_output_for_fails(self, output_name):
+        output = self.suite_output
+        if output_name == "golden":
+            output = self.golden_output
         if not output.find('| FAIL |') == -1:
             self.logger_adapter.debug(logging_messages(11, jobname=self.get_jobname()))
             return True
         return False
 
-    def check_output_for_errors(self):
-        output = self.get_job_output().split('\n')
+    def check_output_for_errors(self, output_name):
+        output = self.suite_output
+        if output_name == "golden":
+            output = self.golden_output.split('\n')
         for line in output:
             if re.findall('\[.ERROR.\].*no tests.*', line):
                 self.write_suitename_to_testsWithoutTag_file_if_no_enable_tag_in_suite()
@@ -366,9 +419,9 @@ class SuperVisor(Jenkins):
                 return True
         return False
 
-    def check_output_for_other_fails_or_errors_and_set_test_end_status(self):
+    def check_output_for_other_fails_or_errors_and_set_test_end_status(self, output_name):
         if not self.get_are_any_failed_tests():
-            if not self.check_output_for_fails() and not self.check_output_for_errors():
+            if not self.check_output_for_fails(output_name) and not self.check_output_for_errors(output_name):
                 self.set_test_end_status("SUCCESSFUL")
                 self.logger_adapter.debug(logging_messages(131, suitename=self.get_suitname()))
             else:
@@ -414,7 +467,7 @@ class SuperVisor(Jenkins):
                 SSHClient = paramiko.SSHClient()
                 SSHClient.load_system_host_keys()
                 SSHClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                SSHClient.connect(self.get_TLaddress(), username='ute', password='ute2')
+                SSHClient.connect(self.get_TLaddress(), username='ute', password='ute')
                 return SSHClient
             except socket.error:
                 self.logger_adapter.warning("SSH Timeout")
@@ -440,7 +493,9 @@ class SuperVisor(Jenkins):
         self.set_filenames_of_failed_tests([tmp_filename_and_path['filename'] for tmp_filename_and_path in tmp_filenames_and_paths])
         return filenames_and_paths
 
-    def remove_tag_from_robots_tests(self):
+    def add_disable_tag_to_robot_tests_files(self):
+        if self.get_suitname() == 'CRT':
+            return
         tmp_filenames_and_paths = self.__get_robot_filenames_and_paths()
         filenames_and_paths = self.__match_filenames_and_paths(tmp_filenames_and_paths)
         SSHClient = self.get_SSHClient_connection()
@@ -593,14 +648,28 @@ class SuperVisor(Jenkins):
             messages.append({'message': _message,
                              'feature': self.get_suitname()})
             subject = "Tests status update - You are slacking"
+
+        elif test_end_status == 'GOLDEN_FATAL':
+            logs_url_address = '{url}/job/{job_name}/{bn}/console'.format(url='http://plkraaa-jenkins.emea.nsn-net.net:8080',
+                                                                          job_name=self.get_jobname(),
+                                                                          bn=self.job.get_last_buildnumber())
+            _message = "Dear admin! \n\n" \
+                       "Golden suite failed on {tl_name}.\n" \
+                       "Please check logs available at: {logs_link} \n\n" \
+                       "Have a nice day!".format(tl_name=self.get_TLname(),
+                                                 logs_link=logs_url_address)
+            messages.append({'message': _message})
+            subject = "Golden suite failed."
         print "test end status = {}\nsubject = {}\n".format(test_end_status, subject)
         return messages, subject
 
-    def send_information_about_executed_job(self):
+    def send_information_about_executed_job(self, send_to_admin=False):
         (messages, subject) = self.set_mail_message_and_subject()
         if messages == 0 and subject == 0:
             return 0
-        if self.get_user_info():
+        if send_to_admin:
+            recipients = admin['mail']
+        elif self.get_user_info():
             recipients = self.get_user_info()['mail']
         else:
             print self.get_suitname()

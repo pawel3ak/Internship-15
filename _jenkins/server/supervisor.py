@@ -51,7 +51,7 @@ def supervise(serverID, reservation_data, parent_dict, jenkins_info, user_info =
     print supervisor_api.check_output_for_other_fails_or_errors_and_get_test_end_status()
 
     # if supervisor_api.are_any_failed_tests :
-        # supervisor_api.remove_tag_from_robots_tests()
+        # supervisor_api.add_disable_tag_to_robot_tests_files()
 
     supervisor_api.send_information_about_executed_job()
 
