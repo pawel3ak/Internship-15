@@ -7,6 +7,8 @@ def logging_messages(*args, **kwargs):
         return "Suite '{}' was removed from testsWithoutTag file".format(kwargs['suitename'])
     elif args[0] == 13:
         return "| ERROR | found in output of '{}'".format(kwargs['jobname'])
+    elif args[0] == 14:
+        return "Creating NODE '{}'".format(kwargs['TLname'])
     elif args[0] == 100:
         return "Created new Supervisor object with args: " \
                "jenkins_info = {}, user_info = {}, TLname = {}".format(kwargs['jenkins'],
@@ -54,6 +56,8 @@ def logging_messages(*args, **kwargs):
         return "Connection to Jenkins failed"
     elif args[0] == 125:
         return "Cannot get job '{}'".format(kwargs['jobname'])
+    elif args[0] == 126:
+        return "Cannot get job '{}' next build number".format(kwargs['jobname'])
     elif args[0] == 128:
         return "SSH Connection Failure"
     elif args[0] == 129:
@@ -72,6 +76,8 @@ def logging_messages(*args, **kwargs):
         return "Cannot get job status '{}'".format(kwargs['jobname'])
     elif args[0] == 136:
         return "Cannot read TLaddress for '{}' from file or file doesn't exists".format(kwargs['TLname'])
+    elif args[0] == 137:
+        return "Cannot get job output '{}'".format(kwargs['jobname'])
     elif args[0] == 1102:
         return "Reservation already exists"
     elif args[0] == 1103:

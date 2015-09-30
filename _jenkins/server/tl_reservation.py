@@ -80,14 +80,14 @@ class TestLineReservation(CloudReservationApi):
 if __name__ == '__main__':
     print 'abc'
     #9:47 (11:47)
-    # for i in range(75891,75963):
+    for i in range(86500, 88000):
     #75891
     #75924
     #75962
-    if True:
+    # if True:
         # i = 75891
-
-        reservation = TestLineReservation(76563)
+        try:
+            reservation = TestLineReservation(i)
     # print reservation.get_available_tl_count_group_by_type()
     # reservation = TestLineReservation(66567)
     # reservation = TestLineReservation(66626)
@@ -96,16 +96,18 @@ if __name__ == '__main__':
     #     print "max user"
     # if not isinstance(id, int):
     #     print "max user"
-        if reservation.get_reservation_details()['user'] == 'app_lmts':
+            if reservation.get_reservation_details()['user'] == 'app_lmts':
     # print reservation.get_address()
-            print reservation.get_reservation_status()
-            # print i
-            print reservation.get_reservation_details()
+                print reservation.get_reservation_status()
+                print i
+        except:
+            pass
+            # print reservation.get_reservation_details()
 
                 # reservation.extend_reservation()
         # print reservation.get_reservation_details()
     # now = datetime.datetime.utcnow()
-            print reservation.release_reservation()
+    #         print reservation.release_reservation()
     # print reservation.get_address()
     # print reservation.get_reservation_status()
     # print reservation.get_reservation_details()

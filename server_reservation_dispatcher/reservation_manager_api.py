@@ -56,6 +56,7 @@ class ReservationManager(CloudReservationApi):
         self.FREETL = 0
         self.RELEASE = False
         self.eNB_Build = None
+
     def handle_client_request_and_response(self, client_socket):
         client_request = client_socket.recv(1024).strip()
         if re.search("request\/get_testline&cloud=(.*)", client_request):
@@ -72,10 +73,21 @@ class ReservationManager(CloudReservationApi):
             client_socket.send(self.delete_TL_from_blacklist_file(client_request))
         elif re.search('eNB_Build=(.*)', client_request):
             client_socket.send(self.set_eNB_build(client_request))
+        elif re.search('request/release_TL=(.*)', client_request):
+            client_socket.send(self.request_release_reservation(client_request))
         else:
             client_socket.send("Unknown command")
 
+    def request_release_reservation(self, client_request):
+        TLname = re.search('request/release_TL=(.*)', client_request)
+        if TLname in self.get_reservation_dictionary():
+            self.release_reservation(TLname)
+            return TLname
+        else:
+            return "Wrong TLname"
+
     def set_eNB_build(self, client_request):
+        print client_request
         self.eNB_Build = re.search('eNB_Build=(.*)', client_request).group(1)
         return self.eNB_Build
 
