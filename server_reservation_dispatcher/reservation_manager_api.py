@@ -8,7 +8,6 @@
 """
 
 from ute_cloud_reservation_api.api import CloudReservationApi
-from ute_cloud_reservation_api.exception import ApiMaxReservationCountExceededException
 import logging
 from utilities.logger_messages import logging_messages
 from utilities.mailing_list import admin
@@ -24,39 +23,31 @@ import re
 import sys
 import copy
 import ConfigParser
+import threading
 
 
 logger = logging.getLogger("server." + __name__)
 logger_adapter = logging.LoggerAdapter(logger, {'custom_name': None})
-HOST = "127.0.0.1"
-PORT = 50010
-SMTP_SERVER_IP = "10.150.129.55"
-
-#######################################################################################
-# temporary
-'''
-from utilities.logger_config import config_logger
-config_logger(logger,'server_config.cfg')
-'''
-########################################################################################
 
 
 class ReservationManager(CloudReservationApi):
     def __init__(self):
-        self.config_file_path = os.path.join('.','server_config.cfg')
+        self.config_file_path = os.path.join('.', 'server_config.cfg')
         self.config = ConfigParser.RawConfigParser()
         self.config.read(self.config_file_path)
-        # super(ReservationManager, self).__init__(api_token='99e66a269e648c9c1a3fb896bec34cd04f50a7d2', api_address='http://cloud.ute.inside.nsn.com')
         super(ReservationManager, self).__init__(
             api_token=self.config.get('ReservationManager', 'api_token'),
             api_address=self.config.get('ReservationManager', 'api_address'))
         self.__reservations_dictionary = {}
-        self.backup_file_path = os.path.join('.','files','ReservationManager','backup.data')
-        self.TL_map_file_path = os.path.join('.','utilities','TL_name_to_address_map.data')
-        self.TL_blacklist_file_path = os.path.join('.','files','ReservationManager','blacklist.data')
+        self.backup_file_path = os.path.join('.', 'files', 'ReservationManager', 'backup.data')
+        self.TL_map_file_path = os.path.join('.', 'utilities', 'TL_name_to_address_map.data')
+        self.TL_blacklist_file_path = os.path.join('.', 'files', 'ReservationManager', 'blacklist.data')
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.socket.bind((HOST, PORT))
+        self.HOST = self.config.get('ReservationManager', 'host_ip')
+        self.PORT = self.config.getint('ReservationManager', 'host_port')
+        self.SMTP_SERVER_IP = self.config.get('ReservationManager', 'smtp_server_ip')
+        self.socket.bind((self.HOST, self.PORT))
         self.socket.listen(5)
         self.outputs = []
         self.MAXTL = self.config.getint('ReservationManager', 'max_tl')
@@ -111,7 +102,7 @@ class ReservationManager(CloudReservationApi):
         TLname = re.search("request\/status_of_\=(.*)", client_request).group(1)
         try:
             status = self.get_reservation_status(TLname)
-            if status <3:
+            if status < 3:
                 return "Preparing"
             elif status > 3:
                 return "Finished"
@@ -129,7 +120,6 @@ class ReservationManager(CloudReservationApi):
         if not TLname == -1:
             self.set_jobname_for_TL_in_dictionary(TLname, jobname=True)
             self.make_backup_file()
-
             return TLname
         else:
             return "No available TL"
@@ -138,7 +128,7 @@ class ReservationManager(CloudReservationApi):
         TLname = re.search("request\/free_testline=(.*)", client_request).group(1)
         if not TLname in self.get_reservation_dictionary():
             return "Testline is not reserved"
-        elif not self.get_reservation_dictionary()[TLname]['job'] :
+        elif not self.get_reservation_dictionary()[TLname]['job']:
             return "Testline is already free"
         else:
             self.set_jobname_for_TL_in_dictionary(TLname)
@@ -149,7 +139,8 @@ class ReservationManager(CloudReservationApi):
         try:
             # ID = (super(ReservationManager, self).create_reservation(testline_type = "CLOUD_F", enb_build=self.eNB_Build, duration = 480))
             # ID = (super(ReservationManager, self).create_reservation(enb_build="FL00_FSM3_9999_151014_025747", testline_type = "CLOUD_L", state="commissioned", duration = 480))
-            ID = (super(ReservationManager, self).create_reservation(enb_build=self.eNB_Build, testline_type = "CLOUD_L", state="commissioned", duration = 480))
+            ID = (
+                super(ReservationManager, self).create_reservation(enb_build=self.eNB_Build, testline_type="CLOUD_L", state="commissioned", duration=480))
             return ID
         except:
             return -103  # User max reservation count exceeded
@@ -162,10 +153,10 @@ class ReservationManager(CloudReservationApi):
             else:
                 TLname = TLinfo['testline']['name']
                 break
-        self.__reservations_dictionary[TLname] = {'id' : ID,
-                                                  'job' : False,
-                                                  'cloud' : self.get_testline_type(ID)
-                                                  }
+        self.__reservations_dictionary[TLname] = {'id': ID,
+                                                  'job': False,
+                                                  'cloud': self.get_testline_type(ID)
+        }
         self.write_TL_address_to_TL_map_file(TLname)
 
     def get_release_flag(self):
@@ -183,7 +174,7 @@ class ReservationManager(CloudReservationApi):
     def get_reservation_dictionary(self):
         return self.__reservations_dictionary
 
-    def set_jobname_for_TL_in_dictionary(self,TLname, jobname=False):
+    def set_jobname_for_TL_in_dictionary(self, TLname, jobname=False):
         self.__reservations_dictionary[TLname]['job'] = jobname
 
     def create_reservation_and_set_TL_info(self):
@@ -219,7 +210,7 @@ class ReservationManager(CloudReservationApi):
         try:
             for TLname in self.get_reservation_dictionary():
                 if not self.get_reservation_dictionary()[TLname]['job'] and \
-                        self.get_reservation_dictionary()[TLname]['cloud'] == cloud and \
+                                self.get_reservation_dictionary()[TLname]['cloud'] == cloud and \
                         self.check_if_TL_not_in_blacklist_file(TLname):
                     status = self.get_reservation_status(TLname)
                     if not status == 3:
@@ -235,29 +226,29 @@ class ReservationManager(CloudReservationApi):
     def get_reservation_status(self, TLname):
         return super(ReservationManager, self).get_reservation_details(self.get_reservation_dictionary()[TLname]['id'])['status']
 
-    def extend_reservation(self,TLname, duration = 40):
+    def extend_reservation(self, TLname, duration=40):
         return super(ReservationManager, self).extend_reservation(
             self.get_reservation_dictionary()[TLname]['id'],
-            duration = duration)
+            duration=duration)
 
     def add_to_blacklist(self, TLname):
-        #since we can't actually block TL, we're extending reservation by max_time == 180min
+        # since we can't actually block TL, we're extending reservation by max_time == 180min
         #sending e-mail to admin and adding_to_our_blacklist_file
         self.extend_reservation(TLname, 180)
         self.write_TLname_to_blacklist_file(TLname)
         try:
             message = "TL {} added to blacklist. Please check it".format(TLname)
             subject = "TL blacklisted"
-            mail = ute_mail.mail.Mail(subject=subject,message=message,
+            mail = ute_mail.mail.Mail(subject=subject, message=message,
                                       recipients=admin['mail'],
                                       name_from="ReservationManager_Api")
-            send = ute_mail.sender.SMTPMailSender(host=SMTP_SERVER_IP)
+            send = ute_mail.sender.SMTPMailSender(host=self.SMTP_SERVER_IP)
             send.connect()
             send.send(mail)
         except:
             logger_adapter.error('{}'.format(logging_messages(1105)))
 
-    def remove_TL_from_reservations_dictionary(self,TLname):
+    def remove_TL_from_reservations_dictionary(self, TLname):
         self.__reservations_dictionary.pop(TLname)
 
     def check_if_TL_reservation_didnt_expire_during_breakdown(self):
@@ -268,12 +259,14 @@ class ReservationManager(CloudReservationApi):
                 self.remove_TL_from_reservations_dictionary(TLname)
                 self.make_backup_file()
 
-    def convert_unicode_to_datetime(self, unicode):
-        date = datetime.datetime.strptime(unicode.split('.')[0],"%Y-%m-%d %H:%M:%S")
+    @staticmethod
+    def convert_unicode_to_datetime(unicode):
+        date = datetime.datetime.strptime(unicode.split('.')[0], '%Y-%m-%d %H:%M:%S')
         return date
 
-    def convert_datetime_to_unicode(self, date):
-        unicode = u'{}'.format(date.strftime("%Y-%m-%d %H:%M:%S"))
+    @staticmethod
+    def convert_datetime_to_unicode(date):
+        unicode = u'{}'.format(date.strftime('%Y-%m-%d %H:%M:%S'))
         return unicode
 
     def get_add_date(self, TLname, convert_unicode_to_datetime=True):
@@ -299,7 +292,7 @@ class ReservationManager(CloudReservationApi):
 
     def check_all_TL_for_extending_or_releasing(self):
         for TLname in self.get_reservation_dictionary().keys():
-            if self.get_reservation_status(TLname) < 3:      #TL not yet prepared
+            if self.get_reservation_status(TLname) < 3:  # TL not yet prepared
                 continue
             elif self.get_reservation_status(TLname) > 3:
                 self.release_reservation(TLname)
@@ -308,12 +301,11 @@ class ReservationManager(CloudReservationApi):
                 self.make_backup_file()
             else:
                 if (self.get_end_date(TLname) -
-                        datetime.datetime.utcnow()).total_seconds() < 60*30:
+                        datetime.datetime.utcnow()).total_seconds() < 60 * 30:
                     self.extend_reservation(TLname)
 
-                elif not self.get_job_from_reservation_dictionary(TLname) and\
-                                (datetime.datetime.utcnow() -
-                                self.get_add_date(TLname)).total_seconds() > 60*60*24:
+                elif not self.get_job_from_reservation_dictionary(TLname) and \
+                                (datetime.datetime.utcnow() - self.get_add_date(TLname)).total_seconds() > 60 * 60 * 24:
                     self.release_reservation(TLname)
                     self.delete_TL_address_from_TL_map_file(TLname)
                     self.remove_TL_from_reservations_dictionary(TLname)
@@ -321,13 +313,13 @@ class ReservationManager(CloudReservationApi):
 
                 if self.get_release_flag():
                     if not self.get_job_from_reservation_dictionary(TLname):
-                        # print "powinienem zwolnic, ale nie"
                         self.release_reservation(TLname)
                         self.delete_TL_address_from_TL_map_file(TLname)
                         self.remove_TL_from_reservations_dictionary(TLname)
                         self.make_backup_file()
 
-    def check_if_file_exists_and_create_if_not(self, path):
+    @staticmethod
+    def check_if_file_exists_and_create_if_not(path):
         if not os.path.exists(path):
             os.mknod(path)
 
@@ -335,7 +327,7 @@ class ReservationManager(CloudReservationApi):
         self.check_if_file_exists_and_create_if_not(self.backup_file_path)
         with open(self.backup_file_path, 'wb') as backup_file:
             for TLname in self.get_reservation_dictionary():
-                backup_file.writelines(json.dumps({TLname : self.get_reservation_dictionary()[TLname]}) + "\n")
+                backup_file.writelines(json.dumps({TLname: self.get_reservation_dictionary()[TLname]}) + "\n")
 
     def read_backup_file(self):
         self.check_if_file_exists_and_create_if_not(self.backup_file_path)
@@ -357,10 +349,10 @@ class ReservationManager(CloudReservationApi):
         self.check_if_file_exists_and_create_if_not(self.TL_map_file_path)
         with open(self.TL_map_file_path, 'rb+') as TL_map_file:
             TL_map = self.create_TL_name_to_address_map_from_file_output(TL_map_file)
-            if not TLname in TL_map:
+            if TLname not in TL_map:
                 TL_map[TLname] = self.get_TL_address_from_ute_reservation_api(TLname)
-            self.clear_file(fd = TL_map_file)
-            [TL_map_file.writelines(json.dumps({TLname : TL_map[TLname]}) + "\n") for TLname in TL_map]
+            self.clear_file(fd=TL_map_file)
+            [TL_map_file.writelines(json.dumps({TLname: TL_map[TLname]}) + "\n") for TLname in TL_map]
 
     def delete_TL_address_from_TL_map_file(self, TLname):
         self.check_if_file_exists_and_create_if_not(self.TL_map_file_path)
@@ -368,8 +360,8 @@ class ReservationManager(CloudReservationApi):
             TL_map = self.create_TL_name_to_address_map_from_file_output(TL_map_file)
             if TLname in TL_map:
                 TL_map.pop(TLname)
-            self.clear_file(fd = TL_map_file)
-            [TL_map_file.writelines(json.dumps({TLname : TL_map[TLname]}) + "\n") for TLname in TL_map]
+            self.clear_file(fd=TL_map_file)
+            [TL_map_file.writelines(json.dumps({TLname: TL_map[TLname]}) + "\n") for TLname in TL_map]
 
     def write_TLname_to_blacklist_file(self, TLname):
         with open(self.TL_blacklist_file_path, "ab") as TL_blacklist_file:
@@ -393,7 +385,7 @@ class ReservationManager(CloudReservationApi):
         return TLname
 
     def check_if_TLaddresses_in_file(self):
-        [self. write_TL_address_to_TL_map_file(TLname) for TLname in self.get_reservation_dictionary()]
+        [self.write_TL_address_to_TL_map_file(TLname) for TLname in self.get_reservation_dictionary()]
 
     def serve(self):
         inputs = [self.socket, sys.stdin]
@@ -413,8 +405,8 @@ class ReservationManager(CloudReservationApi):
                 else:
                     pass
 
+
 def managing_reservations():
-    import threading
     try:
         ReservManager = ReservationManager()
     except socket.error, err:
@@ -427,7 +419,7 @@ def managing_reservations():
     t.setDaemon(True)
     t.start()
     while True:
-        TIME = 60         #how long should I sleep if there is no available TL
+        TIME = 60  # how long should I sleep if there is no available TL
         print "Available TL on Cloud L = {}".format(ReservManager.get_available_tl_count_group_by_type()['CLOUD_L'])
         print "FreeTL = {}".format(ReservManager.FREETL)
         print "Len of dict = {}".format(len(ReservManager.get_reservation_dictionary()))
@@ -435,7 +427,7 @@ def managing_reservations():
         if ReservManager.get_available_tl_count_group_by_type()['CLOUD_L'] > ReservManager.FREETL:
             ReservManager.set_release_flag(False)
             if len(ReservManager.get_reservation_dictionary()) < ReservManager.MAXTL:
-                TIME=0.01
+                TIME = 0.01
                 print "creating reservation..."
                 ReservManager.create_reservation_and_set_TL_info()
                 print ReservManager.get_reservation_dictionary()
