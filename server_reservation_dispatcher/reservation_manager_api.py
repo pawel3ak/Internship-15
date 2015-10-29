@@ -23,6 +23,7 @@ import select
 import re
 import sys
 import copy
+import ConfigParser
 
 
 logger = logging.getLogger("server." + __name__)
@@ -42,7 +43,13 @@ config_logger(logger,'server_config.cfg')
 
 class ReservationManager(CloudReservationApi):
     def __init__(self):
-        super(ReservationManager, self).__init__(api_token='99e66a269e648c9c1a3fb896bec34cd04f50a7d2', api_address='http://cloud.ute.inside.nsn.com')
+        self.config_file_path = os.path.join('.','server_config.cfg')
+        self.config = ConfigParser.RawConfigParser()
+        self.config.read(self.config_file_path)
+        # super(ReservationManager, self).__init__(api_token='99e66a269e648c9c1a3fb896bec34cd04f50a7d2', api_address='http://cloud.ute.inside.nsn.com')
+        super(ReservationManager, self).__init__(
+            api_token=self.config.get('ReservationManager', 'api_token'),
+            api_address=self.config.get('ReservationManager', 'api_address'))
         self.__reservations_dictionary = {}
         self.backup_file_path = os.path.join('.','files','ReservationManager','backup.data')
         self.TL_map_file_path = os.path.join('.','utilities','TL_name_to_address_map.data')
@@ -52,9 +59,9 @@ class ReservationManager(CloudReservationApi):
         self.socket.bind((HOST, PORT))
         self.socket.listen(5)
         self.outputs = []
-        self.MAXTL = 2
-        self.FREETL = 0
-        self.RELEASE = False
+        self.MAXTL = self.config.getint('ReservationManager', 'max_tl')
+        self.FREETL = self.config.getint('ReservationManager', 'free_tl')
+        self._release_flag = False
         self.eNB_Build = None
 
     def handle_client_request_and_response(self, client_socket):
@@ -141,6 +148,7 @@ class ReservationManager(CloudReservationApi):
     def _create_reservation(self):
         try:
             # ID = (super(ReservationManager, self).create_reservation(testline_type = "CLOUD_F", enb_build=self.eNB_Build, duration = 480))
+            # ID = (super(ReservationManager, self).create_reservation(enb_build="FL00_FSM3_9999_151014_025747", testline_type = "CLOUD_L", state="commissioned", duration = 480))
             ID = (super(ReservationManager, self).create_reservation(enb_build=self.eNB_Build, testline_type = "CLOUD_L", state="commissioned", duration = 480))
             return ID
         except:
@@ -159,6 +167,12 @@ class ReservationManager(CloudReservationApi):
                                                   'cloud' : self.get_testline_type(ID)
                                                   }
         self.write_TL_address_to_TL_map_file(TLname)
+
+    def get_release_flag(self):
+        return self._release_flag
+
+    def set_release_flag(self, flag):
+        self._release_flag = flag
 
     def get_testline_type(self, ID):
         return super(ReservationManager, self).get_reservation_details(ID)['testline_type']
@@ -199,7 +213,7 @@ class ReservationManager(CloudReservationApi):
             logger_adapter.error('{}'.format(logging_messages(1104)))
 
     def find_first_free_TL(self, cloud):
-        if self.RELEASE:
+        if self._release_flag:
             return -1
         _TLname = None
         try:
@@ -254,11 +268,11 @@ class ReservationManager(CloudReservationApi):
                 self.remove_TL_from_reservations_dictionary(TLname)
                 self.make_backup_file()
 
-    def convert_unicode_to_datetime(self,unicode):
+    def convert_unicode_to_datetime(self, unicode):
         date = datetime.datetime.strptime(unicode.split('.')[0],"%Y-%m-%d %H:%M:%S")
         return date
 
-    def convert_datetime_to_unicode(self,date):
+    def convert_datetime_to_unicode(self, date):
         unicode = u'{}'.format(date.strftime("%Y-%m-%d %H:%M:%S"))
         return unicode
 
@@ -305,7 +319,7 @@ class ReservationManager(CloudReservationApi):
                     self.remove_TL_from_reservations_dictionary(TLname)
                     self.make_backup_file()
 
-                if self.RELEASE:
+                if self.get_release_flag():
                     if not self.get_job_from_reservation_dictionary(TLname):
                         # print "powinienem zwolnic, ale nie"
                         self.release_reservation(TLname)
@@ -413,21 +427,23 @@ def managing_reservations():
     t.setDaemon(True)
     t.start()
     while True:
-        TIME=20
+        TIME = 60         #how long should I sleep if there is no available TL
         print "Available TL on Cloud L = {}".format(ReservManager.get_available_tl_count_group_by_type()['CLOUD_L'])
         print "FreeTL = {}".format(ReservManager.FREETL)
         print "Len of dict = {}".format(len(ReservManager.get_reservation_dictionary()))
         print "MAXTL = {}".format(ReservManager.MAXTL)
         if ReservManager.get_available_tl_count_group_by_type()['CLOUD_L'] > ReservManager.FREETL:
-            ReservManager.RELEASE = False
+            ReservManager.set_release_flag(False)
             if len(ReservManager.get_reservation_dictionary()) < ReservManager.MAXTL:
                 TIME=0.01
                 print "creating reservation..."
                 ReservManager.create_reservation_and_set_TL_info()
                 print ReservManager.get_reservation_dictionary()
                 ReservManager.make_backup_file()
+        elif ReservManager.get_available_tl_count_group_by_type()['CLOUD_L'] == ReservManager.FREETL:
+            pass
         else:
-            ReservManager.RELEASE = True
+            ReservManager.set_release_flag(True)
         ReservManager.check_all_TL_for_extending_or_releasing()
         time.sleep(TIME)
 
