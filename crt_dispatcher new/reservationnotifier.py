@@ -2,60 +2,76 @@
 CRT Dispatcher website:
 https://confluence.int.net.nokia.com/display/RUFF/CRT+Dispatcher
 """
-from ute_cloud_common_api.exception import ApiParametersValidationFailException
-from ute_cloud_reservation_api import api
-from crt_dispatcher.logger import Logger
-from crt_dispatcher.messages.reservationready import ReservationReady
-from crt_dispatcher.tmp.config import reservation_credentials
-from time import sleep
-import socket
-from crt_dispatcher.tmp.decorators import suppress_warnings
+from datetime import datetime
 
-__author__ = 'gtqk84 Michal Plichta'
+import SocketServer
+from ute_cloud_common_api.exception import ApiParametersValidationFailException
+from crt_dispatcher.logger_new import Logger
+from crt_dispatcher.messages.reservationready import ReservationReady
+from time import sleep
+from crt_dispatcher.tmp.decorators import suppress_insecure_platform_warnings
+from messages.reservationcrashed import ReservationCrashed
+from ute_cloud_proxy import UteCloudProxy
+
+__author__ = 'Pawel Tarsa'
 __copyright__ = 'Copyright 2015, Nokia'
-__version__ = '2015-11-17'
-__maintainer__ = 'gtqk84 Michal Plichta'
-__email__ = 'gtqk84@nokia.com'
+__version__ = '2015-11-23'
+__maintainer__ = 'Pawel Tarsa'
+__email__ = 'pawel.tarsa@nokia.com'
 
 
 class ReservationReadyNotifier(object):
+    """
+    Used in:
+        Nowhere, it is stand-alone part.
 
-    def __init__(self, reservation):
-        self._cloud_reservation_manager = api.CloudReservationApi(api_token=reservation_credentials['token'])
+    :param giveup_timeout: Number of minutes after which creating actions will be cancelled, and environment will be cleaned.
+    :param reservation: Reservation object which contains all necessary information to make reservation
+    :return:
+        1. Positive case: Reservation object with filled items like: add_date, reservation_id etc.
+        2. Negative case (e.g. Api exception) Reservation object with set on True item 'reservation_failed'
+    """
+    TESTLINE_STATUS_CHECKING_INTERVAL = 60
+
+    def __init__(self, reservation, giveup_timeout=180):
+        self._giveup_timeout = giveup_timeout
+        self._start_time = None
+        self._ute_cloud_proxy = UteCloudProxy()
         self._reservation = reservation
-        self._log_prefix = " (ReservationReadyNotifier) "
+        self._logger = Logger(name="reservation_ready_notifier")
 
-    @suppress_warnings
+    @suppress_insecure_platform_warnings
     def run(self):
-        print("RUN %s" % self._reservation)
+        self._logger.info("Run %s" % self._reservation)
         try:
-            reservation_id = self._cloud_reservation_manager.create_reservation(testline_type=self._reservation.tl_type,
-                                                                            enb_build=self._reservation.enb_build_name,
-                                                                            ute_build=None,
-                                                                            sysimage_build=None,
-                                                                            robotlte_revision=None,
-                                                                            state=None,
-                                                                            duration=None)
-            while self._cloud_reservation_manager.get_reservation_status(reservation_id).encode('utf-8') != ('Confirmed' and 'Canceled'):
-                print self._cloud_reservation_manager.get_reservation_details(reservation_id)
-                sleep(60)
-                self._reservation['reservation_id'] = reservation_id
-            #TODO if canceled then return none or sth like that
-            print self._cloud_reservation_manager.get_reservation_details(reservation_id)
-            self._reservation.reservation_id = reservation_id
+            #return renewal reservation
+            self._start_time = datetime.now()
+            self._reservation = self._ute_cloud_proxy.create_reservation(reservation=self._reservation)
+            if self._reservation.reservation_failed:
+                self._logger.warning("Reservation failed. I know that here should be a reason and identifier but there isn't:\(")
+                return ReservationCrashed(reservation=self._reservation)
+            self._wait_until_testline_will_be_ready_to_use_or_time_goes_off()
+            return ReservationReady(reservation=self._reservation)
         except ApiParametersValidationFailException as e:
-            print "ApiParametersValidationFailException"
-            print e
-            raise
+            self._logger.info(e.type + e.message)
+            return ReservationCrashed(reservation=self._reservation)  #TODO set reason why crashed
         except UnboundLocalError as e:
-            print "UnboundLocalError"
-            print e
+            self._logger.error(str(e))
             raise
         except Exception as e:
-            print e
-            self._cloud_reservation_manager.release_reservation(reservation_id=reservation_id)
-        return ReservationReady(reservation=self._reservation)
+            self._logger.error(str(e))
+            self._ute_cloud_proxy.cancel_reservation(reservation=self._reservation)
 
-    def _log(self, message, *args, **kwargs):
-        Logger.debug(" [ReservationReadyNotifier] " + message, *args, **kwargs)
+    def _wait_until_testline_will_be_ready_to_use_or_time_goes_off(self):
+        while not (self._ute_cloud_proxy.is_reservation_canceled(self._reservation) or
+                   self._ute_cloud_proxy.is_reservation_finished(self._reservation)):
+            self._logger.info(self._ute_cloud_proxy.get_reservation_details(self._reservation))
+            if self._ute_cloud_proxy.is_reservation_ready(self._reservation):
+                break
+            if self._is_giveup_timeout_reached():
+                break
+            sleep(ReservationReadyNotifier.TESTLINE_STATUS_CHECKING_INTERVAL)
 
+    def _is_giveup_timeout_reached(self):
+        time_delta = datetime.now() - self._start_time
+        return True if time_delta.seconds > self._giveup_timeout*60 else False

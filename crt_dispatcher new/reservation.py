@@ -13,10 +13,6 @@ __email__ = 'gtqk84@nokia.com'
 
 class Reservation(InternalMessage):
 
-    @property
-    def description(self):
-        return " (Reservation) "
-
     def __init__(self, enb_build_name=None, tl_type=None, priority=0, tl_name=None, reservation_id=None, tl_hostname=None, *arg, **kwargs):
         """
         Contains data regarding reservation test line in cloud and it use widly in crt dispatcher.
@@ -43,8 +39,13 @@ class Reservation(InternalMessage):
         self['tl_hostname'] = tl_hostname
         self['priority'] = priority
         self['extend_for'] = 60
+        self['password'] = None
         self['testline_address'] = None
         self['testline_name'] = None
+        self['add_date'] = None
+        self['start_date'] = None
+        self['end_date'] = None
+        self['reservation_failed'] = False
         if kwargs is not None:
             for key, val in kwargs.items():
                 self[key] = val
@@ -59,8 +60,14 @@ class Reservation(InternalMessage):
     def __cmp__(self, other):
         return cmp(other['priority'], self['priority'])
 
+    def __eq__(self, other):
+        return self['tl_type'] == other['tl_type'] and \
+               self['tl_name'] == other['tl_name'] and \
+               self['reservation_id'] == other['reservation_id'] and \
+               self['enb_build_name'] == other['enb_build_name']
+
     def __str__(self):
-        return self.description +\
+        return 'Reservation' +\
                ' eNB build: ' + self['enb_build_name'] +\
                ' priority: ' + str(self['priority']) +\
                ' reservation_id: ' + (str(self['reservation_id']) if self['reservation_id'] else 'None')

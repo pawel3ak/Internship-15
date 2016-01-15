@@ -5,11 +5,9 @@ https://confluence.int.net.nokia.com/display/RUFF/CRT+Dispatcher
 from ute_cloud_common_api.exception import ApiParametersValidationFailException
 
 from crt_dispatcher.messages.reservation import Reservation
-from crt_dispatcher.messages.reservationready import ReservationReady
 from crt_dispatcher.reservationnotifier import ReservationReadyNotifier
 from concurrent.futures import ThreadPoolExecutor
-from ute_cloud_reservation_api import api
-from logger import Logger
+from logger_new import Logger
 from time import sleep
 from Queue import PriorityQueue
 import json
@@ -17,6 +15,7 @@ import config
 import re
 
 from tmp.udp_server import UDP_server
+from crt_dispatcher.ute_cloud_proxy import UteCloudProxy
 
 __author__ = 'Pawel Tarsa'
 __copyright__ = 'Copyright 2015, Nokia'
@@ -25,15 +24,8 @@ __maintainer__ = 'Pawel Tarsa'
 __email__ = 'pawel.tarsa@nokia.com'
 
 
-class ReservationManager(object):
 
-    @property
-    def thread_pool_exec_description(self):
-        return " (ThreadPoolExecutor) "
-
-    @property
-    def reservation_mgr_description(self):
-        return " (ReservationManager) "
+class ReservationManager(object): #TODO actualization reserved_testlines
 
     def __init__(self):
         """
@@ -47,7 +39,7 @@ class ReservationManager(object):
         super(ReservationManager, self).__init__()
         configuration = config.ReservationManager
         self._server_handler = self._create_reservation_manager_handler()
-        self._reservation_manager = api.CloudReservationApi(api_token=configuration['api_token'])
+        self._ute_cloud_proxy = UteCloudProxy()
         self._server_udp = UDP_server(server_host=configuration['host_ip'],
                                       server_port=configuration['host_port'],
                                       handler=self._server_handler)
@@ -55,6 +47,7 @@ class ReservationManager(object):
         self._max_number_of_tl_available_for_usage = configuration['max_tl']
         self._max_executor_workers = 10  # configuration['max_tl']
         self._reserved_testlines = []
+        self._logger = Logger(name="reservation_manager")
 
     def run(self):
         """ Start all reservation manager actions.
@@ -90,82 +83,88 @@ class ReservationManager(object):
             assert message is not None
         except:
             return
-        msg_type = message['msg_type'].split('.')[0].encode('utf-8')
-        reservation = Reservation(**message['reservation'])
-        Logger.debug("Message with highest priority " + str(message))
+        msg_type = self._get_message_type_from_message(message)
+        reservation = self._get_reservation_from_message(message)
+        self._logger.debug("Message with highest priority " + str(message))
         if msg_type == "createreservation":
             self._try_to_reserve_new_testline(executor=executor, reservation=reservation)
-        if msg_type == "releasereservation":
-            self._release_reservation(reservation=reservation)
+            return
         if msg_type == "extendreservation":
             self._extend_reservation(reservation)
+            return
+        if msg_type == "diagnosticreservation":
+            self._logger.info("Diagnostic case. Only 4 tests.")
+            return
+        if msg_type == "releasereservation" and len(self._reserved_testlines) > 0:   #TODO it is under comment only becouse I want to clean environ
+            self._release_reservation(reservation=reservation)
+            return
+        else: #TODO sth strange here? Why I've added this case?
+            self._logger.warning("Releasing reservation failed. There are no reserved testlines."
+                      " You should try cancel ongoing reservation")
 
     def _try_to_reserve_new_testline(self, executor, reservation):
-        self.debug("Creating reservation...")
-        notifier = ReservationReadyNotifier(Reservation(**reservation))
+        self._logger.debug("Creating reservation...")
+        notifier = self._get_new_reservation_notifier(reservation=reservation)
         executor.submit(notifier.run).add_done_callback(self._update_queues_and_send_confirmation_to_test_scheduler)
-        self.debug("Reservation created.")
+        self._logger.debug("Reservation created.")
+
+    def _get_message_type_from_message(self, message):
+        return message['msg_type'].split('.')[0].encode('utf-8')
+
+    def _get_reservation_from_message(self, message):
+        return Reservation(**message['reservation'])
+
+    def _get_new_reservation_notifier(self, reservation):
+        return ReservationReadyNotifier(Reservation(**reservation))
 
     def _release_reservation(self, reservation):
-        self.debug("Releasing reservation...")
+        self._logger.debug("Releasing reservation...")
         try:
-            id = self._reservation_manager.release_reservation(reservation_id=reservation.reservation_id)
-            self.info(str(id))
-            self._reserved_testlines.remove(reservation)
-            self.debug("Reservation %d released." % id)
+            released_reservation = self._ute_cloud_proxy.release_reservation_and_get_them(reservation=reservation)
+            self._reserved_testlines.remove(released_reservation)
+            self._logger.debug("Reservation %s released." % reservation)
         except ApiParametersValidationFailException as e:
-            self.error(str(e))
+            self._logger.error(str(e))
         except ValueError as ve:
-            self.warn(str(ve))
+            self._logger.ing(str(ve))
         except Exception as e:
-            self.error(str(e))
-
+            self._logger.error("Exception in _release_reservation method: " + str(e))
 
     def _extend_reservation(self, reservation):
-        self.debug("Extending reservation...")
+        self._logger.debug("Extending reservation...")
         try:
-            id = self._reservation_manager.extend_reservation(reservation_id=reservation.reservation_id,
-                                                              duration=reservation.extend_for)
-            self.debug("Reservation %d extended." % id)
+            extended_reservation = self._ute_cloud_proxy.extend_reservation(reservation=reservation)
+            self._update_reserved_testlines(updated_reservation=extended_reservation)
         except ApiParametersValidationFailException as e:
-            self.error(str(e))
+            self._logger.error(str(e))
         except Exception as e:
-            self.debug(e)
+            self._logger.debug(e)
 
     def _update_queues_and_send_confirmation_to_test_scheduler(self, future):
         task_result = future._result
-        if isinstance(task_result, ReservationReady):
+        if 'reservationready' in str(type(task_result)):   # sth wrong in this place
+        # if isinstance(task_result, ReservationReady.__class__):
             self._reserved_testlines.append(task_result['reservation'])
-            self.debug("READY TL NOTIFICATIONS " + str(self._reserved_testlines))
+            self._logger.debug("Reservation ready: " + str(self._reserved_testlines))
             #TODO sending confirmation message to test scheduler.
             # self._server_udp.send(ReservationReady(Reservation(task_result['reservation'])))
+        if 'reservationcrashed' in str(type(task_result)):
+            raise NotImplementedError
+
+    def _send_confirmation_to_test_scheduler(self):
+        raise NotImplementedError
+
+    def _update_reserved_testlines(self, updated_reservation):
+        self._reserved_testlines = [updated_reservation if updated_reservation.reservation_id == reservation.reservation_id else reservation for reservation in self._reserved_testlines]
 
     def _create_reservation_manager_handler(self):
-        return ReservationManager.ReservationManagerHandler(self)
+        return ReservationManager._ReservationManagerHandler(self)
 
-    def error(self, message, *args, **kwargs):
-        """ Wrapper for common logger (to guarantee potential easy change common logger or add some additional options e.g. choose debug level) """
-        Logger.error(message, *args, **kwargs)
 
-    def warn(self, message, *args, **kwargs):
-        """ Wrapper for common logger. Same as above """
-        Logger.warn(self.reservation_mgr_description + message, *args, **kwargs)
-
-    def debug(self, message, *args, **kwargs):
-        """ Wrapper for common logger. Same as above """
-        Logger.debug(self.reservation_mgr_description + message, *args, **kwargs)
-
-    def info(self, message, *args, **kwargs):
-        """ Wrapper for common logger. Same as above """
-        Logger.info(self.reservation_mgr_description + message, *args, **kwargs)
-
-    class ReservationManagerHandler(object):
+    class _ReservationManagerHandler(object):
         """
             Custom Handler used only in ReservationManager.
         """
-        @property
-        def description(self):
-            return " (ReservationManagerHandler) "
 
         def __init__(self, outer_instance):
             ''' It guard from situation in which nested class is created, but outer not. Factory-method used.
@@ -177,14 +176,9 @@ class ReservationManager(object):
         def _handle(self, message):
             try:
                 message = json.loads(message)
-                if re.match("create|release|extend", message['msg_type']):
+                if re.match("create|release|extend|diagnostic", message['msg_type']):
                     self._outer_instance._messages_queue.put(message)
                 else:
-                    Logger.info("Messages does not transport information about class. It is only dict")
+                    self._outer_instance._logger.info("Messages does not transport information about class. It is only dict")
             except Exception as e:
-                Logger.info(self.description + e.message)
-
-if __name__ == '__main__':
-    rm = ReservationManager()
-    rm.run()
-
+                self._outer_instance._logger.info(self.description + e.message)
